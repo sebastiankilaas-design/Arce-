@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arce — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F8F7F3;--bg2:#F0EEE9;--bg3:#E8E5DE;
+  --white:#FDFCF9;--ink:#17161300;
+  --ink:#171613;--ink2:#3A3834;--ink3:#6A6760;--ink4:#9E9B96;
+  --f:#0A4A38;--f2:#0D5C48;--f3:#0F6E57;
+  --fl:#EAF2EE;--fm:#B6D3C9;--fd:rgba(10,74,56,.07);
+  --gold:#C49A3C;--gl:#F5EDD6;
+  --red:#C0392B;--rl:#FEF0EE;--rm:#F5C6C2;
+  --blue:#1E40AF;--bl:#EEF2FF;--bm:#C7D2FE;
+  --amber:#92400E;--al:#FEF3C7;--am:#FDE68A;
+  --border:#E0DDD6;--border2:#CCC9C1;
+  --sh:0 1px 2px rgba(23,22,19,.06),0 3px 12px rgba(23,22,19,.05);
+  --sh2:0 4px 16px rgba(23,22,19,.08),0 20px 60px rgba(23,22,19,.07);
+  --serif:'Instrument Serif',Georgia,serif;
+  --sans:'Plus Jakarta Sans',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+  --sidebar:240px;
+}
+
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-weight:300;display:flex;font-size:14px}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  width:var(--sidebar);flex-shrink:0;
+  background:var(--white);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;height:100vh;overflow:hidden;
+  position:relative;z-index:10;
+}
+.sb-top{padding:1.25rem 1.1rem 0}
+.sb-logo{display:flex;align-items:center;gap:8px;text-decoration:none;margin-bottom:1.75rem}
+.sb-logo-text{font-family:var(--serif);font-size:1.25rem;color:var(--ink);font-style:italic}
+.sb-logo-text span{color:var(--f2)}
+
+.sb-section{padding:0 .75rem;margin-bottom:1.5rem}
+.sb-section-label{font-family:var(--mono);font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink4);padding:.25rem .5rem;margin-bottom:.35rem}
+.sb-nav{list-style:none;display:flex;flex-direction:column;gap:1px}
+.sb-nav a{
+  display:flex;align-items:center;gap:.65rem;padding:.55rem .75rem;
+  border-radius:6px;text-decoration:none;font-size:.82rem;font-weight:400;
+  color:var(--ink3);transition:all .15s;
+}
+.sb-nav a:hover{background:var(--bg);color:var(--ink)}
+.sb-nav a.active{background:var(--fd);color:var(--f2);font-weight:500}
+.sb-nav a.active .nav-icon{color:var(--f2)}
+.nav-icon{font-size:.9rem;width:16px;text-align:center;flex-shrink:0;color:var(--ink4)}
+.nav-badge{margin-left:auto;background:var(--f2);color:#fff;font-family:var(--mono);font-size:.58rem;padding:1px 6px;border-radius:100px}
+.nav-badge.amber{background:var(--amber);color:#fff}
+
+.sb-divider{height:1px;background:var(--border);margin:.75rem 1.1rem}
+
+.sb-bottom{margin-top:auto;padding:1rem 1.1rem;border-top:1px solid var(--border)}
+.sb-user{display:flex;align-items:center;gap:.65rem}
+.sb-avatar{width:32px;height:32px;border-radius:50%;background:var(--fl);border:1px solid var(--fm);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:600;color:var(--f2);flex-shrink:0}
+.sb-user-info{flex:1;min-width:0}
+.sb-user-name{font-size:.8rem;font-weight:500;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-user-plan{font-family:var(--mono);font-size:.6rem;color:var(--ink4)}
+.sb-user-btn{color:var(--ink4);cursor:pointer;font-size:.85rem;padding:.2rem;border-radius:4px;transition:color .15s}
+.sb-user-btn:hover{color:var(--ink)}
+
+/* ── MAIN ── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+
+/* TOPBAR */
+.topbar{
+  height:56px;border-bottom:1px solid var(--border);
+  background:var(--white);display:flex;align-items:center;
+  padding:0 1.75rem;gap:1rem;flex-shrink:0;
+}
+.topbar-title{font-family:var(--serif);font-size:1.1rem;font-style:italic;color:var(--ink)}
+.topbar-title span{color:var(--f2)}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:.65rem}
+.tb-btn{
+  display:flex;align-items:center;gap:.4rem;padding:.45rem .9rem;
+  border-radius:6px;font-family:var(--sans);font-size:.78rem;font-weight:500;
+  cursor:pointer;border:none;transition:all .15s;
+}
+.tb-btn-ghost{background:transparent;color:var(--ink3);border:1px solid var(--border2)}
+.tb-btn-ghost:hover{background:var(--bg);color:var(--ink)}
+.tb-btn-primary{background:var(--f2);color:#fff}
+.tb-btn-primary:hover{background:var(--f3)}
+.tb-notif{position:relative;width:32px;height:32px;border:1px solid var(--border);border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:transparent;color:var(--ink3);font-size:.9rem;transition:all .15s}
+.tb-notif:hover{background:var(--bg)}
+.tb-notif-dot{position:absolute;top:6px;right:6px;width:6px;height:6px;background:var(--red);border-radius:50%;border:1.5px solid var(--white)}
+.live-badge{display:flex;align-items:center;gap:5px;background:var(--fl);border:1px solid var(--fm);border-radius:100px;padding:.25rem .65rem;font-family:var(--mono);font-size:.6rem;color:var(--f2)}
+.live-dot{width:5px;height:5px;background:var(--f3);border-radius:50%;animation:pulse 2s ease infinite}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(15,110,87,.5)}70%{opacity:.7;box-shadow:0 0 0 5px rgba(15,110,87,0)}}
+
+/* CONTENT AREA */
+.content{flex:1;overflow-y:auto;padding:1.75rem}
+.content::-webkit-scrollbar{width:4px}
+.content::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* VIEWS */
+.view{display:none}
+.view.active{display:block;animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* STAT CARDS */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem}
+.stat-card{
+  background:var(--white);border:1px solid var(--border);border-radius:10px;
+  padding:1.1rem 1.25rem;box-shadow:var(--sh);
+}
+.stat-label{font-size:.72rem;color:var(--ink4);margin-bottom:.5rem;display:flex;align-items:center;justify-content:space-between}
+.stat-icon{font-size:.85rem}
+.stat-val{font-family:var(--serif);font-size:1.9rem;font-style:italic;color:var(--ink);line-height:1;margin-bottom:.3rem;letter-spacing:-.02em}
+.stat-delta{font-size:.72rem;display:flex;align-items:center;gap:4px}
+.delta-up{color:var(--f2)}
+.delta-down{color:var(--red)}
+.delta-neutral{color:var(--ink4)}
+
+/* GRID 2-COL */
+.grid2{display:grid;grid-template-columns:1.4fr 1fr;gap:1rem;margin-bottom:1rem}
+.grid2-eq{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
+
+/* CARD */
+.card{background:var(--white);border:1px solid var(--border);border-radius:10px;box-shadow:var(--sh);overflow:hidden}
+.card-head{padding:.9rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.card-title{font-size:.82rem;font-weight:500;color:var(--ink)}
+.card-action{font-size:.74rem;color:var(--f2);cursor:pointer;text-decoration:none;transition:color .15s}
+.card-action:hover{color:var(--f3)}
+
+/* LEADS TABLE */
+.leads-table{width:100%;border-collapse:collapse}
+.leads-table th{padding:.6rem 1.25rem;text-align:left;font-size:.68rem;font-family:var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink4);border-bottom:1px solid var(--border);font-weight:400;background:var(--bg)}
+.leads-table td{padding:.75rem 1.25rem;border-bottom:1px solid var(--border);font-size:.8rem;color:var(--ink2);vertical-align:middle}
+.leads-table tr:last-child td{border-bottom:none}
+.leads-table tr:hover td{background:var(--bg)}
+.lead-name{font-weight:500;color:var(--ink);display:flex;align-items:center;gap:.5rem}
+.lead-av{width:26px;height:26px;border-radius:50%;background:var(--bg2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:600;color:var(--ink3);flex-shrink:0}
+
+/* STATUS PILLS */
+.pill{display:inline-flex;align-items:center;gap:4px;padding:.2rem .6rem;border-radius:100px;font-size:.67rem;font-family:var(--mono);white-space:nowrap}
+.pill::before{content:'';width:5px;height:5px;border-radius:50%}
+.pill-active{background:var(--fl);color:var(--f2);border:1px solid var(--fm)}.pill-active::before{background:var(--f3)}
+.pill-booked{background:var(--bl);color:var(--blue);border:1px solid var(--bm)}.pill-booked::before{background:var(--blue)}
+.pill-waiting{background:var(--al);color:var(--amber);border:1px solid var(--am)}.pill-waiting::before{background:var(--amber)}
+.pill-lost{background:var(--rl);color:var(--red);border:1px solid var(--rm)}.pill-lost::before{background:var(--red)}
+
+/* MINI CHART */
+.chart-bars{display:flex;align-items:flex-end;gap:4px;height:60px;padding:.5rem 0}
+.bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px}
+.bar{width:100%;border-radius:3px 3px 0 0;background:var(--fd);transition:background .15s;cursor:default;min-height:4px}
+.bar.filled{background:var(--f2)}
+.bar:hover{background:var(--f3)!important}
+.bar-label{font-family:var(--mono);font-size:.55rem;color:var(--ink4)}
+
+/* APPOINTMENTS */
+.appt-list{display:flex;flex-direction:column}
+.appt-item{padding:.85rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.85rem;transition:background .15s}
+.appt-item:last-child{border-bottom:none}
+.appt-item:hover{background:var(--bg)}
+.appt-time-col{min-width:72px}
+.appt-date{font-family:var(--mono);font-size:.65rem;color:var(--ink4)}
+.appt-time{font-size:.82rem;font-weight:500;color:var(--ink);font-family:var(--mono)}
+.appt-info{flex:1}
+.appt-name{font-size:.82rem;font-weight:500;color:var(--ink)}
+.appt-meta{font-size:.74rem;color:var(--ink4);margin-top:.1rem}
+.appt-channel{font-size:.7rem;font-family:var(--mono);color:var(--ink4)}
+.appt-actions{display:flex;gap:.4rem}
+.appt-btn{padding:.3rem .65rem;border-radius:5px;font-size:.72rem;font-weight:500;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--ink3);font-family:var(--sans);transition:all .15s}
+.appt-btn:hover{background:var(--bg2);color:var(--ink)}
+.appt-btn.danger:hover{background:var(--rl);color:var(--red);border-color:var(--rm)}
+
+/* CHANNEL INDICATOR */
+.ch-badge{display:inline-flex;align-items:center;gap:3px;font-size:.66rem;font-family:var(--mono);color:var(--ink4)}
+
+/* AI CONVERSATION PREVIEW */
+.conv-preview{padding:1.1rem 1.25rem;display:flex;flex-direction:column;gap:.75rem}
+.conv-msg{display:flex;flex-direction:column;gap:.2rem}
+.conv-sender{font-size:.65rem;font-family:var(--mono);color:var(--ink4);text-transform:uppercase;letter-spacing:.07em}
+.conv-text{font-size:.8rem;color:var(--ink2);line-height:1.55;background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:.55rem .75rem}
+.conv-text.ai-msg{background:var(--fd);border-color:var(--fm);color:var(--ink)}
+.conv-time{font-size:.62rem;font-family:var(--mono);color:var(--ink4);align-self:flex-end}
+
+/* PERFORMANCE RINGS */
+.perf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;padding:1.1rem 1.25rem}
+.perf-item{display:flex;flex-direction:column;align-items:center;gap:.5rem}
+.ring-wrap{position:relative;width:64px;height:64px}
+.ring-svg{transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:var(--border);stroke-width:5}
+.ring-fill{fill:none;stroke-width:5;stroke-linecap:round;transition:stroke-dashoffset .8s ease}
+.ring-val{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.72rem;font-weight:500;color:var(--ink)}
+.perf-label{font-size:.7rem;color:var(--ink3);text-align:center;line-height:1.35}
+
+/* ONBOARDING CHECKLIST */
+.checklist{padding:.75rem 1.25rem;display:flex;flex-direction:column;gap:0}
+.check-item{display:flex;align-items:center;gap:.85rem;padding:.7rem 0;border-bottom:1px solid var(--border)}
+.check-item:last-child{border-bottom:none}
+.check-box{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.7rem}
+.check-box.done{background:var(--f2);border-color:var(--f2);color:#fff}
+.check-box.pending{background:var(--al);border-color:var(--am);color:var(--amber)}
+.check-text{flex:1;font-size:.8rem;color:var(--ink2)}
+.check-text.done-text{color:var(--ink4);text-decoration:line-through}
+.check-link{font-size:.74rem;color:var(--f2);cursor:pointer;white-space:nowrap}
+
+/* LEAD DETAIL PANEL */
+.panel-overlay{position:fixed;inset:0;background:rgba(23,22,19,.35);z-index:200;display:none;align-items:flex-start;justify-content:flex-end}
+.panel-overlay.open{display:flex}
+.side-panel{
+  width:480px;height:100vh;background:var(--white);border-left:1px solid var(--border);
+  display:flex;flex-direction:column;box-shadow:-8px 0 40px rgba(23,22,19,.1);
+  animation:slideIn .25s ease;
+}
+@keyframes slideIn{from{transform:translateX(40px);opacity:0}to{transform:translateX(0);opacity:1}}
+.panel-head{padding:1.1rem 1.4rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.panel-close{width:28px;height:28px;border:1px solid var(--border);border-radius:5px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink4);font-size:1rem;transition:all .15s}
+.panel-close:hover{background:var(--bg);color:var(--ink)}
+.panel-body{flex:1;overflow-y:auto;padding:1.25rem 1.4rem;display:flex;flex-direction:column;gap:1.1rem}
+.panel-section-label{font-size:.65rem;font-family:var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--ink4);margin-bottom:.5rem}
+.panel-row{display:flex;align-items:center;justify-content:space-between;padding:.5rem 0;border-bottom:1px solid var(--border)}
+.panel-row:last-child{border-bottom:none}
+.panel-key{font-size:.78rem;color:var(--ink3)}
+.panel-val{font-size:.8rem;color:var(--ink);font-weight:400}
+
+/* AI CHAT (lead panel) */
+.ai-chat{display:flex;flex-direction:column;gap:.6rem;max-height:280px;overflow-y:auto}
+.ai-chat::-webkit-scrollbar{width:3px}
+.ai-chat::-webkit-scrollbar-thumb{background:var(--border2)}
+.msg-row{display:flex;flex-direction:column;gap:.15rem}
+.msg-who{font-size:.62rem;font-family:var(--mono);color:var(--ink4);text-transform:uppercase;letter-spacing:.07em}
+.msg-bubble{font-size:.79rem;line-height:1.55;padding:.5rem .75rem;border-radius:8px}
+.msg-bubble.them{background:var(--bg2);border:1px solid var(--border);color:var(--ink2)}
+.msg-bubble.ai{background:var(--fd);border:1px solid var(--fm);color:var(--ink)}
+.msg-time{font-size:.6rem;color:var(--ink4);font-family:var(--mono);align-self:flex-end}
+
+/* AI INPUT IN PANEL */
+.panel-input-wrap{border-top:1px solid var(--border);padding:1rem 1.4rem;display:flex;gap:.5rem;flex-shrink:0}
+.panel-input{flex:1;background:var(--bg);border:1px solid var(--border2);border-radius:7px;padding:.6rem .85rem;font-family:var(--sans);font-size:.8rem;color:var(--ink);outline:none;transition:border-color .15s}
+.panel-input:focus{border-color:var(--f2);background:var(--white)}
+.panel-send{background:var(--f2);color:#fff;border:none;border-radius:6px;padding:.6rem .9rem;font-family:var(--sans);font-size:.78rem;font-weight:500;cursor:pointer;transition:background .15s}
+.panel-send:hover{background:var(--f3)}
+.panel-send:disabled{background:var(--border2);cursor:not-allowed}
+
+/* LOADING */
+.typing-indicator{display:flex;gap:4px;align-items:center;padding:.45rem .75rem;background:var(--fd);border:1px solid var(--fm);border-radius:8px;width:fit-content}
+.typing-indicator span{width:5px;height:5px;background:var(--f3);border-radius:50%;animation:bounce 1.1s ease infinite}
+.typing-indicator span:nth-child(2){animation-delay:.15s}
+.typing-indicator span:nth-child(3){animation-delay:.3s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+
+/* SETTINGS */
+.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.setting-card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:1.25rem;box-shadow:var(--sh)}
+.setting-card h3{font-size:.85rem;font-weight:500;color:var(--ink);margin-bottom:.35rem}
+.setting-card p{font-size:.78rem;color:var(--ink3);line-height:1.6;margin-bottom:1rem}
+.setting-input{width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:6px;padding:.6rem .85rem;font-family:var(--mono);font-size:.78rem;color:var(--ink);outline:none;transition:border-color .15s;margin-bottom:.5rem}
+.setting-input:focus{border-color:var(--f2);background:var(--white)}
+.setting-input::placeholder{color:var(--ink4)}
+.setting-select{width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:6px;padding:.6rem .85rem;font-family:var(--sans);font-size:.78rem;color:var(--ink);outline:none;cursor:pointer;margin-bottom:.5rem}
+.setting-save{background:var(--f2);color:#fff;border:none;border-radius:6px;padding:.55rem 1rem;font-family:var(--sans);font-size:.78rem;font-weight:500;cursor:pointer;transition:background .15s}
+.setting-save:hover{background:var(--f3)}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:.6rem 0;border-bottom:1px solid var(--border)}
+.toggle-row:last-child{border-bottom:none}
+.toggle-label{font-size:.8rem;color:var(--ink2)}
+.toggle-sub{font-size:.72rem;color:var(--ink4);margin-top:.1rem}
+.toggle{width:38px;height:20px;background:var(--border2);border-radius:100px;cursor:pointer;transition:background .2s;position:relative;flex-shrink:0}
+.toggle.on{background:var(--f2)}
+.toggle::after{content:'';position:absolute;top:3px;left:3px;width:14px;height:14px;background:#fff;border-radius:50%;transition:transform .2s}
+.toggle.on::after{transform:translateX(18px)}
+
+/* INTEGRATION CARDS */
+.integrations-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+.integ-card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:1.1rem;box-shadow:var(--sh);display:flex;flex-direction:column;gap:.65rem}
+.integ-head{display:flex;align-items:center;justify-content:space-between}
+.integ-logo{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;border:1px solid var(--border);background:var(--bg)}
+.integ-status{font-family:var(--mono);font-size:.62rem;padding:.15rem .55rem;border-radius:100px}
+.integ-status.connected{background:var(--fl);color:var(--f2);border:1px solid var(--fm)}
+.integ-status.pending{background:var(--al);color:var(--amber);border:1px solid var(--am)}
+.integ-status.off{background:var(--bg2);color:var(--ink4);border:1px solid var(--border)}
+.integ-name{font-size:.82rem;font-weight:500;color:var(--ink)}
+.integ-desc{font-size:.76rem;color:var(--ink3);line-height:1.5}
+.integ-btn{width:100%;padding:.5rem;background:transparent;border:1px solid var(--border2);border-radius:6px;font-family:var(--sans);font-size:.76rem;color:var(--ink3);cursor:pointer;font-weight:500;transition:all .15s;text-align:center}
+.integ-btn:hover{background:var(--bg);color:var(--ink)}
+.integ-btn.connected{color:var(--red);border-color:var(--rm)}
+.integ-btn.connected:hover{background:var(--rl)}
+.integ-btn.connect{background:var(--f2);color:#fff;border-color:var(--f2)}
+.integ-btn.connect:hover{background:var(--f3)}
+
+/* SECTION HEADING */
+.section-heading{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:1rem}
+.section-heading h2{font-family:var(--serif);font-size:1rem;font-style:italic;color:var(--ink)}
+.section-heading a{font-size:.75rem;color:var(--f2);text-decoration:none}
+.section-heading a:hover{color:var(--f3)}
+
+/* PAGE HEADING */
+.page-head{margin-bottom:1.5rem}
+.page-head h1{font-family:var(--serif);font-size:1.35rem;font-style:italic;color:var(--ink);margin-bottom:.2rem}
+.page-head p{font-size:.8rem;color:var(--ink4)}
+
+/* EMPTY STATE */
+.empty{padding:2.5rem;text-align:center}
+.empty-icon{font-size:2rem;margin-bottom:.75rem;opacity:.4}
+.empty-title{font-size:.88rem;font-weight:500;color:var(--ink2);margin-bottom:.35rem}
+.empty-sub{font-size:.78rem;color:var(--ink4);line-height:1.6}
+
+/* TOAST */
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;z-index:500;display:flex;align-items:center;gap:.65rem;background:var(--ink);color:var(--white);padding:.75rem 1.1rem;border-radius:8px;font-size:.8rem;box-shadow:var(--sh2);transform:translateY(80px);opacity:0;transition:all .3s ease;pointer-events:none}
+.toast.show{transform:translateY(0);opacity:1}
+
+@media(max-width:900px){
+  .sidebar{display:none}
+  .stats-row{grid-template-columns:1fr 1fr}
+  .grid2{grid-template-columns:1fr}
+  .integrations-grid{grid-template-columns:1fr 1fr}
+  .settings-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sb-top">
+    <a class="sb-logo" href="index.html">
+      <svg width="24" height="24" viewBox="0 0 30 30" fill="none"><rect width="30" height="30" rx="7" fill="#0A4A38"/><rect x="7" y="9" width="16" height="14" rx="2.5" stroke="#F7F5EF" stroke-width="1.5" fill="none"/><line x1="7" y1="13" x2="23" y2="13" stroke="#F7F5EF" stroke-width="1.5"/><line x1="11" y1="7" x2="11" y2="11" stroke="#F7F5EF" stroke-width="1.5" stroke-linecap="round"/><line x1="19" y1="7" x2="19" y2="11" stroke="#F7F5EF" stroke-width="1.5" stroke-linecap="round"/><path d="M11.5 18l2.5 2.5 5-5" stroke="#C8D9D4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div class="sb-logo-text">Arce<span>.</span></div>
+    </a>
+
+    <div class="sb-section">
+      <div class="sb-section-label">Oversikt</div>
+      <ul class="sb-nav">
+        <li><a href="#" class="active" onclick="showView('overview',this)"><span class="nav-icon">◈</span> Dashboard</a></li>
+        <li><a href="#" onclick="showView('leads',this)"><span class="nav-icon">◎</span> Leads <span class="nav-badge amber" id="newLeadsBadge">3</span></a></li>
+        <li><a href="#" onclick="showView('appointments',this)"><span class="nav-icon">▦</span> Avtaler</a></li>
+        <li><a href="#" onclick="showView('analytics',this)"><span class="nav-icon">◉</span> Analytikk</a></li>
+      </ul>
+    </div>
+
+    <div class="sb-divider"></div>
+
+    <div class="sb-section">
+      <div class="sb-section-label">Konfigurasjon</div>
+      <ul class="sb-nav">
+        <li><a href="#" onclick="showView('agent',this)"><span class="nav-icon">⬡</span> AI-agent</a></li>
+        <li><a href="#" onclick="showView('integrations',this)"><span class="nav-icon">⊞</span> Integrasjoner <span class="nav-badge" id="intBadge">1</span></a></li>
+        <li><a href="#" onclick="showView('settings',this)"><span class="nav-icon">◌</span> Innstillinger</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sb-bottom">
+    <div class="sb-user">
+      <div class="sb-avatar">NK</div>
+      <div class="sb-user-info">
+        <div class="sb-user-name">Nordvik AS</div>
+        <div class="sb-user-plan">Vekst-plan</div>
+      </div>
+      <div class="sb-user-btn" onclick="showToast('Innstillinger åpnes…')">⚙</div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title">God morgen, <span>Nordvik.</span></div>
+    <div class="topbar-right">
+      <div class="live-badge"><div class="live-dot"></div> AI-agent aktiv</div>
+      <button class="tb-btn tb-btn-ghost" onclick="showView('agent',document.querySelector('.sb-nav a:nth-child(5)'))">⬡ Konfigurer agent</button>
+      <button class="tb-btn tb-btn-primary" onclick="openAddLead()">+ Legg til lead</button>
+      <button class="tb-notif" onclick="showToast('3 nye varsler')">🔔<div class="tb-notif-dot"></div></button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ── OVERVIEW ── -->
+    <div class="view active" id="view-overview">
+      <div class="page-head">
+        <h1>Oversikt</h1>
+        <p>Siste 30 dager · Oppdatert nå</p>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">Bookede møter <span class="stat-icon">▦</span></div>
+          <div class="stat-val">27</div>
+          <div class="stat-delta"><span class="delta-up">↑ +38%</span> <span class="delta-neutral">vs forrige mnd</span></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Aktive leads <span class="stat-icon">◎</span></div>
+          <div class="stat-val">14</div>
+          <div class="stat-delta"><span class="delta-up">↑ +5</span> <span class="delta-neutral">denne uken</span></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Show-rate <span class="stat-icon">◉</span></div>
+          <div class="stat-val">84%</div>
+          <div class="stat-delta"><span class="delta-up">↑ +12%</span> <span class="delta-neutral">vs bransjesnitt</span></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Responstid <span class="stat-icon">⏱</span></div>
+          <div class="stat-val">1m 42s</div>
+          <div class="stat-delta"><span class="delta-up">↑ Raskere</span> <span class="delta-neutral">enn 95%</span></div>
+        </div>
+      </div>
+
+      <div class="grid2">
+        <!-- ACTIVE LEADS -->
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title">Aktive leads</div>
+            <a class="card-action" href="#" onclick="showView('leads',null)">Se alle →</a>
+          </div>
+          <table class="leads-table">
+            <thead><tr><th>Navn</th><th>Status</th><th>Kanal</th><th>Siste aktivitet</th></tr></thead>
+            <tbody>
+              <tr onclick="openPanel('marte')" style="cursor:pointer">
+                <td><div class="lead-name"><div class="lead-av">MO</div>Marte Olsen</div></td>
+                <td><span class="pill pill-active">Under samtale</span></td>
+                <td><span class="ch-badge">✉ E-post</span></td>
+                <td>2 min siden</td>
+              </tr>
+              <tr onclick="openPanel('lars')" style="cursor:pointer">
+                <td><div class="lead-name"><div class="lead-av">LH</div>Lars Haugen</div></td>
+                <td><span class="pill pill-booked">Booket</span></td>
+                <td><span class="ch-badge">💬 SMS</span></td>
+                <td>14 min siden</td>
+              </tr>
+              <tr onclick="openPanel('kari')" style="cursor:pointer">
+                <td><div class="lead-name"><div class="lead-av">KN</div>Kari Nilsen</div></td>
+                <td><span class="pill pill-waiting">Venter på svar</span></td>
+                <td><span class="ch-badge">✉ E-post</span></td>
+                <td>1 time siden</td>
+              </tr>
+              <tr onclick="openPanel('erik')" style="cursor:pointer">
+                <td><div class="lead-name"><div class="lead-av">EB</div>Erik Berg</div></td>
+                <td><span class="pill pill-active">Under samtale</span></td>
+                <td><span class="ch-badge">✉ E-post</span></td>
+                <td>3 timer siden</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div style="display:flex;flex-direction:column;gap:1rem">
+          <!-- WEEK CHART -->
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">Bookinger denne uken</div>
+              <span style="font-family:var(--mono);font-size:.65rem;color:var(--f2)">+3 vs forrige uke</span>
+            </div>
+            <div style="padding:.75rem 1.25rem">
+              <div class="chart-bars">
+                <div class="bar-wrap"><div class="bar filled" style="height:40%" title="2"></div><div class="bar-label">Man</div></div>
+                <div class="bar-wrap"><div class="bar filled" style="height:65%" title="3"></div><div class="bar-label">Tir</div></div>
+                <div class="bar-wrap"><div class="bar filled" style="height:90%" title="5"></div><div class="bar-label">Ons</div></div>
+                <div class="bar-wrap"><div class="bar filled" style="height:55%" title="3"></div><div class="bar-label">Tor</div></div>
+                <div class="bar-wrap"><div class="bar" style="height:30%;opacity:.35" title="1"></div><div class="bar-label">Fre</div></div>
+                <div class="bar-wrap"><div class="bar" style="height:15%;opacity:.25" title="0"></div><div class="bar-label">Lør</div></div>
+                <div class="bar-wrap"><div class="bar" style="height:5%;opacity:.15" title="0"></div><div class="bar-label">Søn</div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- PERFORMANCE RINGS -->
+          <div class="card">
+            <div class="card-head"><div class="card-title">AI-ytelse</div></div>
+            <div class="perf-grid">
+              <div class="perf-item">
+                <div class="ring-wrap">
+                  <svg class="ring-svg" width="64" height="64" viewBox="0 0 64 64">
+                    <circle class="ring-bg" cx="32" cy="32" r="27"/>
+                    <circle class="ring-fill" cx="32" cy="32" r="27" stroke="#0D5C48" stroke-dasharray="169.6" stroke-dashoffset="27"/>
+                  </svg>
+                  <div class="ring-val">84%</div>
+                </div>
+                <div class="perf-label">Show-rate</div>
+              </div>
+              <div class="perf-item">
+                <div class="ring-wrap">
+                  <svg class="ring-svg" width="64" height="64" viewBox="0 0 64 64">
+                    <circle class="ring-bg" cx="32" cy="32" r="27"/>
+                    <circle class="ring-fill" cx="32" cy="32" r="27" stroke="#C49A3C" stroke-dasharray="169.6" stroke-dashoffset="51"/>
+                  </svg>
+                  <div class="ring-val">70%</div>
+                </div>
+                <div class="perf-label">Svarrate</div>
+              </div>
+              <div class="perf-item">
+                <div class="ring-wrap">
+                  <svg class="ring-svg" width="64" height="64" viewBox="0 0 64 64">
+                    <circle class="ring-bg" cx="32" cy="32" r="27"/>
+                    <circle class="ring-fill" cx="32" cy="32" r="27" stroke="#1E40AF" stroke-dasharray="169.6" stroke-dashoffset="34"/>
+                  </svg>
+                  <div class="ring-val">80%</div>
+                </div>
+                <div class="perf-label">Konvertering</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- UPCOMING APPOINTMENTS -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">Kommende avtaler</div>
+          <a class="card-action" href="#" onclick="showView('appointments',null)">Kalendervisning →</a>
+        </div>
+        <div class="appt-list">
+          <div class="appt-item">
+            <div class="appt-time-col"><div class="appt-date">I dag</div><div class="appt-time">14:00</div></div>
+            <div class="appt-info"><div class="appt-name">Marte Olsen</div><div class="appt-meta">Video · Google Meet · 30 min</div></div>
+            <div class="appt-actions">
+              <button class="appt-btn" onclick="showToast('Påminnelse sendt til Marte Olsen')">Send påminnelse</button>
+              <button class="appt-btn danger" onclick="showToast('Avtale kansellert')">Kanseller</button>
+            </div>
+          </div>
+          <div class="appt-item">
+            <div class="appt-time-col"><div class="appt-date">I morgen</div><div class="appt-time">10:30</div></div>
+            <div class="appt-info"><div class="appt-name">Lars Haugen</div><div class="appt-meta">Telefon · 20 min</div></div>
+            <div class="appt-actions">
+              <button class="appt-btn" onclick="showToast('Påminnelse sendt til Lars Haugen')">Send påminnelse</button>
+              <button class="appt-btn danger" onclick="showToast('Avtale kansellert')">Kanseller</button>
+            </div>
+          </div>
+          <div class="appt-item">
+            <div class="appt-time-col"><div class="appt-date">Tors</div><div class="appt-time">09:00</div></div>
+            <div class="appt-info"><div class="appt-name">Erik Berg</div><div class="appt-meta">Video · Zoom · 45 min</div></div>
+            <div class="appt-actions">
+              <button class="appt-btn" onclick="showToast('Påminnelse sendt til Erik Berg')">Send påminnelse</button>
+              <button class="appt-btn danger" onclick="showToast('Avtale kansellert')">Kanseller</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SETUP CHECKLIST -->
+      <div class="card" style="margin-top:1rem">
+        <div class="card-head"><div class="card-title">Kom i gang — fullfør oppsettet</div><span style="font-size:.72rem;color:var(--ink4);font-family:var(--mono)">3/5 fullført</span></div>
+        <div class="checklist">
+          <div class="check-item"><div class="check-box done">✓</div><div class="check-text done-text">Koble til Google Calendar</div></div>
+          <div class="check-item"><div class="check-box done">✓</div><div class="check-text done-text">Konfigurer AI-agent</div></div>
+          <div class="check-item"><div class="check-box done">✓</div><div class="check-text done-text">Importer første leads</div></div>
+          <div class="check-item"><div class="check-box pending">!</div><div class="check-text">Koble til HubSpot CRM</div><a class="check-link" onclick="showView('integrations',null)">Gjør nå →</a></div>
+          <div class="check-item"><div class="check-box" style="border-style:dashed"></div><div class="check-text">Send test-melding til lead</div><a class="check-link" onclick="showView('agent',null)">Test agent →</a></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── LEADS ── -->
+    <div class="view" id="view-leads">
+      <div class="page-head">
+        <h1>Leads</h1>
+        <p>Alle leads som AI-agenten håndterer</p>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div style="display:flex;gap:.5rem;align-items:center">
+            <div class="card-title">Alle leads</div>
+            <span class="pill pill-active">14 aktive</span>
+          </div>
+          <button class="tb-btn tb-btn-primary" style="font-size:.75rem;padding:.4rem .85rem" onclick="openAddLead()">+ Legg til lead</button>
+        </div>
+        <table class="leads-table">
+          <thead><tr><th>Navn</th><th>Status</th><th>Kanal</th><th>Kvalifisert</th><th>Siste aktivitet</th><th></th></tr></thead>
+          <tbody>
+            <tr onclick="openPanel('marte')" style="cursor:pointer"><td><div class="lead-name"><div class="lead-av">MO</div>Marte Olsen</div></td><td><span class="pill pill-active">Under samtale</span></td><td><span class="ch-badge">✉ E-post</span></td><td><span class="pill pill-booked">Ja</span></td><td>2 min siden</td><td><button class="appt-btn" onclick="event.stopPropagation();openPanel('marte')">Se samtale</button></td></tr>
+            <tr onclick="openPanel('lars')" style="cursor:pointer"><td><div class="lead-name"><div class="lead-av">LH</div>Lars Haugen</div></td><td><span class="pill pill-booked">Booket</span></td><td><span class="ch-badge">💬 SMS</span></td><td><span class="pill pill-booked">Ja</span></td><td>14 min siden</td><td><button class="appt-btn" onclick="event.stopPropagation();openPanel('lars')">Se samtale</button></td></tr>
+            <tr onclick="openPanel('kari')" style="cursor:pointer"><td><div class="lead-name"><div class="lead-av">KN</div>Kari Nilsen</div></td><td><span class="pill pill-waiting">Venter på svar</span></td><td><span class="ch-badge">✉ E-post</span></td><td><span class="pill pill-waiting">Pågår</span></td><td>1 time siden</td><td><button class="appt-btn" onclick="event.stopPropagation();openPanel('kari')">Se samtale</button></td></tr>
+            <tr onclick="openPanel('erik')" style="cursor:pointer"><td><div class="lead-name"><div class="lead-av">EB</div>Erik Berg</div></td><td><span class="pill pill-active">Under samtale</span></td><td><span class="ch-badge">✉ E-post</span></td><td><span class="pill pill-waiting">Pågår</span></td><td>3 timer siden</td><td><button class="appt-btn" onclick="event.stopPropagation();openPanel('erik')">Se samtale</button></td></tr>
+            <tr><td><div class="lead-name"><div class="lead-av">SJ</div>Sara Johansen</div></td><td><span class="pill pill-lost">Tapt</span></td><td><span class="ch-badge">💬 SMS</span></td><td><span class="pill pill-lost">Nei</span></td><td>2 dager siden</td><td><button class="appt-btn">Gjenopprett</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── APPOINTMENTS ── -->
+    <div class="view" id="view-appointments">
+      <div class="page-head">
+        <h1>Avtaler</h1>
+        <p>Alle bookede og kommende møter</p>
+      </div>
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-label">Denne uken</div><div class="stat-val">8</div><div class="stat-delta delta-up">↑ +2 vs forrige uke</div></div>
+        <div class="stat-card"><div class="stat-label">Denne måneden</div><div class="stat-val">27</div><div class="stat-delta delta-up">↑ +38%</div></div>
+        <div class="stat-card"><div class="stat-label">No-shows</div><div class="stat-val">3</div><div class="stat-delta delta-neutral">11% rate</div></div>
+        <div class="stat-card"><div class="stat-label">Snitt møtelengde</div><div class="stat-val">28m</div><div class="stat-delta delta-neutral">Stabilt</div></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-title">Kommende avtaler</div></div>
+        <div class="appt-list">
+          <div class="appt-item"><div class="appt-time-col"><div class="appt-date">I dag</div><div class="appt-time">14:00</div></div><div class="appt-info"><div class="appt-name">Marte Olsen</div><div class="appt-meta">Video · Google Meet · 30 min · Booket av Arce AI</div></div><div class="appt-actions"><button class="appt-btn" onclick="showToast('📧 Påminnelse sendt!')">Minn på</button><button class="appt-btn danger" onclick="showToast('Avtale kansellert')">Kanseller</button></div></div>
+          <div class="appt-item"><div class="appt-time-col"><div class="appt-date">I morgen</div><div class="appt-time">10:30</div></div><div class="appt-info"><div class="appt-name">Lars Haugen</div><div class="appt-meta">Telefon · 20 min · Booket av Arce AI</div></div><div class="appt-actions"><button class="appt-btn" onclick="showToast('📧 Påminnelse sendt!')">Minn på</button><button class="appt-btn danger" onclick="showToast('Avtale kansellert')">Kanseller</button></div></div>
+          <div class="appt-item"><div class="appt-time-col"><div class="appt-date">Tors</div><div class="appt-time">09:00</div></div><div class="appt-info"><div class="appt-name">Erik Berg</div><div class="appt-meta">Video · Zoom · 45 min · Booket av Arce AI</div></div><div class="appt-actions"><button class="appt-btn" onclick="showToast('📧 Påminnelse sendt!')">Minn på</button><button class="appt-btn danger" onclick="showToast('Avtale kansellert')">Kanseller</button></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ANALYTICS ── -->
+    <div class="view" id="view-analytics">
+      <div class="page-head"><h1>Analytikk</h1><p>Dyptgående ytelsesdata for AI-agenten din</p></div>
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-label">Totale leads kontaktet</div><div class="stat-val">148</div><div class="stat-delta delta-up">↑ +22 denne måneden</div></div>
+        <div class="stat-card"><div class="stat-label">Konverteringsrate</div><div class="stat-val">18%</div><div class="stat-delta delta-up">↑ +3% vs snitt</div></div>
+        <div class="stat-card"><div class="stat-label">Gj.snitt responstid</div><div class="stat-val">1m 42s</div><div class="stat-delta delta-up">↑ Raskere enn 95%</div></div>
+        <div class="stat-card"><div class="stat-label">Inntekt generert*</div><div class="stat-val">kr 84k</div><div class="stat-delta delta-neutral">*estimert</div></div>
+      </div>
+      <div class="grid2-eq">
+        <div class="card"><div class="card-head"><div class="card-title">Bookinger per uke (siste 4 uker)</div></div>
+          <div style="padding:1rem 1.25rem">
+            <div class="chart-bars" style="height:90px">
+              <div class="bar-wrap"><div class="bar filled" style="height:55%"></div><div class="bar-label">Uke 1</div></div>
+              <div class="bar-wrap"><div class="bar filled" style="height:70%"></div><div class="bar-label">Uke 2</div></div>
+              <div class="bar-wrap"><div class="bar filled" style="height:85%"></div><div class="bar-label">Uke 3</div></div>
+              <div class="bar-wrap"><div class="bar filled" style="height:100%"></div><div class="bar-label">Uke 4</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="card"><div class="card-head"><div class="card-title">Kanal-fordeling</div></div>
+          <div style="padding:1rem 1.25rem;display:flex;flex-direction:column;gap:.75rem">
+            <div><div style="display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:.3rem"><span>E-post</span><span style="font-family:var(--mono);color:var(--f2)">68%</span></div><div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden"><div style="height:100%;width:68%;background:var(--f2);border-radius:3px"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:.3rem"><span>SMS</span><span style="font-family:var(--mono);color:var(--gold)">24%</span></div><div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden"><div style="height:100%;width:24%;background:var(--gold);border-radius:3px"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:.3rem"><span>WhatsApp</span><span style="font-family:var(--mono);color:var(--blue)">8%</span></div><div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden"><div style="height:100%;width:8%;background:var(--blue);border-radius:3px"></div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── AI AGENT ── -->
+    <div class="view" id="view-agent">
+      <div class="page-head"><h1>AI-agent</h1><p>Konfigurer hva agenten sier og hvordan den opptrer</p></div>
+      <div class="settings-grid">
+        <div class="setting-card">
+          <h3>Personlighet og tone</h3>
+          <p>Beskriv hvordan agenten skal kommunisere med dine leads.</p>
+          <select class="setting-select">
+            <option>Profesjonell og direkte</option>
+            <option>Vennlig og uformell</option>
+            <option>Formell og konservativ</option>
+            <option>Entusiastisk og energisk</option>
+          </select>
+          <textarea class="setting-input" rows="3" style="resize:none" placeholder="Eks: Vi er et eiendomsmeglerfirma i Trondheim. Vi hjelper kunder med å kjøpe og selge boliger…"></textarea>
+          <button class="setting-save" onclick="showToast('✓ Agentprofil lagret')">Lagre</button>
+        </div>
+        <div class="setting-card">
+          <h3>Lead-kvalifisering</h3>
+          <p>Hvilke spørsmål skal AI-en stille for å finne ut om dette er en god match?</p>
+          <textarea class="setting-input" rows="5" style="resize:none" placeholder="Eks:&#10;1. Hva er budsjettet ditt?&#10;2. Søker du bolig til deg selv eller investering?&#10;3. Ønsket innflyttingsdato?"></textarea>
+          <button class="setting-save" onclick="showToast('✓ Kvalifiseringsregler lagret')">Lagre</button>
+        </div>
+        <div class="setting-card">
+          <h3>Test AI-agenten</h3>
+          <p>Send en test-melding og se hvordan agenten svarer i sanntid.</p>
+          <div id="testChat" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:.75rem;min-height:120px;max-height:200px;overflow-y:auto;margin-bottom:.75rem;display:flex;flex-direction:column;gap:.5rem;font-size:.78rem"></div>
+          <div style="display:flex;gap:.5rem">
+            <input class="setting-input" id="testInput" placeholder="Skriv en melding som om du er et lead…" style="margin:0;flex:1" onkeydown="if(event.key==='Enter')testAgent()"/>
+            <button class="setting-save" id="testBtn" onclick="testAgent()">Send</button>
+          </div>
+        </div>
+        <div class="setting-card">
+          <h3>Varsler og påminnelser</h3>
+          <p>Konfigurer automatiske påminnelser til leads og deg selv.</p>
+          <div class="toggle-row"><div><div class="toggle-label">Påminnelse 24t før møte</div><div class="toggle-sub">Sendes automatisk til lead</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+          <div class="toggle-row"><div><div class="toggle-label">Påminnelse 1t før møte</div><div class="toggle-sub">Sendes automatisk til lead</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+          <div class="toggle-row"><div><div class="toggle-label">Varsle meg ved ny booking</div><div class="toggle-sub">E-post til deg</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+          <div class="toggle-row"><div><div class="toggle-label">Varsle meg ved no-show</div><div class="toggle-sub">E-post + SMS til deg</div></div><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── INTEGRATIONS ── -->
+    <div class="view" id="view-integrations">
+      <div class="page-head"><h1>Integrasjoner</h1><p>Koble Arce til verktøyene du allerede bruker</p></div>
+      <div class="integrations-grid">
+        <div class="integ-card"><div class="integ-head"><div class="integ-logo">📅</div><span class="integ-status connected">Tilkoblet</span></div><div class="integ-name">Google Calendar</div><div class="integ-desc">Bookede avtaler synkroniseres automatisk til kalenderen din.</div><button class="integ-btn connected" onclick="showToast('Google Calendar frakoblet')">Frakoble</button></div>
+        <div class="integ-card"><div class="integ-head"><div class="integ-logo">📧</div><span class="integ-status connected">Tilkoblet</span></div><div class="integ-name">Brevo</div><div class="integ-desc">E-postkommunikasjon med leads sendes via Brevo.</div><button class="integ-btn connected" onclick="showToast('Brevo frakoblet')">Frakoble</button></div>
+        <div class="integ-card"><div class="integ-head"><div class="integ-logo">💬</div><span class="integ-status pending">Mangler nøkkel</span></div><div class="integ-name">Twilio SMS</div><div class="integ-desc">Send SMS til leads automatisk. Krever Twilio-konto.</div><button class="integ-btn connect" onclick="connectTwilio()">Koble til</button></div>
+        <div class="integ-card"><div class="integ-head"><div class="integ-logo">🟠</div><span class="integ-status off">Ikke tilkoblet</span></div><div class="integ-name">HubSpot CRM</div><div class="integ-desc">Leads og avtaler synkroniseres automatisk til HubSpot.</div><button class="integ-btn connect" onclick="showToast('Åpner HubSpot-tilkobling…')">Koble til</button></div>
+        <div class="integ-card"><div class="integ-head"><div class="integ-logo">🔵</div><span class="integ-status off">Ikke tilkoblet</span></div><div class="integ-name">Pipedrive</div><div class="integ-desc">Opprett og oppdater deals i Pipedrive automatisk.</div><button class="integ-btn connect" onclick="showToast('Åpner Pipedrive-tilkobling…')">Koble til</button></div>
+        <div class="integ-card"><div class="integ-head"><div class="integ-logo">☁️</div><span class="integ-status off">Ikke tilkoblet</span></div><div class="integ-name">Salesforce</div><div class="integ-desc">Enterprise CRM-integrasjon med full synkronisering.</div><button class="integ-btn connect" onclick="showToast('Åpner Salesforce-tilkobling…')">Koble til</button></div>
+      </div>
+    </div>
+
+    <!-- ── SETTINGS ── -->
+    <div class="view" id="view-settings">
+      <div class="page-head"><h1>Innstillinger</h1><p>Konto og abonnement</p></div>
+      <div class="settings-grid">
+        <div class="setting-card"><h3>Bedriftsinformasjon</h3><p>Oppdater informasjonen Arce bruker i kommunikasjon.</p><input class="setting-input" placeholder="Bedriftsnavn" value="Nordvik AS"/><input class="setting-input" placeholder="Bransje" value="Eiendomsmegling"/><input class="setting-input" placeholder="Nettside" value="nordvik.no"/><button class="setting-save" onclick="showToast('✓ Lagret')">Lagre</button></div>
+        <div class="setting-card"><h3>Abonnement</h3><p>Du er på <strong>Vekst-planen</strong> — kr 1 799/mnd.</p><div class="toggle-row"><div><div class="toggle-label">Vekst-plan</div><div class="toggle-sub">Aktiv · Fornyes 1. feb 2025</div></div><span class="pill pill-booked">Aktiv</span></div><br><button class="setting-save" onclick="showToast('Sender deg til fakturasiden…')">Administrer abonnement</button></div>
+        <div class="setting-card"><h3>Kontaktinformasjon</h3><p>E-posten vi sender varslinger til.</p><input class="setting-input" placeholder="E-post" value="post@nordvik.no"/><input class="setting-input" placeholder="Telefon" value="+47 73 00 00 00"/><button class="setting-save" onclick="showToast('✓ Lagret')">Lagre</button></div>
+        <div class="setting-card"><h3>Sikkerhetsinnstillinger</h3><p>Passord og tilgang.</p><div class="toggle-row"><div><div class="toggle-label">To-faktor autentisering</div><div class="toggle-sub">Anbefalt</div></div><div class="toggle" onclick="this.classList.toggle('on')"></div></div><div class="toggle-row"><div><div class="toggle-label">Innloggingsvarsler</div><div class="toggle-sub">E-post ved ny innlogging</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div></div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- LEAD DETAIL PANEL -->
+<div class="panel-overlay" id="panelOverlay" onclick="if(event.target===this)closePanel()">
+  <div class="side-panel">
+    <div class="panel-head">
+      <div>
+        <div style="font-weight:500;font-size:.9rem;color:var(--ink)" id="panelName">Marte Olsen</div>
+        <div style="font-size:.74rem;color:var(--ink4);margin-top:.15rem" id="panelMeta">E-post · Under samtale</div>
+      </div>
+      <div style="display:flex;gap:.5rem;align-items:center">
+        <span class="pill pill-active" id="panelStatus">Under samtale</span>
+        <div class="panel-close" onclick="closePanel()">✕</div>
+      </div>
+    </div>
+    <div class="panel-body">
+      <div>
+        <div class="panel-section-label">Kontaktinfo</div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;overflow:hidden">
+          <div class="panel-row" style="padding:.55rem 1rem"><div class="panel-key">E-post</div><div class="panel-val" id="panelEmail">marte.olsen@gmail.com</div></div>
+          <div class="panel-row" style="padding:.55rem 1rem"><div class="panel-key">Kilde</div><div class="panel-val">Nettsideskjema</div></div>
+          <div class="panel-row" style="padding:.55rem 1rem;border-bottom:none"><div class="panel-key">Lagt til</div><div class="panel-val">I dag 11:32</div></div>
+        </div>
+      </div>
+      <div>
+        <div class="panel-section-label">AI-samtale</div>
+        <div class="ai-chat" id="panelChat"></div>
+      </div>
+    </div>
+    <div class="panel-input-wrap">
+      <input class="panel-input" id="panelInput" placeholder="Skriv melding som AI-agent…" onkeydown="if(event.key==='Enter')sendPanelMsg()"/>
+      <button class="panel-send" id="panelSendBtn" onclick="sendPanelMsg()">Send</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ── NAVIGATION ── */
+function showView(id, el){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+id).classList.add('active');
+  document.querySelectorAll('.sb-nav a').forEach(a=>a.classList.remove('active'));
+  if(el) el.classList.add('active');
+  else{
+    const map={leads:1,appointments:2,analytics:3,agent:4,integrations:5,settings:6};
+    const links=document.querySelectorAll('.sb-nav a');
+    // just remove active from all, overview is index 0
+  }
+}
+
+/* ── TOAST ── */
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+/* ── LEAD PANEL ── */
+const leads={
+  marte:{name:'Marte Olsen',email:'marte.olsen@gmail.com',meta:'E-post · Under samtale',status:'pill-active',statusTxt:'Under samtale',
+    chat:[
+      {who:'Marte Olsen',text:'Hei, jeg så annonsen deres. Er dette noe for oss?',ai:false,time:'11:32'},
+      {who:'Arce AI',text:'Hei Marte! Absolutt — Arce er designet for bedrifter som ønsker å automatisere oppfølging og booking. Kan jeg stille deg noen raske spørsmål for å se om vi er en god match?',ai:true,time:'11:32'},
+      {who:'Marte Olsen',text:'Ja, det er greit.',ai:false,time:'11:35'},
+      {who:'Arce AI',text:'Bra! Hvor mange leads håndterer dere per uke i dag, og hva er den største utfordringen — responstid, oppfølging, eller selve booking-prosessen?',ai:true,time:'11:35'},
+    ]},
+  lars:{name:'Lars Haugen',email:'lars.h@nordrebygg.no',meta:'SMS · Booket',status:'pill-booked',statusTxt:'Booket',
+    chat:[
+      {who:'Lars Haugen',text:'Kan dere hjelpe med booking for et byggefirma?',ai:false,time:'09:15'},
+      {who:'Arce AI',text:'Hei Lars! Ja, absolutt. Arce fungerer perfekt for B2B-salg og tjenestebedrifter. Hva er typisk antall leads dere jobber med per måned?',ai:true,time:'09:15'},
+      {who:'Lars Haugen',text:'Rundt 30-40.',ai:false,time:'09:18'},
+      {who:'Arce AI',text:'Flott — det er akkurat der Arce er mest effektiv. Vil du booke en demo? Jeg har ledig onsdag 10:30 eller torsdag 14:00 denne uken.',ai:true,time:'09:18'},
+      {who:'Lars Haugen',text:'Onsdag 10:30 passer.',ai:false,time:'09:20'},
+      {who:'Arce AI',text:'Perfekt! Booket onsdag kl 10:30. Kalenderinvitasjon sendt til lars.h@nordrebygg.no. Ses da! 👍',ai:true,time:'09:20'},
+    ]},
+  kari:{name:'Kari Nilsen',email:'kari.nilsen@konsulent.no',meta:'E-post · Venter på svar',status:'pill-waiting',statusTxt:'Venter på svar',
+    chat:[
+      {who:'Kari Nilsen',text:'Jeg er selvstendig konsulent. Passer Arce for meg?',ai:false,time:'Igår 16:45'},
+      {who:'Arce AI',text:'Hei Kari! Ja — Solo-planen er laget spesielt for deg. Du betaler kr 599/mnd og Arce håndterer all oppfølging og booking mens du fokuserer på selve arbeidet. Ønsker du å se mer?',ai:true,time:'Igår 16:45'},
+    ]},
+  erik:{name:'Erik Berg',email:'erik.berg@example.no',meta:'E-post · Under samtale',status:'pill-active',statusTxt:'Under samtale',
+    chat:[
+      {who:'Erik Berg',text:'Hva skiller Arce fra Calendly?',ai:false,time:'08:00'},
+      {who:'Arce AI',text:'Godt spørsmål, Erik! Calendly krever at du sender lenken manuelt til folk. Arce kontakter leads proaktivt, kvalifiserer dem, og booker møtet — alt uten at du gjør noe. Det er forskjellen mellom et bookingverktøy og en booking-agent.',ai:true,time:'08:00'},
+    ]},
+};
+let currentLead=null;
+let panelHistory=[];
+
+function openPanel(id){
+  const l=leads[id];
+  currentLead=id;
+  panelHistory=[...l.chat];
+  document.getElementById('panelName').textContent=l.name;
+  document.getElementById('panelMeta').textContent=l.meta;
+  document.getElementById('panelEmail').textContent=l.email;
+  document.getElementById('panelStatus').className='pill '+l.status;
+  document.getElementById('panelStatus').textContent=l.statusTxt;
+  renderPanelChat();
+  document.getElementById('panelOverlay').classList.add('open');
+}
+function closePanel(){document.getElementById('panelOverlay').classList.remove('open')}
+
+function renderPanelChat(){
+  const c=document.getElementById('panelChat');
+  c.innerHTML='';
+  panelHistory.forEach(m=>{
+    const row=document.createElement('div');
+    row.className='msg-row';
+    row.innerHTML=`<div class="msg-who">${m.who}</div><div class="msg-bubble ${m.ai?'ai':'them'}">${m.text}</div><div class="msg-time">${m.time}</div>`;
+    c.appendChild(row);
+  });
+  c.scrollTop=c.scrollHeight;
+}
+
+async function sendPanelMsg(){
+  const inp=document.getElementById('panelInput');
+  const btn=document.getElementById('panelSendBtn');
+  const txt=inp.value.trim();
+  if(!txt)return;
+  inp.value='';
+  btn.disabled=true;
+  const l=leads[currentLead];
+  panelHistory.push({who:l.name,text:txt,ai:false,time:'Nå'});
+  renderPanelChat();
+
+  // Typing indicator
+  const c=document.getElementById('panelChat');
+  const typingRow=document.createElement('div');
+  typingRow.className='msg-row';
+  typingRow.id='typing';
+  typingRow.innerHTML='<div class="msg-who">Arce AI</div><div class="typing-indicator"><span></span><span></span><span></span></div>';
+  c.appendChild(typingRow);
+  c.scrollTop=c.scrollHeight;
+
+  try{
+    const hist=panelHistory.slice(-6).map(m=>({role:m.ai?'assistant':'user',content:m.text}));
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:300,
+        system:`Du er Arce, en AI-drevet booking-agent. Du kommuniserer på norsk med leads på vegne av bedriften. Vær profesjonell, vennlig og kortfattet. Målet er å kvalifisere leadet og booke et møte. Dagens dato: ${new Date().toLocaleDateString('no-NO')}. Bedrift du representerer: ${document.getElementById('panelName').textContent.split(' ')[0]} sin bedrift.`,
+        messages:hist
+      })
+    });
+    const data=await res.json();
+    document.getElementById('typing')?.remove();
+    const reply=data.content?.[0]?.text||'Takk for meldingen! Jeg kommer tilbake til deg snart.';
+    panelHistory.push({who:'Arce AI',text:reply,ai:true,time:'Nå'});
+    renderPanelChat();
+  }catch(e){
+    document.getElementById('typing')?.remove();
+    panelHistory.push({who:'Arce AI',text:'Beklager, noe gikk galt. Prøv igjen.',ai:true,time:'Nå'});
+    renderPanelChat();
+  }
+  btn.disabled=false;
+}
+
+/* ── AGENT TEST ── */
+let testHistory=[];
+async function testAgent(){
+  const inp=document.getElementById('testInput');
+  const btn=document.getElementById('testBtn');
+  const txt=inp.value.trim();
+  if(!txt)return;
+  inp.value='';
+  btn.disabled=true;
+  const c=document.getElementById('testChat');
+
+  const userEl=document.createElement('div');
+  userEl.style.cssText='padding:.4rem .65rem;background:var(--bg2);border:1px solid var(--border);border-radius:6px;font-size:.78rem;color:var(--ink2);align-self:flex-end;max-width:80%;margin-left:auto';
+  userEl.textContent=txt;
+  c.appendChild(userEl);
+
+  const typing=document.createElement('div');
+  typing.className='typing-indicator';
+  typing.style.cssText='margin-top:.25rem';
+  typing.innerHTML='<span></span><span></span><span></span>';
+  c.appendChild(typing);
+  c.scrollTop=c.scrollHeight;
+
+  testHistory.push({role:'user',content:txt});
+
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:200,
+        system:'Du er Arce AI-booking-agent. Test-modus. Svar kort og naturlig på norsk som om du snakker med et lead.',
+        messages:testHistory
+      })
+    });
+    const data=await res.json();
+    typing.remove();
+    const reply=data.content?.[0]?.text||'Hei! Takk for meldingen.';
+    testHistory.push({role:'assistant',content:reply});
+    const aiEl=document.createElement('div');
+    aiEl.style.cssText='padding:.4rem .65rem;background:var(--fd);border:1px solid var(--fm);border-radius:6px;font-size:.78rem;color:var(--ink);max-width:85%';
+    aiEl.innerHTML='<span style="font-family:var(--mono);font-size:.58rem;color:var(--f2);text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:.2rem">Arce AI</span>'+reply;
+    c.appendChild(aiEl);
+  }catch(e){
+    typing.remove();
+    const err=document.createElement('div');
+    err.style.cssText='font-size:.72rem;color:var(--red)';
+    err.textContent='Tilkoblingsfeil — sjekk API-nøkkel';
+    c.appendChild(err);
+  }
+  c.scrollTop=c.scrollHeight;
+  btn.disabled=false;
+}
+document.getElementById('testInput').addEventListener('keydown',e=>{if(e.key==='Enter')testAgent()});
+
+/* ── TWILIO CONNECT ── */
+function connectTwilio(){
+  const key=prompt('Lim inn din Twilio API-nøkkel (Account SID):');
+  if(key){showToast('✓ Twilio tilkoblet! SMS aktivert.');document.getElementById('intBadge').style.display='none';}
+}
+
+/* ── ADD LEAD ── */
+function openAddLead(){
+  const name=prompt('Navn på lead:');
+  if(!name)return;
+  const email=prompt('E-post:');
+  if(!email)return;
+  showToast(`✓ ${name} lagt til — AI-agent kontakter innen 2 minutter`);
+  document.getElementById('newLeadsBadge').textContent=parseInt(document.getElementById('newLeadsBadge').textContent)+1;
+}
+</script>
+</body>
+</html>

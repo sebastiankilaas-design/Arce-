@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arce — Logg inn</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,400;0,500;1,400&family=Outfit:wght@300;400;500&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --cream:#F3F1EB;--cream2:#EAE8E1;--white:#FAFAF7;
+  --ink:#181612;--ink2:#3C3A34;--ink3:#6E6C65;--ink4:#A09D96;
+  --g:#0C4D3A;--g2:#0F6048;--g3:#128058;--gl:#EBF3EE;--gm:#ACCFC0;
+  --gold:#B8892A;--gm2:#DFC07A;
+  --char:#1A1917;--char2:#252320;
+  --red:#C0392B;--rl:#FEF0EE;
+  --brd:#D8D5CC;--brd2:#C5C2B8;
+  --sh:0 2px 12px rgba(24,22,18,.08),0 20px 60px rgba(24,22,18,.07);
+  --serif:'Cormorant',Georgia,serif;
+  --body:'Outfit',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+}
+html,body{height:100%;overflow:hidden}
+body{
+  background:var(--char);color:var(--cream);
+  font-family:var(--body);font-weight:300;
+  display:flex;flex-direction:column;
+}
+
+/* BG LAYERS */
+.bg-orb{position:fixed;border-radius:50%;pointer-events:none}
+.bg-orb-1{width:800px;height:800px;top:-250px;left:-250px;background:radial-gradient(circle,rgba(12,77,58,.5) 0%,transparent 65%);filter:blur(80px);animation:drift1 14s ease-in-out infinite}
+.bg-orb-2{width:600px;height:600px;bottom:-150px;right:-150px;background:radial-gradient(circle,rgba(184,137,42,.2) 0%,transparent 65%);filter:blur(90px);animation:drift2 18s ease-in-out infinite}
+@keyframes drift1{0%,100%{transform:translate(0,0)}50%{transform:translate(30px,-20px)}}
+@keyframes drift2{0%,100%{transform:translate(0,0)}50%{transform:translate(-25px,18px)}}
+.bg-noise{position:fixed;inset:0;opacity:.04;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E")}
+
+/* NAV */
+.auth-nav{
+  position:relative;z-index:10;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.95rem 2rem;border-bottom:1px solid rgba(255,255,255,.07);
+  flex-shrink:0;
+}
+.logo{display:flex;align-items:center;gap:9px;text-decoration:none}
+.logo-mark{width:30px;height:30px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:5px;display:flex;align-items:center;justify-content:center}
+.logo-word{font-family:var(--serif);font-size:1.2rem;font-weight:500;color:rgba(255,255,255,.88);letter-spacing:.02em}
+.nav-back{font-size:.78rem;color:rgba(255,255,255,.4);text-decoration:none;transition:color .15s}
+.nav-back:hover{color:rgba(255,255,255,.75)}
+
+/* MAIN LAYOUT */
+.auth-main{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  padding:2rem;position:relative;z-index:2;overflow-y:auto;
+}
+
+/* AUTH CARD */
+.auth-card{
+  width:100%;max-width:420px;
+  background:rgba(250,250,247,.06);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:16px;
+  backdrop-filter:blur(32px);
+  -webkit-backdrop-filter:blur(32px);
+  padding:2.5rem;
+  box-shadow:0 8px 40px rgba(0,0,0,.3);
+  animation:cardIn .5s ease both;
+}
+@keyframes cardIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+.auth-header{text-align:center;margin-bottom:2rem}
+.auth-title{font-family:var(--serif);font-size:1.9rem;font-style:italic;font-weight:400;color:rgba(255,255,255,.92);margin-bottom:.35rem}
+.auth-sub{font-size:.82rem;color:rgba(255,255,255,.38);line-height:1.6}
+
+/* GOOGLE BTN */
+.btn-google{
+  width:100%;display:flex;align-items:center;justify-content:center;gap:.75rem;
+  background:rgba(255,255,255,.92);color:var(--ink);border:none;border-radius:8px;
+  padding:.78rem;font-family:var(--body);font-size:.85rem;font-weight:500;
+  cursor:pointer;transition:all .18s;margin-bottom:1.5rem;
+}
+.btn-google:hover{background:#fff;transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,0,0,.2)}
+.google-icon{flex-shrink:0}
+
+/* DIVIDER */
+.divider{display:flex;align-items:center;gap:.85rem;margin-bottom:1.5rem}
+.divider-line{flex:1;height:1px;background:rgba(255,255,255,.1)}
+.divider-text{font-size:.7rem;color:rgba(255,255,255,.28);font-family:var(--mono);letter-spacing:.06em;white-space:nowrap}
+
+/* FORM */
+.field{margin-bottom:1rem}
+.field label{display:block;font-size:.72rem;font-weight:500;color:rgba(255,255,255,.5);margin-bottom:.38rem;letter-spacing:.02em}
+.field-hint{font-size:.68rem;color:rgba(255,255,255,.28);margin-top:.28rem}
+.inp{
+  width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
+  border-radius:7px;padding:.68rem .9rem;
+  font-family:var(--body);font-size:.85rem;color:rgba(255,255,255,.88);
+  outline:none;transition:all .18s;
+}
+.inp:focus{border-color:var(--gm);background:rgba(255,255,255,.1);box-shadow:0 0 0 3px rgba(12,77,58,.2)}
+.inp::placeholder{color:rgba(255,255,255,.22)}
+.inp-error{border-color:rgba(192,57,43,.5)!important;background:rgba(192,57,43,.08)!important}
+
+/* FORGOT */
+.forgot{display:flex;justify-content:flex-end;margin-top:.25rem}
+.forgot a{font-size:.7rem;color:rgba(255,255,255,.3);text-decoration:none;transition:color .15s;font-family:var(--mono)}
+.forgot a:hover{color:rgba(255,255,255,.6)}
+
+/* SUBMIT */
+.btn-submit{
+  width:100%;padding:.82rem;background:var(--cream);color:var(--char);
+  border:none;border-radius:8px;font-family:var(--body);font-size:.9rem;
+  font-weight:600;cursor:pointer;transition:all .18s;margin-top:1.25rem;
+  letter-spacing:.01em;
+}
+.btn-submit:hover{background:#fff;transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,0,0,.25)}
+.btn-submit:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+
+/* SWITCH MODE */
+.switch-mode{text-align:center;margin-top:1.5rem;font-size:.78rem;color:rgba(255,255,255,.3)}
+.switch-mode button{background:none;border:none;color:rgba(255,255,255,.6);cursor:pointer;font-family:var(--body);font-size:.78rem;text-decoration:underline;padding:0;margin-left:.3rem;transition:color .15s}
+.switch-mode button:hover{color:rgba(255,255,255,.9)}
+
+/* ERROR / SUCCESS */
+.auth-msg{
+  padding:.65rem .9rem;border-radius:7px;font-size:.78rem;margin-bottom:1rem;
+  display:none;line-height:1.5;
+}
+.auth-msg.error{background:rgba(192,57,43,.15);border:1px solid rgba(192,57,43,.3);color:#F5A5A5;display:block}
+.auth-msg.success{background:rgba(12,77,58,.2);border:1px solid rgba(12,77,58,.4);color:var(--gm);display:block}
+
+/* RESET VIEW */
+.reset-sent{text-align:center;padding:1rem 0;display:none}
+.reset-icon{font-size:2rem;margin-bottom:.75rem}
+.reset-title{font-family:var(--serif);font-size:1.35rem;font-style:italic;color:rgba(255,255,255,.88);margin-bottom:.5rem}
+.reset-sub{font-size:.8rem;color:rgba(255,255,255,.38);line-height:1.65}
+
+/* LOADING SPINNER */
+.spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:var(--char);border-radius:50%;animation:spin .7s linear infinite;display:none;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.btn-submit.loading{display:flex;align-items:center;justify-content:center;gap:.6rem}
+.btn-submit.loading .spinner{display:block}
+
+/* TERMS */
+.terms{text-align:center;margin-top:1.25rem;font-size:.68rem;color:rgba(255,255,255,.22);line-height:1.6}
+.terms a{color:rgba(255,255,255,.35);text-decoration:underline}
+</style>
+</head>
+<body>
+
+<div class="bg-orb bg-orb-1"></div>
+<div class="bg-orb bg-orb-2"></div>
+<div class="bg-noise"></div>
+
+<nav class="auth-nav">
+  <a class="logo" href="index.html">
+    <div class="logo-mark">
+      <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
+        <path d="M9 2L16 6v6l-7 4L2 12V6l7-4z" stroke="rgba(243,241,235,.8)" stroke-width="1.4" fill="none" stroke-linejoin="round"/>
+        <path d="M9 2v10M2 6l7 4 7-4" stroke="rgba(243,241,235,.6)" stroke-width="1.1" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="logo-word">Arce</div>
+  </a>
+  <a class="nav-back" href="index.html">← Tilbake</a>
+</nav>
+
+<div class="auth-main">
+  <div class="auth-card">
+
+    <div class="auth-header">
+      <div class="auth-title" id="cardTitle">Velkommen tilbake</div>
+      <div class="auth-sub" id="cardSub">Logg inn for å gå til dashboardet ditt</div>
+    </div>
+
+    <div class="auth-msg" id="authMsg"></div>
+
+    <!-- Google OAuth -->
+    <button class="btn-google" onclick="signInGoogle()">
+      <svg class="google-icon" width="18" height="18" viewBox="0 0 18 18">
+        <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+        <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z" fill="#34A853"/>
+        <path d="M3.964 10.71c-.18-.54-.282-1.117-.282-1.71s.102-1.17.282-1.71V4.958H.957C.347 6.173 0 7.548 0 9s.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+        <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+      </svg>
+      Fortsett med Google
+    </button>
+
+    <div class="divider">
+      <div class="divider-line"></div>
+      <div class="divider-text">eller med e-post</div>
+      <div class="divider-line"></div>
+    </div>
+
+    <!-- Login form -->
+    <div id="loginForm">
+      <div class="field">
+        <label>E-post</label>
+        <input class="inp" type="email" id="loginEmail" placeholder="din@bedrift.no" autocomplete="email"/>
+      </div>
+      <div class="field">
+        <label>Passord</label>
+        <input class="inp" type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password"/>
+        <div class="forgot"><a href="#" onclick="showForgot();return false">Glemt passord?</a></div>
+      </div>
+      <button class="btn-submit" id="loginBtn" onclick="doLogin()">
+        <span class="spinner"></span>
+        <span class="btn-label">Logg inn</span>
+      </button>
+      <div class="switch-mode">Ny bruker?<button onclick="showSignup()">Opprett konto</button></div>
+      <div class="terms">Ved å logge inn godtar du <a href="#">Vilkår</a> og <a href="#">Personvernerklæring</a></div>
+    </div>
+
+    <!-- Signup form -->
+    <div id="signupForm" style="display:none">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.65rem">
+        <div class="field">
+          <label>Fornavn</label>
+          <input class="inp" type="text" id="signupFirst" placeholder="Kari" autocomplete="given-name"/>
+        </div>
+        <div class="field">
+          <label>Etternavn</label>
+          <input class="inp" type="text" id="signupLast" placeholder="Nilsen" autocomplete="family-name"/>
+        </div>
+      </div>
+      <div class="field">
+        <label>E-post</label>
+        <input class="inp" type="email" id="signupEmail" placeholder="din@bedrift.no" autocomplete="email"/>
+      </div>
+      <div class="field">
+        <label>Passord</label>
+        <input class="inp" type="password" id="signupPass" placeholder="Minst 8 tegn" autocomplete="new-password"/>
+        <div class="field-hint">Bruk minst 8 tegn, gjerne med tall og symboler</div>
+      </div>
+      <button class="btn-submit" id="signupBtn" onclick="doSignup()">
+        <span class="spinner"></span>
+        <span class="btn-label">Opprett konto</span>
+      </button>
+      <div class="switch-mode">Har konto?<button onclick="showLogin()">Logg inn</button></div>
+    </div>
+
+    <!-- Forgot password form -->
+    <div id="forgotForm" style="display:none">
+      <div class="field">
+        <label>E-post</label>
+        <input class="inp" type="email" id="forgotEmail" placeholder="din@bedrift.no"/>
+      </div>
+      <button class="btn-submit" id="forgotBtn" onclick="doForgot()">
+        <span class="spinner"></span>
+        <span class="btn-label">Send tilbakestillingslenke</span>
+      </button>
+      <div class="switch-mode"><button onclick="showLogin()">← Tilbake til innlogging</button></div>
+    </div>
+
+    <!-- Reset sent confirmation -->
+    <div class="reset-sent" id="resetSent">
+      <div class="reset-icon">✉️</div>
+      <div class="reset-title">Sjekk innboksen din</div>
+      <p class="reset-sub">Vi har sendt en tilbakestillingslenke til e-postadressen din. Den er gyldig i 60 minutter.</p>
+    </div>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+/* ─── CONFIG — replace with your credentials ─── */
+const SUPABASE_URL  = 'https://YOUR_PROJECT_ID.supabase.co';
+const SUPABASE_ANON = 'YOUR_ANON_PUBLIC_KEY';
+
+let sb;
+try { sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON); }
+catch(e) { showMsg('Supabase er ikke konfigurert. Se README.', 'error'); }
+
+/* Redirect if already logged in */
+(async () => {
+  if (!sb) return;
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) window.location.href = 'dashboard.html';
+})();
+
+/* ─── UI HELPERS ─── */
+function showMsg(text, type) {
+  const el = document.getElementById('authMsg');
+  el.textContent = text;
+  el.className = 'auth-msg ' + type;
+}
+function clearMsg() {
+  const el = document.getElementById('authMsg');
+  el.className = 'auth-msg';
+  el.textContent = '';
+}
+function setLoading(btnId, loading) {
+  const btn = document.getElementById(btnId);
+  const sp = btn.querySelector('.spinner');
+  const lbl = btn.querySelector('.btn-label');
+  btn.disabled = loading;
+  if (sp) sp.style.display = loading ? 'block' : 'none';
+  if (lbl) lbl.textContent = loading ? 'Vent litt…' : btn.dataset.label || lbl.textContent;
+}
+
+/* ─── VIEW SWITCHING ─── */
+function showForm(id) {
+  ['loginForm','signupForm','forgotForm','resetSent'].forEach(f =>
+    document.getElementById(f).style.display = f === id ? 'block' : 'none');
+  clearMsg();
+}
+function showLogin() {
+  document.getElementById('cardTitle').textContent = 'Velkommen tilbake';
+  document.getElementById('cardSub').textContent = 'Logg inn for å gå til dashboardet ditt';
+  showForm('loginForm');
+}
+function showSignup() {
+  document.getElementById('cardTitle').textContent = 'Opprett konto';
+  document.getElementById('cardSub').textContent = '14 dager gratis — ingen kredittkort';
+  showForm('signupForm');
+}
+function showForgot() {
+  document.getElementById('cardTitle').textContent = 'Tilbakestill passord';
+  document.getElementById('cardSub').textContent = 'Vi sender en lenke til e-posten din';
+  showForm('forgotForm');
+}
+
+/* ─── AUTH ACTIONS ─── */
+async function signInGoogle() {
+  if (!sb) return;
+  clearMsg();
+  const { error } = await sb.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: window.location.origin + '/dashboard.html' }
+  });
+  if (error) showMsg(error.message, 'error');
+}
+
+async function doLogin() {
+  if (!sb) return;
+  clearMsg();
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass  = document.getElementById('loginPass').value;
+  if (!email || !pass) { showMsg('Fyll inn e-post og passord.', 'error'); return; }
+  setLoading('loginBtn', true);
+  const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+  setLoading('loginBtn', false);
+  if (error) { showMsg(error.message, 'error'); return; }
+  showMsg('Logger inn…', 'success');
+  setTimeout(() => window.location.href = 'dashboard.html', 600);
+}
+
+async function doSignup() {
+  if (!sb) return;
+  clearMsg();
+  const first = document.getElementById('signupFirst').value.trim();
+  const last  = document.getElementById('signupLast').value.trim();
+  const email = document.getElementById('signupEmail').value.trim();
+  const pass  = document.getElementById('signupPass').value;
+  if (!first || !email || !pass) { showMsg('Fyll inn alle påkrevde felt.', 'error'); return; }
+  if (pass.length < 8) { showMsg('Passordet må være minst 8 tegn.', 'error'); return; }
+  setLoading('signupBtn', true);
+  const { error } = await sb.auth.signUp({
+    email, password: pass,
+    options: { data: { full_name: `${first} ${last}`.trim() } }
+  });
+  setLoading('signupBtn', false);
+  if (error) { showMsg(error.message, 'error'); return; }
+  showMsg('Konto opprettet! Sjekk e-posten din for bekreftelse.', 'success');
+}
+
+async function doForgot() {
+  if (!sb) return;
+  clearMsg();
+  const email = document.getElementById('forgotEmail').value.trim();
+  if (!email) { showMsg('Skriv inn e-postadressen din.', 'error'); return; }
+  setLoading('forgotBtn', true);
+  const { error } = await sb.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin + '/auth.html'
+  });
+  setLoading('forgotBtn', false);
+  if (error) { showMsg(error.message, 'error'); return; }
+  document.getElementById('cardTitle').textContent = 'E-post sendt';
+  document.getElementById('cardSub').textContent = '';
+  showForm('resetSent');
+}
+
+/* Enter key support */
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  if (document.getElementById('loginForm').style.display !== 'none') doLogin();
+  else if (document.getElementById('signupForm').style.display !== 'none') doSignup();
+  else if (document.getElementById('forgotForm').style.display !== 'none') doForgot();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arce — Kom i gang</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --cream:#F7F5EF;--cream2:#EFEDE6;--white:#FDFCF9;
+  --ink:#171613;--ink2:#3A3834;--ink3:#6A6760;--ink4:#9E9B96;
+  --f:#0A4A38;--f2:#0D5C48;--f3:#0F6E57;
+  --fl:#EAF2EE;--fm:#B6D3C9;
+  --gold:#C49A3C;--gl:#F5EDD6;--gm:#E8D5A0;
+  --border:#E0DDD6;--border2:#CCC9C1;
+  --sh:0 2px 8px rgba(23,22,19,.07),0 12px 40px rgba(23,22,19,.06);
+  --serif:'Instrument Serif',Georgia,serif;
+  --sans:'Plus Jakarta Sans',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+}
+html,body{height:100%;background:var(--cream)}
+body{font-family:var(--sans);color:var(--ink);font-weight:300;display:flex;flex-direction:column;min-height:100vh}
+
+/* TOPBAR */
+.ob-top{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1rem 2.5rem;border-bottom:1px solid var(--border);
+  background:var(--white);flex-shrink:0;
+}
+.logo-wrap{display:flex;align-items:center;gap:9px;text-decoration:none}
+.logo-text{font-family:var(--serif);font-size:1.25rem;font-style:italic;color:var(--ink)}
+.logo-text span{color:var(--f2)}
+.ob-step-info{font-size:.78rem;color:var(--ink4);font-family:var(--mono)}
+.ob-step-info strong{color:var(--ink2)}
+
+/* PROGRESS BAR */
+.progress-bar-wrap{height:3px;background:var(--border)}
+.progress-bar{height:100%;background:var(--f2);transition:width .4s ease}
+
+/* LAYOUT */
+.ob-body{display:flex;flex:1}
+
+/* LEFT STEPS */
+.ob-steps{
+  width:280px;flex-shrink:0;border-right:1px solid var(--border);
+  background:var(--white);padding:2rem 1.5rem;
+  display:flex;flex-direction:column;gap:.25rem;
+}
+.ob-step-item{
+  display:flex;align-items:center;gap:.85rem;padding:.75rem .85rem;
+  border-radius:8px;cursor:default;transition:background .15s;
+}
+.ob-step-num{
+  width:28px;height:28px;border-radius:50%;border:1.5px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:.68rem;color:var(--ink4);flex-shrink:0;
+  transition:all .2s;
+}
+.ob-step-num.done{background:var(--f2);border-color:var(--f2);color:#fff}
+.ob-step-num.active{border-color:var(--f2);color:var(--f2);font-weight:700}
+.ob-step-label{font-size:.82rem;color:var(--ink3)}
+.ob-step-label.active{color:var(--ink);font-weight:500}
+.ob-step-label.done{color:var(--ink4)}
+
+/* MAIN CONTENT */
+.ob-content{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:3rem 2rem;overflow-y:auto}
+.ob-card{
+  background:var(--white);border:1px solid var(--border);border-radius:14px;
+  box-shadow:var(--sh);width:100%;max-width:560px;overflow:hidden;
+}
+.ob-card-head{padding:2rem 2.25rem 1.5rem;border-bottom:1px solid var(--border)}
+.ob-card-step{font-family:var(--mono);font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--f2);margin-bottom:.6rem;display:flex;align-items:center;gap:7px}
+.ob-card-step::before{content:'';width:14px;height:1px;background:var(--f2)}
+.ob-card-title{font-family:var(--serif);font-size:1.6rem;font-style:italic;color:var(--ink);line-height:1.2;margin-bottom:.4rem}
+.ob-card-sub{font-size:.85rem;color:var(--ink3);line-height:1.65}
+.ob-card-body{padding:1.75rem 2.25rem}
+.ob-card-footer{padding:1.25rem 2.25rem;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--cream)}
+
+/* FORM ELEMENTS */
+.field{margin-bottom:1.1rem}
+.field label{display:block;font-size:.78rem;font-weight:500;color:var(--ink2);margin-bottom:.45rem}
+.field-sub{font-size:.72rem;color:var(--ink4);margin-top:.25rem}
+.inp{
+  width:100%;background:var(--cream);border:1px solid var(--border2);border-radius:7px;
+  padding:.7rem .95rem;font-family:var(--sans);font-size:.85rem;color:var(--ink);
+  outline:none;transition:all .2s;
+}
+.inp:focus{border-color:var(--f2);background:var(--white);box-shadow:0 0 0 3px rgba(10,74,56,.08)}
+.inp::placeholder{color:var(--ink4)}
+.sel{
+  width:100%;background:var(--cream);border:1px solid var(--border2);border-radius:7px;
+  padding:.7rem .95rem;font-family:var(--sans);font-size:.85rem;color:var(--ink);
+  outline:none;cursor:pointer;transition:border-color .2s;
+}
+.sel:focus{border-color:var(--f2)}
+.txt{
+  width:100%;background:var(--cream);border:1px solid var(--border2);border-radius:7px;
+  padding:.7rem .95rem;font-family:var(--sans);font-size:.85rem;color:var(--ink);
+  outline:none;resize:none;transition:all .2s;min-height:100px;
+}
+.txt:focus{border-color:var(--f2);background:var(--white)}
+.txt::placeholder{color:var(--ink4)}
+
+/* OPTION CARDS */
+.option-grid{display:grid;grid-template-columns:1fr 1fr;gap:.65rem}
+.option-card{
+  border:1.5px solid var(--border);border-radius:9px;padding:1rem;cursor:pointer;
+  transition:all .15s;background:var(--cream);
+}
+.option-card:hover{border-color:var(--fm);background:var(--fl)}
+.option-card.selected{border-color:var(--f2);background:var(--fl)}
+.option-icon{font-size:1.3rem;margin-bottom:.5rem;display:block}
+.option-label{font-size:.82rem;font-weight:500;color:var(--ink);margin-bottom:.2rem}
+.option-desc{font-size:.74rem;color:var(--ink3)}
+
+/* INTEGRATION CONNECT */
+.integ-row{
+  display:flex;align-items:center;gap:1rem;padding:.9rem;
+  border:1px solid var(--border);border-radius:9px;margin-bottom:.65rem;
+  background:var(--cream);transition:border-color .15s;
+}
+.integ-row.connected{border-color:var(--fm);background:var(--fl)}
+.integ-logo{width:36px;height:36px;border-radius:7px;border:1px solid var(--border);background:var(--white);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+.integ-info{flex:1}
+.integ-name{font-size:.82rem;font-weight:500;color:var(--ink)}
+.integ-desc{font-size:.72rem;color:var(--ink4)}
+.integ-btn{padding:.4rem .9rem;border-radius:6px;font-family:var(--sans);font-size:.75rem;font-weight:500;cursor:pointer;border:none;transition:all .15s;white-space:nowrap}
+.integ-connect{background:var(--f2);color:#fff}
+.integ-connect:hover{background:var(--f3)}
+.integ-done{background:var(--fl);color:var(--f2);border:1px solid var(--fm)}
+
+/* CHANNEL TOGGLES */
+.channel-row{display:flex;align-items:center;justify-content:space-between;padding:.85rem 0;border-bottom:1px solid var(--border)}
+.channel-row:last-child{border-bottom:none}
+.channel-left{display:flex;align-items:center;gap:.75rem}
+.channel-icon{width:34px;height:34px;border:1px solid var(--border);border-radius:8px;background:var(--white);display:flex;align-items:center;justify-content:center;font-size:.95rem}
+.channel-name{font-size:.82rem;font-weight:500;color:var(--ink)}
+.channel-note{font-size:.72rem;color:var(--ink4)}
+.toggle{width:40px;height:22px;background:var(--border2);border-radius:100px;cursor:pointer;transition:background .2s;position:relative;flex-shrink:0}
+.toggle.on{background:var(--f2)}
+.toggle::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;background:#fff;border-radius:50%;transition:transform .2s}
+.toggle.on::after{transform:translateX(18px)}
+
+/* BUTTONS */
+.btn-back{background:transparent;border:1px solid var(--border2);color:var(--ink3);padding:.65rem 1.25rem;border-radius:7px;font-family:var(--sans);font-size:.85rem;font-weight:400;cursor:pointer;transition:all .15s}
+.btn-back:hover{background:var(--cream2);color:var(--ink)}
+.btn-next{background:var(--f2);color:#fff;border:none;padding:.65rem 1.5rem;border-radius:7px;font-family:var(--sans);font-size:.85rem;font-weight:500;cursor:pointer;transition:background .15s;display:flex;align-items:center;gap:.4rem}
+.btn-next:hover{background:var(--f3)}
+
+/* SUCCESS */
+.success-view{display:flex;flex-direction:column;align-items:center;text-align:center;padding:3rem 2rem}
+.success-ring{width:72px;height:72px;border-radius:50%;background:var(--fl);border:2px solid var(--fm);display:flex;align-items:center;justify-content:center;font-size:1.75rem;margin-bottom:1.5rem;animation:pop .4s ease}
+@keyframes pop{0%{transform:scale(.6);opacity:0}70%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
+.success-view h2{font-family:var(--serif);font-size:1.8rem;font-style:italic;color:var(--ink);margin-bottom:.75rem}
+.success-view p{font-size:.88rem;color:var(--ink3);line-height:1.75;max-width:400px;margin-bottom:2rem}
+.checklist-mini{width:100%;max-width:360px;background:var(--cream);border:1px solid var(--border);border-radius:10px;padding:1rem;text-align:left;margin-bottom:2rem}
+.mini-item{display:flex;align-items:center;gap:.65rem;padding:.4rem 0;font-size:.8rem;color:var(--ink2)}
+.mini-item::before{content:'✓';color:var(--f2);font-weight:600;font-size:.85rem;flex-shrink:0}
+
+.view-step{display:none}
+.view-step.active{display:block;animation:stepIn .25s ease}
+@keyframes stepIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+
+<div class="ob-top">
+  <a class="logo-wrap" href="index.html">
+    <svg width="26" height="26" viewBox="0 0 30 30" fill="none"><rect width="30" height="30" rx="7" fill="#0A4A38"/><rect x="7" y="9" width="16" height="14" rx="2.5" stroke="#F7F5EF" stroke-width="1.5" fill="none"/><line x1="7" y1="13" x2="23" y2="13" stroke="#F7F5EF" stroke-width="1.5"/><line x1="11" y1="7" x2="11" y2="11" stroke="#F7F5EF" stroke-width="1.5" stroke-linecap="round"/><line x1="19" y1="7" x2="19" y2="11" stroke="#F7F5EF" stroke-width="1.5" stroke-linecap="round"/><path d="M11.5 18l2.5 2.5 5-5" stroke="#C8D9D4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <div class="logo-text">Arce<span>.</span></div>
+  </a>
+  <div class="ob-step-info">Steg <strong id="stepNum">1</strong> av 5 — <span id="stepName">Om bedriften din</span></div>
+</div>
+<div class="progress-bar-wrap"><div class="progress-bar" id="progressBar" style="width:20%"></div></div>
+
+<div class="ob-body">
+  <!-- SIDEBAR STEPS -->
+  <aside class="ob-steps">
+    <div class="ob-step-item" id="si1"><div class="ob-step-num active" id="sn1">1</div><div class="ob-step-label active" id="sl1">Om bedriften din</div></div>
+    <div class="ob-step-item" id="si2"><div class="ob-step-num" id="sn2">2</div><div class="ob-step-label" id="sl2">Konfigurer AI-agenten</div></div>
+    <div class="ob-step-item" id="si3"><div class="ob-step-num" id="sn3">3</div><div class="ob-step-label" id="sl3">Koble til kalender</div></div>
+    <div class="ob-step-item" id="si4"><div class="ob-step-num" id="sn4">4</div><div class="ob-step-label" id="sl4">Kommunikasjonskanaler</div></div>
+    <div class="ob-step-item" id="si5"><div class="ob-step-num" id="sn5">5</div><div class="ob-step-label" id="sl5">Importer første leads</div></div>
+  </aside>
+
+  <!-- CONTENT -->
+  <div class="ob-content">
+
+    <!-- STEP 1: About your business -->
+    <div class="view-step active" id="step1">
+      <div class="ob-card">
+        <div class="ob-card-head">
+          <div class="ob-card-step">Steg 1 av 5</div>
+          <div class="ob-card-title">Fortell oss om bedriften din</div>
+          <div class="ob-card-sub">Arce bruker denne informasjonen til å tilpasse AI-agenten din og gjøre kommunikasjonen så naturlig som mulig.</div>
+        </div>
+        <div class="ob-card-body">
+          <div class="field">
+            <label>Bedriftsnavn *</label>
+            <input class="inp" id="f_company" placeholder="Eks: Nordvik Eiendom AS" />
+          </div>
+          <div class="field">
+            <label>Hva gjør bedriften din? *</label>
+            <input class="inp" id="f_what" placeholder="Eks: Vi selger og kjøper boliger i Trondheim-regionen" />
+            <div class="field-sub">Brukes av AI-agenten til å svare naturlig på spørsmål fra leads.</div>
+          </div>
+          <div class="field">
+            <label>Hvilken bransje er du i? *</label>
+            <select class="sel" id="f_industry">
+              <option value="">Velg bransje…</option>
+              <option>Eiendomsmegling</option>
+              <option>Konsulent / Rådgivning</option>
+              <option>B2B-salg / SaaS</option>
+              <option>Helse og velvære</option>
+              <option>Coaching / Trening</option>
+              <option>Finans / Forsikring</option>
+              <option>Bygg og anlegg</option>
+              <option>Annet</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Hvem er din typiske kunde?</label>
+            <input class="inp" id="f_customer" placeholder="Eks: Boligkjøpere mellom 30–50 år i Trondheim" />
+          </div>
+        </div>
+        <div class="ob-card-footer">
+          <div style="font-size:.74rem;color:var(--ink4)">* Obligatorisk</div>
+          <button class="btn-next" onclick="goToStep(2)">Neste steg →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2: Configure AI agent -->
+    <div class="view-step" id="step2">
+      <div class="ob-card">
+        <div class="ob-card-head">
+          <div class="ob-card-step">Steg 2 av 5</div>
+          <div class="ob-card-title">Konfigurer AI-agenten</div>
+          <div class="ob-card-sub">Bestem hvordan agenten skal oppføre seg og hvilke spørsmål den stiller for å kvalifisere leads.</div>
+        </div>
+        <div class="ob-card-body">
+          <div class="field">
+            <label>Hva heter agenten? (valgfritt)</label>
+            <input class="inp" id="f_agentname" placeholder="Eks: Sara (eller la den hete 'Arce')" />
+            <div class="field-sub">Leads vil se dette navnet i meldinger.</div>
+          </div>
+          <div class="field">
+            <label>Tone og personlighet</label>
+            <select class="sel" id="f_tone">
+              <option>Profesjonell og direkte</option>
+              <option>Vennlig og uformell</option>
+              <option>Formell og konservativ</option>
+              <option>Entusiastisk og hjelpsom</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Kvalifiseringsspørsmål</label>
+            <textarea class="txt" id="f_qual" placeholder="Skriv inn spørsmålene AI-en skal stille for å kvalifisere leads. Eks:&#10;&#10;1. Hva er budsjettet ditt?&#10;2. Er du på utkikk etter kjøp eller salg?&#10;3. Ønsket tidslinje?"></textarea>
+            <div class="field-sub">AI-en vil stille disse spørsmålene naturlig i samtalen — ikke som en skjema.</div>
+          </div>
+          <div class="field">
+            <label>Hva skjer etter et møte er booket?</label>
+            <select class="sel">
+              <option>Agenten takker og avslutter samtalen</option>
+              <option>Agenten sender bekreftelse og møteagenda</option>
+              <option>Agenten spør om det er noe de skal forberede</option>
+            </select>
+          </div>
+        </div>
+        <div class="ob-card-footer">
+          <button class="btn-back" onclick="goToStep(1)">← Tilbake</button>
+          <button class="btn-next" onclick="goToStep(3)">Neste steg →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 3: Calendar -->
+    <div class="view-step" id="step3">
+      <div class="ob-card">
+        <div class="ob-card-head">
+          <div class="ob-card-step">Steg 3 av 5</div>
+          <div class="ob-card-title">Koble til kalenderen din</div>
+          <div class="ob-card-sub">Arce sjekker tilgjengeligheten din i sanntid og booker møter direkte — uten at du trenger å gjøre noe.</div>
+        </div>
+        <div class="ob-card-body">
+          <div class="integ-row" id="gcal-row">
+            <div class="integ-logo">📅</div>
+            <div class="integ-info"><div class="integ-name">Google Calendar</div><div class="integ-desc">Kobler direkte til Gmail-kontoen din</div></div>
+            <button class="integ-btn integ-connect" id="gcal-btn" onclick="connectCal('gcal')">Koble til</button>
+          </div>
+          <div class="integ-row" id="outlook-row">
+            <div class="integ-logo">📧</div>
+            <div class="integ-info"><div class="integ-name">Outlook / Microsoft 365</div><div class="integ-desc">For bedrifter med Microsoft-konto</div></div>
+            <button class="integ-btn integ-connect" id="outlook-btn" onclick="connectCal('outlook')">Koble til</button>
+          </div>
+          <div style="margin-top:1.25rem">
+            <div class="field">
+              <label>Tilgjengelig for møter</label>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:.65rem">
+                <div><div style="font-size:.74rem;color:var(--ink4);margin-bottom:.3rem">Fra</div><input class="inp" type="time" value="09:00"/></div>
+                <div><div style="font-size:.74px;color:var(--ink4);margin-bottom:.3rem">Til</div><input class="inp" type="time" value="17:00"/></div>
+              </div>
+            </div>
+            <div class="field">
+              <label>Minstetid mellom møter (buffer)</label>
+              <select class="sel"><option>15 minutter</option><option selected>30 minutter</option><option>45 minutter</option><option>1 time</option></select>
+            </div>
+          </div>
+        </div>
+        <div class="ob-card-footer">
+          <button class="btn-back" onclick="goToStep(2)">← Tilbake</button>
+          <button class="btn-next" onclick="goToStep(4)">Neste steg →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 4: Channels -->
+    <div class="view-step" id="step4">
+      <div class="ob-card">
+        <div class="ob-card-head">
+          <div class="ob-card-step">Steg 4 av 5</div>
+          <div class="ob-card-title">Kommunikasjonskanaler</div>
+          <div class="ob-card-sub">Aktiver kanalene AI-agenten skal bruke til å nå leads. Flere kanaler = høyere svarprosent.</div>
+        </div>
+        <div class="ob-card-body">
+          <div class="channel-row">
+            <div class="channel-left"><div class="channel-icon">✉️</div><div><div class="channel-name">E-post</div><div class="channel-note">Inkludert i alle planer · Krever ingen ekstra oppsett</div></div></div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="channel-row">
+            <div class="channel-left"><div class="channel-icon">💬</div><div><div class="channel-name">SMS</div><div class="channel-note">Krever Twilio API-nøkkel · ~kr 0,80/SMS</div></div></div>
+            <div class="toggle" id="smsToggle" onclick="toggleSMS()"></div>
+          </div>
+          <div id="smsKeyField" style="display:none;padding:.85rem;background:var(--cream);border:1px solid var(--border);border-radius:8px;margin-top:.25rem">
+            <div style="font-size:.74rem;color:var(--ink3);margin-bottom:.6rem">Logg inn på <strong>twilio.com</strong>, gå til Console Dashboard og kopier Account SID og Auth Token.</div>
+            <input class="inp" placeholder="Twilio Account SID" style="margin-bottom:.5rem"/>
+            <input class="inp" placeholder="Twilio Auth Token" type="password"/>
+          </div>
+          <div class="channel-row">
+            <div class="channel-left"><div class="channel-icon">🟢</div><div><div class="channel-name">WhatsApp</div><div class="channel-note">Via Twilio WhatsApp API · Vekst og Agency-plan</div></div></div>
+            <div class="toggle" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="channel-row">
+            <div class="channel-left"><div class="channel-icon">📞</div><div><div class="channel-name">Telefon (AI-stemme)</div><div class="channel-note">Agency-plan · Kommer snart</div></div></div>
+            <div class="toggle" style="opacity:.4;pointer-events:none"></div>
+          </div>
+          <div style="margin-top:1.25rem;padding:.85rem;background:var(--fl);border:1px solid var(--fm);border-radius:8px;font-size:.78rem;color:var(--f2)">
+            💡 <strong>Tips:</strong> Bedrifter som aktiverer e-post + SMS får 2,3× høyere svarprosent enn de som kun bruker e-post.
+          </div>
+        </div>
+        <div class="ob-card-footer">
+          <button class="btn-back" onclick="goToStep(3)">← Tilbake</button>
+          <button class="btn-next" onclick="goToStep(5)">Neste steg →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 5: Import leads -->
+    <div class="view-step" id="step5">
+      <div class="ob-card">
+        <div class="ob-card-head">
+          <div class="ob-card-step">Steg 5 av 5</div>
+          <div class="ob-card-title">Importer dine første leads</div>
+          <div class="ob-card-sub">Legg til leads nå, så begynner AI-agenten å kontakte dem umiddelbart etter aktivering.</div>
+        </div>
+        <div class="ob-card-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.65rem;margin-bottom:1.25rem" id="importOptions">
+            <div class="option-card selected" id="opt-manual" onclick="selectImport('manual')">
+              <span class="option-icon">✍️</span>
+              <div class="option-label">Legg til manuelt</div>
+              <div class="option-desc">Skriv inn navn og e-post</div>
+            </div>
+            <div class="option-card" id="opt-csv" onclick="selectImport('csv')">
+              <span class="option-icon">📄</span>
+              <div class="option-label">Last opp CSV</div>
+              <div class="option-desc">Fra Excel eller Google Sheets</div>
+            </div>
+          </div>
+
+          <!-- MANUAL -->
+          <div id="manualImport">
+            <div id="leadInputs">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.5rem">
+                <input class="inp" placeholder="Navn" id="ln1"/>
+                <input class="inp" placeholder="E-post" id="le1"/>
+              </div>
+            </div>
+            <button onclick="addLeadRow()" style="background:none;border:1px dashed var(--border2);border-radius:7px;padding:.55rem;width:100%;font-size:.78rem;color:var(--ink4);cursor:pointer;transition:all .15s;font-family:var(--sans)" onmouseover="this.style.borderColor='var(--fm)';this.style.color='var(--f2)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--ink4)'">+ Legg til en til</button>
+          </div>
+
+          <!-- CSV -->
+          <div id="csvImport" style="display:none">
+            <div style="border:2px dashed var(--border2);border-radius:10px;padding:2rem;text-align:center;background:var(--cream);cursor:pointer;transition:all .2s" onclick="showCSVSuccess()" onmouseover="this.style.borderColor='var(--fm)'" onmouseout="this.style.borderColor='var(--border2)'">
+              <div style="font-size:1.75rem;margin-bottom:.5rem">📂</div>
+              <div style="font-size:.82rem;font-weight:500;color:var(--ink2);margin-bottom:.25rem">Klikk for å laste opp CSV-fil</div>
+              <div style="font-size:.74rem;color:var(--ink4)">Kolonnene: navn, epost (eller name, email)</div>
+            </div>
+            <div id="csvSuccess" style="display:none;margin-top:.75rem;background:var(--fl);border:1px solid var(--fm);border-radius:8px;padding:.75rem 1rem;font-size:.8rem;color:var(--f2)">✓ 24 leads importert og klare for oppfølging</div>
+          </div>
+
+          <div style="margin-top:1.25rem;padding:.85rem;background:var(--gl);border:1px solid var(--gm);border-radius:8px;font-size:.78rem;color:#6B4A10">
+            🚀 <strong>Etter aktivering:</strong> AI-agenten kontakter alle leads innen 2 minutter og begynner å qualifisere og booke møter automatisk.
+          </div>
+        </div>
+        <div class="ob-card-footer">
+          <button class="btn-back" onclick="goToStep(4)">← Tilbake</button>
+          <button class="btn-next" onclick="finish()" style="background:var(--f2);padding:.65rem 1.75rem">
+            ✓ Aktiver Arce
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUCCESS -->
+    <div class="view-step" id="stepSuccess">
+      <div class="ob-card">
+        <div class="success-view">
+          <div class="success-ring">🚀</div>
+          <h2>Arce er aktivert!</h2>
+          <p>AI-agenten din er i gang og kontakter leads nå. Du vil se de første bookede møtene i dashboardet ditt innen kort tid.</p>
+          <div class="checklist-mini">
+            <div class="mini-item">Bedriftsprofil konfigurert</div>
+            <div class="mini-item">AI-agent trent og klar</div>
+            <div class="mini-item">Kalender koblet til</div>
+            <div class="mini-item">Kommunikasjonskanaler aktivert</div>
+            <div class="mini-item">Leads importert — oppfølging startet</div>
+          </div>
+          <a href="dashboard.html" style="background:var(--f2);color:#fff;border:none;padding:.75rem 2rem;border-radius:8px;font-family:var(--sans);font-size:.9rem;font-weight:500;cursor:pointer;text-decoration:none;display:inline-block;transition:background .15s" onmouseover="this.style.background='var(--f3)'" onmouseout="this.style.background='var(--f2)'">Gå til dashboardet →</a>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /ob-content -->
+</div><!-- /ob-body -->
+
+<script>
+let currentStep=1;
+const stepNames=['Om bedriften din','Konfigurer AI-agenten','Koble til kalender','Kommunikasjonskanaler','Importer første leads'];
+const totalSteps=5;
+let leadRowCount=1;
+
+function goToStep(n){
+  document.querySelectorAll('.view-step').forEach(v=>v.classList.remove('active'));
+  document.getElementById('step'+n).classList.add('active');
+
+  // Update sidebar
+  for(let i=1;i<=totalSteps;i++){
+    const num=document.getElementById('sn'+i);
+    const lbl=document.getElementById('sl'+i);
+    if(i<n){num.className='ob-step-num done';num.textContent='✓';lbl.className='ob-step-label done'}
+    else if(i===n){num.className='ob-step-num active';num.textContent=i;lbl.className='ob-step-label active'}
+    else{num.className='ob-step-num';num.textContent=i;lbl.className='ob-step-label'}
+  }
+  document.getElementById('stepNum').textContent=n;
+  document.getElementById('stepName').textContent=stepNames[n-1];
+  document.getElementById('progressBar').style.width=(n/totalSteps*100)+'%';
+  currentStep=n;
+  window.scrollTo(0,0);
+}
+
+function finish(){
+  document.querySelectorAll('.view-step').forEach(v=>v.classList.remove('active'));
+  document.getElementById('stepSuccess').classList.add('active');
+  document.getElementById('progressBar').style.width='100%';
+  for(let i=1;i<=totalSteps;i++){
+    const num=document.getElementById('sn'+i);
+    const lbl=document.getElementById('sl'+i);
+    num.className='ob-step-num done';num.textContent='✓';
+    lbl.className='ob-step-label done';
+  }
+}
+
+function connectCal(type){
+  const btn=document.getElementById(type===('gcal')?'gcal-btn':'outlook-btn');
+  const row=document.getElementById(type===('gcal')?'gcal-row':'outlook-row');
+  btn.textContent='Tilkoblet ✓';
+  btn.className='integ-btn integ-done';
+  row.classList.add('connected');
+}
+
+function toggleSMS(){
+  const t=document.getElementById('smsToggle');
+  t.classList.toggle('on');
+  document.getElementById('smsKeyField').style.display=t.classList.contains('on')?'block':'none';
+}
+
+function selectImport(type){
+  document.getElementById('opt-manual').classList.toggle('selected',type==='manual');
+  document.getElementById('opt-csv').classList.toggle('selected',type==='csv');
+  document.getElementById('manualImport').style.display=type==='manual'?'block':'none';
+  document.getElementById('csvImport').style.display=type==='csv'?'block':'none';
+}
+
+function addLeadRow(){
+  leadRowCount++;
+  const n=leadRowCount;
+  const div=document.createElement('div');
+  div.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.5rem';
+  div.innerHTML=`<input class="inp" placeholder="Navn" id="ln${n}"/><input class="inp" placeholder="E-post" id="le${n}"/>`;
+  document.getElementById('leadInputs').appendChild(div);
+}
+
+function showCSVSuccess(){
+  document.getElementById('csvSuccess').style.display='block';
+}
+</script>
+</body>
+</html>

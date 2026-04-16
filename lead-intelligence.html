@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arce — Lead Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital,wght@0,400;0,500;1,400;1,500&family=Plus+Jakarta+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F6F4EE;--bg2:#EDEBE4;--bg3:#E3E0D7;
+  --white:#FDFCF9;--ink:#171613;--ink2:#38362F;--ink3:#6B6860;--ink4:#A09D97;
+  --f:#0B4D3C;--f2:#0E6050;--f3:#117062;--fl:#E9F3EE;--fm:#AECFC4;--fd:rgba(11,77,60,.07);
+  --gold:#C49A3C;--gl:#F5EDD6;--gm:#DBBF76;
+  --red:#B83232;--rl:#FEEEEE;--rm:#F2B8B8;
+  --amber:#8A5C00;--al:#FEF6E4;--am:#F0D080;
+  --blue:#1A3FA8;--bl:#EEF2FF;
+  --border:#DEDAD2;--border2:#C9C5BC;
+  --sh:0 1px 3px rgba(23,22,19,.06),0 6px 24px rgba(23,22,19,.05);
+  --sh2:0 4px 16px rgba(23,22,19,.09),0 24px 64px rgba(23,22,19,.07);
+  --serif:'Instrument Serif',Georgia,serif;
+  --sans:'Plus Jakarta Sans',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+}
+
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-weight:300;min-height:100vh;font-size:14px}
+
+/* ─── NAV ─── */
+.nav{
+  position:sticky;top:0;z-index:100;
+  background:rgba(246,244,238,.95);backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 2.5rem;height:58px;
+}
+.nav-logo{display:flex;align-items:center;gap:9px;text-decoration:none}
+.nav-logo-mark{display:flex;align-items:center;justify-content:center}
+.nav-logo-text{font-family:var(--serif);font-size:1.15rem;font-style:italic;color:var(--ink);line-height:1}
+.nav-logo-text b{font-style:normal;color:var(--f2);font-weight:400}
+.nav-right{display:flex;align-items:center;gap:.75rem}
+.nav-pill{font-family:var(--mono);font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;background:var(--fl);color:var(--f2);border:1px solid var(--fm);padding:.25rem .7rem;border-radius:100px}
+.nav-link{font-size:.8rem;color:var(--ink3);text-decoration:none;transition:color .15s}
+.nav-link:hover{color:var(--ink)}
+
+/* ─── HERO ─── */
+.hero{
+  background:var(--white);border-bottom:1px solid var(--border);
+  padding:3.5rem 2rem 3rem;text-align:center;position:relative;overflow:hidden;
+}
+.hero-grid{
+  position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);
+  background-size:44px 44px;
+  mask-image:radial-gradient(ellipse 70% 80% at 50% 40%,black 10%,transparent 100%);
+  opacity:.35;
+}
+.hero-glow{position:absolute;top:-5%;left:50%;transform:translateX(-50%);width:600px;height:400px;background:radial-gradient(ellipse,rgba(11,77,60,.06) 0%,transparent 65%);pointer-events:none}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:7px;background:var(--fl);border:1px solid var(--fm);color:var(--f2);padding:.28rem .85rem;border-radius:100px;font-family:var(--mono);font-size:.6rem;letter-spacing:.07em;text-transform:uppercase;margin-bottom:1.5rem;position:relative;animation:up .5s ease both}
+.hero-dot{width:6px;height:6px;background:var(--f3);border-radius:50%;animation:pulse 2s ease infinite}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(17,112,98,.5)}70%{opacity:.7;box-shadow:0 0 0 5px rgba(17,112,98,0)}}
+.hero h1{font-family:var(--serif);font-size:clamp(2.2rem,5vw,3.75rem);font-style:italic;font-weight:400;color:var(--ink);line-height:1.05;letter-spacing:-.02em;margin-bottom:.85rem;position:relative;animation:up .55s .06s ease both}
+.hero h1 em{color:var(--f2);font-style:italic}
+.hero-sub{font-size:.95rem;color:var(--ink3);max-width:480px;margin:0 auto 1.75rem;line-height:1.78;position:relative;animation:up .55s .12s ease both}
+.hero-trust{display:flex;align-items:center;justify-content:center;gap:1.75rem;flex-wrap:wrap;position:relative;animation:up .55s .18s ease both}
+.trust-item{display:flex;align-items:center;gap:.4rem;font-size:.75rem;color:var(--ink4)}
+.trust-check{color:var(--f2);font-weight:600}
+@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+/* ─── MAIN ─── */
+.main{max-width:980px;margin:0 auto;padding:2rem 1.5rem 4rem}
+
+/* ─── STEP TRACKER ─── */
+.steps-track{display:flex;align-items:center;gap:0;margin-bottom:2rem;background:var(--white);border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:var(--sh)}
+.track-step{flex:1;padding:.85rem 1rem;display:flex;align-items:center;gap:.65rem;border-right:1px solid var(--border);transition:background .2s}
+.track-step:last-child{border-right:none}
+.track-step.st-done{background:var(--fl)}
+.track-step.st-active{background:var(--white)}
+.track-step.st-waiting{background:var(--bg);opacity:.6}
+.track-num{width:22px;height:22px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-family:var(--mono);font-weight:500;border:1.5px solid var(--border2);color:var(--ink4);transition:all .2s}
+.track-step.st-done .track-num{background:var(--f2);border-color:var(--f2);color:#fff}
+.track-step.st-active .track-num{border-color:var(--f2);color:var(--f2)}
+.track-info{min-width:0}
+.track-label{font-size:.75rem;font-weight:500;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.track-step.st-done .track-label{color:var(--f2)}
+.track-sub{font-size:.64rem;color:var(--ink4);font-family:var(--mono)}
+
+/* ─── CARD ─── */
+.card{background:var(--white);border:1px solid var(--border);border-radius:12px;box-shadow:var(--sh);margin-bottom:1.25rem;overflow:hidden}
+.card-head{padding:1.1rem 1.4rem;border-bottom:1px solid var(--border);background:var(--bg);display:flex;align-items:center;justify-content:space-between;gap:.75rem}
+.card-head-left{display:flex;align-items:center;gap:.65rem}
+.card-icon{width:30px;height:30px;border-radius:7px;background:var(--white);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0}
+.card-title{font-size:.85rem;font-weight:500;color:var(--ink)}
+.card-hint{font-size:.72rem;color:var(--ink4)}
+.card-body{padding:1.4rem}
+
+/* ─── FORM ─── */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:.85rem}
+.f{display:flex;flex-direction:column;gap:.38rem}
+.f.full{grid-column:1/-1}
+.f label{font-size:.72rem;font-weight:500;color:var(--ink2);letter-spacing:.01em}
+.f .hint{font-size:.67rem;color:var(--ink4);line-height:1.5}
+.inp,.sel{
+  width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:7px;
+  padding:.62rem .9rem;font-family:var(--sans);font-size:.82rem;color:var(--ink);
+  outline:none;transition:all .18s;
+}
+.inp:focus,.sel:focus{border-color:var(--f2);background:var(--white);box-shadow:0 0 0 3px rgba(11,77,60,.08)}
+.inp::placeholder{color:var(--ink4)}
+.txt{
+  width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:7px;
+  padding:.62rem .9rem;font-family:var(--sans);font-size:.82rem;color:var(--ink);
+  outline:none;resize:vertical;min-height:76px;transition:all .18s;
+}
+.txt:focus{border-color:var(--f2);background:var(--white);box-shadow:0 0 0 3px rgba(11,77,60,.08)}
+.txt::placeholder{color:var(--ink4)}
+
+/* ─── DROPZONE ─── */
+.dropzone{
+  border:2px dashed var(--border2);border-radius:10px;
+  padding:2.5rem 1.5rem;text-align:center;cursor:pointer;
+  transition:all .22s;background:var(--bg);position:relative;overflow:hidden;
+}
+.dropzone:hover,.dropzone.dragover{border-color:var(--fm);background:var(--fl)}
+.dropzone.loaded{border-color:var(--fm);border-style:solid;background:var(--fl);cursor:default}
+.dz-input{position:absolute;inset:0;opacity:0;cursor:pointer;font-size:0}
+.dz-icon{font-size:1.75rem;margin-bottom:.6rem;opacity:.45;display:block}
+.dz-title{font-size:.85rem;font-weight:500;color:var(--ink2);margin-bottom:.25rem}
+.dz-sub{font-size:.74rem;color:var(--ink4);line-height:1.6}
+.file-badge{display:inline-flex;align-items:center;gap:.5rem;background:var(--white);border:1px solid var(--fm);border-radius:100px;padding:.32rem .85rem;font-family:var(--mono);font-size:.7rem;color:var(--f2)}
+.file-remove{background:none;border:none;cursor:pointer;color:var(--ink4);font-size:.8rem;line-height:1;padding:0;margin-left:.15rem;transition:color .15s}
+.file-remove:hover{color:var(--red)}
+
+/* PREVIEW */
+.preview-box{border:1px solid var(--border);border-radius:8px;overflow:auto;max-height:180px;margin-top:.85rem}
+.prev-tbl{width:100%;border-collapse:collapse;font-size:.73rem}
+.prev-tbl th{padding:.4rem .7rem;background:var(--bg2);border-bottom:1px solid var(--border);text-align:left;font-weight:500;color:var(--ink3);white-space:nowrap;font-family:var(--mono);font-size:.61rem;letter-spacing:.06em;text-transform:uppercase;position:sticky;top:0}
+.prev-tbl td{padding:.38rem .7rem;border-bottom:1px solid var(--border);color:var(--ink2);white-space:nowrap;max-width:180px;overflow:hidden;text-overflow:ellipsis}
+.prev-tbl tr:last-child td{border-bottom:none}
+.prev-tbl tr:hover td{background:var(--bg)}
+
+/* COLUMN MAP */
+.col-map{display:grid;grid-template-columns:repeat(3,1fr);gap:.65rem;margin-top:.85rem}
+.col-map-item label{display:block;font-size:.69rem;font-weight:500;color:var(--ink3);margin-bottom:.3rem}
+.col-tag{display:inline-block;font-size:.6rem;font-family:var(--mono);background:var(--fl);color:var(--f2);border:1px solid var(--fm);padding:1px 6px;border-radius:100px;margin-left:.3rem}
+.col-tag.opt{background:var(--bg2);color:var(--ink4);border-color:var(--border)}
+
+/* ─── ANALYSE BTN ─── */
+.run-btn{
+  width:100%;padding:.95rem;background:var(--f2);color:#fff;border:none;border-radius:10px;
+  font-family:var(--sans);font-size:.92rem;font-weight:600;cursor:pointer;
+  transition:all .2s;display:flex;align-items:center;justify-content:center;gap:.55rem;
+  letter-spacing:-.01em;box-shadow:0 4px 20px rgba(14,96,80,.2);
+}
+.run-btn:hover:not(:disabled){background:var(--f3);box-shadow:0 6px 28px rgba(14,96,80,.28);transform:translateY(-1px)}
+.run-btn:active{transform:translateY(0)}
+.run-btn:disabled{background:var(--border2);cursor:not-allowed;box-shadow:none;transform:none}
+.run-btn-sub{font-size:.72rem;font-weight:300;opacity:.75;font-family:var(--sans);margin-top:.1rem}
+
+/* ─── PROGRESS ─── */
+.progress-card{padding:2rem;text-align:center}
+.prog-title{font-family:var(--serif);font-size:1.4rem;font-style:italic;color:var(--ink);margin-bottom:.35rem}
+.prog-sub{font-size:.78rem;color:var(--ink4);font-family:var(--mono);margin-bottom:1.1rem}
+.prog-bar-bg{height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:.75rem}
+.prog-bar-fill{height:100%;background:linear-gradient(90deg,var(--f2),var(--f3));border-radius:3px;transition:width .5s ease}
+.prog-nums{display:flex;align-items:baseline;justify-content:center;gap:.35rem}
+.prog-count{font-family:var(--serif);font-size:2rem;font-style:italic;color:var(--f2);line-height:1}
+.prog-total{font-size:.78rem;color:var(--ink4);font-family:var(--mono)}
+.prog-current{font-size:.74rem;color:var(--ink3);margin-top:.5rem;min-height:1.2em;font-family:var(--mono)}
+
+/* ─── RESULTS ─── */
+.results-summary{display:flex;align-items:center;flex-wrap:wrap;gap:1rem;padding:1.1rem 1.4rem;border-bottom:1px solid var(--border);background:var(--bg)}
+.sum-stat{display:flex;flex-direction:column;align-items:center;min-width:60px}
+.sum-num{font-family:var(--serif);font-size:1.5rem;font-style:italic;color:var(--ink);line-height:1}
+.sum-label{font-size:.62rem;color:var(--ink4);font-family:var(--mono);text-transform:uppercase;letter-spacing:.07em;margin-top:.15rem}
+.sum-div{width:1px;height:32px;background:var(--border);margin:0 .25rem}
+.results-actions{margin-left:auto;display:flex;gap:.5rem;flex-wrap:wrap}
+
+/* FILTER BAR */
+.filter-bar{display:flex;align-items:center;gap:0;padding:0 1.4rem;border-bottom:1px solid var(--border);background:var(--bg);overflow-x:auto}
+.filter-tab{padding:.6rem .95rem;font-size:.76rem;color:var(--ink3);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;flex-shrink:0}
+.filter-tab.on{color:var(--f2);border-bottom-color:var(--f2);font-weight:500}
+.filter-tab:hover:not(.on){color:var(--ink2);background:var(--bg2)}
+.filter-spacer{flex:1}
+.results-count{font-size:.7rem;color:var(--ink4);font-family:var(--mono);padding:.6rem 0}
+
+/* RESULTS TABLE */
+.rt-wrap{overflow-x:auto}
+.rt{width:100%;border-collapse:collapse;font-size:.78rem}
+.rt th{padding:.6rem 1rem;text-align:left;font-size:.62rem;font-family:var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink4);border-bottom:1px solid var(--border);background:var(--bg);font-weight:400;white-space:nowrap;cursor:pointer;transition:color .15s;user-select:none}
+.rt th:hover{color:var(--ink2)}
+.rt th.sorted{color:var(--f2)}
+.rt td{padding:.82rem 1rem;border-bottom:1px solid var(--border);vertical-align:middle;color:var(--ink2)}
+.rt tr:last-child td{border-bottom:none}
+.rt tr:hover td{background:var(--bg)}
+.rt tr.selected td{background:var(--fl)}
+
+/* RANK */
+.rank-badge{font-family:var(--mono);font-size:.67rem;color:var(--ink4);width:28px;text-align:center}
+.rank-badge.top3{color:var(--gold);font-weight:500}
+
+/* NAME CELL */
+.name-cell{font-weight:500;color:var(--ink);line-height:1.3}
+.name-extra{font-size:.7rem;color:var(--ink4);margin-top:.1rem;font-family:var(--mono)}
+
+/* SCORE */
+.score-cell{display:flex;align-items:center;gap:.55rem;min-width:120px}
+.score-bar{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden}
+.score-fill{height:100%;border-radius:3px}
+.score-val{font-family:var(--mono);font-size:.74rem;font-weight:500;min-width:26px;text-align:right}
+
+/* CATEGORY */
+.cat{display:inline-flex;align-items:center;gap:3px;padding:.18rem .58rem;border-radius:100px;font-size:.65rem;font-family:var(--mono);white-space:nowrap;font-weight:400}
+.cat::before{content:'';width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.cat-hot{background:var(--fl);color:var(--f2);border:1px solid var(--fm)}.cat-hot::before{background:var(--f2)}
+.cat-warm{background:var(--gl);color:#7A5C10;border:1px solid var(--gm)}.cat-warm::before{background:var(--gold)}
+.cat-cold{background:var(--bg2);color:var(--ink3);border:1px solid var(--border2)}.cat-cold::before{background:var(--ink4)}
+.cat-skip{background:var(--rl);color:var(--red);border:1px solid var(--rm)}.cat-skip::before{background:var(--red)}
+
+/* REASON */
+.reason{font-size:.74rem;color:var(--ink3);line-height:1.5;max-width:280px}
+.action{font-size:.68rem;color:var(--f2);font-family:var(--mono);margin-top:.2rem}
+
+/* CONFIDENCE */
+.conf{font-family:var(--mono);font-size:.67rem}
+.conf-high{color:var(--f2)}.conf-med{color:var(--gold)}.conf-low{color:var(--ink4)}
+
+/* EXPAND */
+.expand-row{display:none;background:var(--fl)}
+.expand-row.open{display:table-row}
+.expand-cell{padding:1rem 1rem 1rem 3.5rem;font-size:.78rem;color:var(--ink2);line-height:1.7}
+.expand-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+.expand-block label{font-size:.62rem;font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--ink4);display:block;margin-bottom:.3rem}
+.expand-block p{font-size:.78rem;color:var(--ink2);line-height:1.6}
+.expand-block .tag{display:inline-block;font-size:.65rem;font-family:var(--mono);padding:.15rem .55rem;border-radius:4px;margin:.2rem .2rem 0 0}
+
+/* ACTIONS ROW */
+.row-action{background:none;border:none;cursor:pointer;padding:.25rem .5rem;border-radius:4px;font-size:.72rem;color:var(--ink4);font-family:var(--sans);transition:all .15s}
+.row-action:hover{background:var(--bg2);color:var(--ink)}
+
+/* FOOTER BAR */
+.results-footer{padding:.9rem 1.4rem;border-top:1px solid var(--border);background:var(--bg);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem}
+.footer-meta{font-size:.7rem;color:var(--ink4);font-family:var(--mono)}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:.38rem;padding:.48rem 1rem;border-radius:7px;font-family:var(--sans);font-size:.78rem;font-weight:500;cursor:pointer;border:none;transition:all .15s;text-decoration:none;white-space:nowrap}
+.btn-p{background:var(--f2);color:#fff}.btn-p:hover{background:var(--f3)}
+.btn-g{background:var(--gold);color:#fff}.btn-g:hover{background:#b8891e}
+.btn-o{background:transparent;color:var(--ink2);border:1px solid var(--border2)}.btn-o:hover{background:var(--bg2)}
+.btn-sm{padding:.36rem .75rem;font-size:.73rem}
+
+/* TOAST */
+.toast{position:fixed;bottom:1.25rem;right:1.25rem;z-index:999;background:var(--ink);color:#fff;padding:.65rem 1rem;border-radius:8px;font-size:.78rem;box-shadow:var(--sh2);display:flex;align-items:center;gap:.5rem;transform:translateY(60px);opacity:0;transition:all .28s;pointer-events:none;max-width:340px}
+.toast.show{transform:translateY(0);opacity:1}
+
+/* HIDDEN */
+/* APPROVAL BUTTONS */
+.approve-btn{padding:.28rem .65rem;border-radius:5px;font-size:.69rem;font-weight:500;cursor:pointer;border:1px solid;font-family:var(--sans);transition:all .15s;white-space:nowrap}
+.approve-btn.approve{background:var(--fl);color:var(--f2);border-color:var(--fm)}
+.approve-btn.approve:hover,.approve-btn.approve.on{background:var(--f2);color:#fff;border-color:var(--f2)}
+.approve-btn.reject{background:var(--rl);color:var(--red);border-color:var(--rm)}
+.approve-btn.reject:hover,.approve-btn.reject.on{background:var(--red);color:#fff;border-color:var(--red)}
+
+.lead-type-btn{flex:1;padding:.6rem .75rem;border-radius:8px;font-family:var(--sans);font-size:.8rem;font-weight:400;cursor:pointer;transition:all .18s;border:1.5px solid var(--border2);background:var(--bg);color:var(--ink3);display:flex;align-items:center;justify-content:center;gap:.4rem}
+.lead-type-btn.on{background:var(--fl);border-color:var(--fm);color:var(--f2);font-weight:500}
+.lead-type-btn:hover:not(.on){background:var(--bg2);color:var(--ink)}
+.hidden{display:none!important}
+
+/* RESPONSIVE */
+@media(max-width:760px){
+  .nav{padding:0 1rem}
+  .main{padding:1.25rem 1rem 3rem}
+  .form-grid{grid-template-columns:1fr}
+  .col-map{grid-template-columns:1fr 1fr}
+  .steps-track{display:none}
+  .expand-grid{grid-template-columns:1fr}
+  .results-actions{width:100%}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a class="nav-logo" href="#">
+    <div class="nav-logo-mark">
+      <svg width="24" height="24" viewBox="0 0 30 30" fill="none"><rect width="30" height="30" rx="7" fill="#0B4D3C"/><rect x="7" y="9" width="16" height="14" rx="2.5" stroke="#F6F4EE" stroke-width="1.5" fill="none"/><line x1="7" y1="13" x2="23" y2="13" stroke="#F6F4EE" stroke-width="1.5"/><line x1="11" y1="7" x2="11" y2="11" stroke="#F6F4EE" stroke-width="1.5" stroke-linecap="round"/><line x1="19" y1="7" x2="19" y2="11" stroke="#F6F4EE" stroke-width="1.5" stroke-linecap="round"/><path d="M11.5 18l2.5 2.5 5-5" stroke="#AECFC4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="nav-logo-text">Arce<b>.</b> <span style="font-family:var(--sans);font-size:.75rem;font-style:normal;font-weight:300;color:var(--ink3);margin-left:.1rem">Lead Intelligence</span></div>
+  </a>
+  <div class="nav-right">
+    <div class="nav-pill">Ingen CRM nødvendig</div>
+    <a class="nav-link" href="dashboard.html">Dashboard →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-eyebrow"><div class="hero-dot"></div>AI-drevet leadanalyse</div>
+  <h1>Hvem er det <em>faktisk</em><br>verdt å ringe?</h1>
+  <p class="hero-sub">Last opp kundelisten din. AI-en analyserer hvert lead, scorer dem 0–100 og forteller deg nøyaktig hvem du skal kontakte — og hva du skal si. Last ned ferdig rangert Excel.</p>
+  <div class="hero-trust">
+    <div class="trust-item"><span class="trust-check">✓</span> Fungerer med eksisterende CRM</div>
+    <div class="trust-item"><span class="trust-check">✓</span> Excel inn · Excel ut</div>
+    <div class="trust-item"><span class="trust-check">✓</span> Ingen data lagres</div>
+    <div class="trust-item"><span class="trust-check">✓</span> Resultater på under 2 min</div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- STEP TRACKER -->
+  <div class="steps-track">
+    <div class="track-step st-active" id="tr1">
+      <div class="track-num" id="tn1">1</div>
+      <div class="track-info"><div class="track-label">Kontekst</div><div class="track-sub">Om bedriften din</div></div>
+    </div>
+    <div class="track-step st-waiting" id="tr2">
+      <div class="track-num" id="tn2">2</div>
+      <div class="track-info"><div class="track-label">Last opp liste</div><div class="track-sub">Excel eller CSV</div></div>
+    </div>
+    <div class="track-step st-waiting" id="tr3">
+      <div class="track-num" id="tn3">3</div>
+      <div class="track-info"><div class="track-label">Analyser</div><div class="track-sub">AI scorer leads</div></div>
+    </div>
+    <div class="track-step st-waiting" id="tr4">
+      <div class="track-num" id="tn4">4</div>
+      <div class="track-info"><div class="track-label">Last ned</div><div class="track-sub">Ferdig Excel-rapport</div></div>
+    </div>
+  </div>
+
+  <!-- CARD 1: CONTEXT -->
+  <div class="card" id="cardCtx">
+    <div class="card-head">
+      <div class="card-head-left">
+        <div class="card-icon">🎯</div>
+        <div><div class="card-title">Fortell AI-en hva den skal se etter</div><div class="card-hint">Jo mer presist du beskriver idealkundene dine, desto skarpere scoring</div></div>
+      </div>
+    </div>
+    <div class="card-body">
+
+      <!-- B2B / B2C TOGGLE -->
+      <div style="display:flex;gap:.5rem;margin-bottom:1.1rem">
+        <button class="lead-type-btn on" id="btnB2B" onclick="setLeadType('b2b')">
+          🏢 B2B — Bedriftskunder
+        </button>
+        <button class="lead-type-btn" id="btnB2C" onclick="setLeadType('b2c')">
+          👤 B2C — Privatkunder
+        </button>
+      </div>
+      <div id="leadTypeHint" style="font-size:.72rem;background:var(--fl);border:1px solid var(--fm);color:var(--f2);border-radius:7px;padding:.55rem .85rem;margin-bottom:1.1rem;line-height:1.6">
+        <strong>B2B:</strong> AI-en ser etter org.nr, bransje, stillingstittel, bedriftsstørrelse, beslutningsrolle og vekstfase.
+      </div>
+
+      <div class="form-grid">
+        <div class="f">
+          <label>Hva selger du? *</label>
+          <input class="inp" id="c_prod" placeholder="Eks: AI-booking for eiendomsmeglere"/>
+          <div class="hint">Produkt, tjeneste eller løsning — én setning</div>
+        </div>
+        <div class="f">
+          <label id="idealLabel">Hvem er din ideelle kunde? *</label>
+          <input class="inp" id="c_ideal" placeholder="Eks: Daglig leder, 5–50 ansatte, Norden"/>
+          <div class="hint" id="idealHint">Bransje, størrelse, stilling, geografi</div>
+        </div>
+        <div class="f full">
+          <label>Hva skiller et varmt lead fra et kaldt?</label>
+          <textarea class="txt" id="c_signals" placeholder="Eks: Har vært i kontakt tidligere · Jobber i voksende bedrift · Nevnt konkret smertepunkt · Annonserer aktivt · Beslutningstaker (ikke mellommann) · Bransje med kjent behov for booking-automatisering…"></textarea>
+          <div class="hint">Legg inn alt du vet fra erfaring — AI-en bruker dette til å differensiere</div>
+        </div>
+        <div class="f">
+          <label>Gjennomsnittlig kontraktverdi</label>
+          <select class="sel" id="c_val">
+            <option value="">Velg (valgfritt)</option>
+            <option>Under kr 5 000</option>
+            <option>kr 5 000 – 20 000</option>
+            <option>kr 20 000 – 100 000</option>
+            <option>Over kr 100 000</option>
+          </select>
+        </div>
+        <div class="f">
+          <label>Typisk salgssyklus</label>
+          <select class="sel" id="c_cycle">
+            <option value="">Velg (valgfritt)</option>
+            <option>Under 1 uke</option>
+            <option>1–4 uker</option>
+            <option>1–3 måneder</option>
+            <option>Over 3 måneder</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARD 2: UPLOAD -->
+  <div class="card" id="cardUp">
+    <div class="card-head">
+      <div class="card-head-left">
+        <div class="card-icon">📂</div>
+        <div><div class="card-title">Last opp kundelisten din</div><div class="card-hint">Excel (.xlsx, .xls) eller CSV — kolonner kan hete hva som helst</div></div>
+      </div>
+      <div id="resetBtn" class="hidden"><button class="btn btn-o btn-sm" onclick="doReset()">Bytt fil</button></div>
+    </div>
+    <div class="card-body">
+      <div class="dropzone" id="dz" ondrop="onDrop(event)" ondragover="onDragOver(event)" ondragleave="onDragLeave(event)">
+        <input class="dz-input" type="file" accept=".xlsx,.xls,.csv" onchange="onFile(this.files[0])" id="fileInp"/>
+        <div id="dzEmpty">
+          <span class="dz-icon">📄</span>
+          <div class="dz-title">Dra inn fil her, eller klikk for å velge</div>
+          <div class="dz-sub">Støtter .xlsx, .xls og .csv · Maks ~5 000 rader<br>Kolonnene trenger ikke hete noe spesielt — AI gjetter</div>
+        </div>
+        <div id="dzLoaded" class="hidden">
+          <span class="dz-icon" style="opacity:1">✅</span>
+          <div class="file-badge" id="fileBadge">—<button class="file-remove" onclick="event.stopPropagation();doReset()">✕</button></div>
+          <div style="font-size:.72rem;color:var(--f2);font-family:var(--mono);margin-top:.35rem" id="fileRows">—</div>
+        </div>
+      </div>
+
+      <div id="previewArea" class="hidden">
+        <div style="font-size:.65rem;font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--ink4);margin:.9rem 0 .35rem">Forhåndsvisning (5 første rader)</div>
+        <div class="preview-box"><table class="prev-tbl" id="prevTbl"></table></div>
+      </div>
+
+      <div id="mapArea" class="hidden">
+        <div style="font-size:.74rem;font-weight:500;color:var(--ink2);margin:.9rem 0 .4rem">Bekreft kolonner <span style="font-weight:300;color:var(--ink4)">(AI gjetter automatisk)</span></div>
+        <div class="col-map">
+          <div class="col-map-item"><label>Navn / Bedrift <span class="col-tag">påkrevd</span></label><select class="sel" id="mName" style="font-size:.75rem"></select></div>
+          <div class="col-map-item"><label>E-post <span class="col-tag opt">valgfritt</span></label><select class="sel" id="mEmail" style="font-size:.75rem"></select></div>
+          <div class="col-map-item"><label>Tilleggsinformasjon <span class="col-tag opt">valgfritt</span></label><select class="sel" id="mExtra" style="font-size:.75rem"></select></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RUN BUTTON -->
+  <div id="runWrap" class="hidden" style="margin-bottom:1.25rem">
+    <button class="run-btn" id="runBtn" onclick="runAnalysis()">
+      <span>⬡</span>
+      <div>
+        <div>Analyser leads med AI</div>
+        <div class="run-btn-sub" id="runBtnSub">Klar — klikk for å starte</div>
+      </div>
+    </button>
+  </div>
+
+  <!-- PROGRESS -->
+  <div class="card hidden" id="cardProg">
+    <div class="progress-card">
+      <div class="prog-title">AI-en analyserer leadene dine…</div>
+      <div class="prog-sub" id="progLabel">Starter opp</div>
+      <div class="prog-bar-bg"><div class="prog-bar-fill" id="progFill" style="width:0%"></div></div>
+      <div class="prog-nums">
+        <div class="prog-count" id="progCount">0</div>
+        <div class="prog-total">av <span id="progTotal">0</span> leads scoret</div>
+      </div>
+      <div class="prog-current" id="progCurrent"></div>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="card hidden" id="cardRes">
+    <!-- Summary -->
+    <div class="results-summary">
+      <div class="sum-stat"><div class="sum-num" id="sTotal">0</div><div class="sum-label">Totalt</div></div>
+      <div class="sum-div"></div>
+      <div class="sum-stat"><div class="sum-num" id="sHot" style="color:var(--f2)">0</div><div class="sum-label">🔥 Varme</div></div>
+      <div class="sum-stat"><div class="sum-num" id="sWarm" style="color:var(--gold)">0</div><div class="sum-label">☀ Lunkne</div></div>
+      <div class="sum-stat"><div class="sum-num" id="sCold" style="color:var(--ink4)">0</div><div class="sum-label">❄ Kalde</div></div>
+      <div class="sum-stat"><div class="sum-num" id="sSkip" style="color:var(--red)">0</div><div class="sum-label">🚫 Skip</div></div>
+      <div class="sum-div"></div>
+      <div class="sum-stat"><div class="sum-num" id="sAvg" style="color:var(--ink)">—</div><div class="sum-label">Snitt-score</div></div>
+      <div class="results-actions">
+        <button class="btn btn-o btn-sm" onclick="copyTop()">📋 Kopier topp 10</button>
+        <button class="btn btn-g btn-sm" onclick="dlExcel()">⬇ Last ned Excel</button>
+      </div>
+    </div>
+
+    <!-- Filter bar -->
+    <div class="filter-bar">
+      <div class="filter-tab on" onclick="applyFilter('all',this)">Alle</div>
+      <div class="filter-tab" onclick="applyFilter('hot',this)">🔥 Varme</div>
+      <div class="filter-tab" onclick="applyFilter('warm',this)">☀ Lunkne</div>
+      <div class="filter-tab" onclick="applyFilter('cold',this)">❄ Kalde</div>
+      <div class="filter-tab" onclick="applyFilter('skip',this)">🚫 Ikke prioriter</div>
+      <div class="filter-tab" onclick="applyFilter('approved',this)" style="color:var(--f2);font-weight:500">✓ Godkjente</div>
+      <div class="filter-tab" onclick="applyFilter('rejected',this)" style="color:var(--red)">✗ Avviste</div>
+      <div class="filter-spacer"></div>
+      <div class="results-count" id="resCount"></div>
+    </div>
+
+    <!-- Table -->
+    <div class="rt-wrap">
+      <table class="rt">
+        <thead>
+          <tr>
+            <th style="width:36px">#</th>
+            <th onclick="sortBy('name')">Navn / Bedrift</th>
+            <th onclick="sortBy('score')" class="sorted">Score ↓</th>
+            <th>Kategori</th>
+            <th>AI-analyse</th>
+            <th>Prioritert handling</th>
+            <th style="width:130px">Din beslutning</th>
+          </tr>
+        </thead>
+        <tbody id="resTbody"></tbody>
+      </table>
+    </div>
+
+    <!-- Footer -->
+    <div class="results-footer">
+      <div class="footer-meta" id="resMeta">—</div>
+      <button class="btn btn-g btn-sm" onclick="dlExcel()">⬇ Last ned komplett Excel-rapport</button>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ── STATE ── */
+let rawRows=[], headers=[], scored=[], curFilter='all', sortField='score', sortDir=-1, t0=null;
+
+/* ── FILE ── */
+function onDragOver(e){e.preventDefault();document.getElementById('dz').classList.add('dragover')}
+function onDragLeave(){document.getElementById('dz').classList.remove('dragover')}
+function onDrop(e){e.preventDefault();document.getElementById('dz').classList.remove('dragover');const f=e.dataTransfer.files[0];if(f)onFile(f)}
+
+function onFile(file){
+  if(!file)return;
+  const ext=file.name.split('.').pop().toLowerCase();
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    let wb;
+    try{
+      if(ext==='csv') wb=XLSX.read(ev.target.result,{type:'string'});
+      else wb=XLSX.read(new Uint8Array(ev.target.result),{type:'array'});
+    }catch(e){toast('⚠ Kunne ikke lese filen. Prøv å lagre den som CSV.');return}
+    const ws=wb.Sheets[wb.SheetNames[0]];
+    const arr=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+    if(arr.length<2){toast('⚠ Filen ser tom ut.');return}
+    headers=arr[0].map(h=>String(h||'').trim());
+    rawRows=arr.slice(1).filter(r=>r.some(c=>c!==''&&c!=null));
+    if(rawRows.length===0){toast('⚠ Ingen datarader funnet.');return}
+    renderUpload(file.name);
+  };
+  if(ext==='csv') reader.readAsText(file,'UTF-8');
+  else reader.readAsArrayBuffer(file);
+}
+
+function renderUpload(name){
+  const dz=document.getElementById('dz');
+  dz.classList.add('loaded');
+  document.getElementById('dzEmpty').classList.add('hidden');
+  document.getElementById('dzLoaded').classList.remove('hidden');
+  document.getElementById('fileBadge').childNodes[0].textContent=' '+name+' ';
+  document.getElementById('fileRows').textContent=rawRows.length+' leads funnet';
+  document.getElementById('dz-input','fileInp')&&(document.getElementById('fileInp').style.pointerEvents='none');
+  document.getElementById('resetBtn').classList.remove('hidden');
+
+  // Preview
+  const prev=rawRows.slice(0,5);
+  let th='<tr>'+headers.map(h=>`<th>${h||'—'}</th>`).join('')+'</tr>';
+  let trs=prev.map(r=>'<tr>'+headers.map((_,i)=>`<td>${String(r[i]||'').slice(0,35)}</td>`).join('')+'</tr>').join('');
+  document.getElementById('prevTbl').innerHTML=th+trs;
+  document.getElementById('previewArea').classList.remove('hidden');
+
+  // Column map
+  const none='<option value="-1">— ingen —</option>';
+  const opts=headers.map((h,i)=>`<option value="${i}">${h||'Kolonne '+(i+1)}</option>`).join('');
+  ['mName','mEmail','mExtra'].forEach(id=>document.getElementById(id).innerHTML=none+opts);
+  autoMap();
+  document.getElementById('mapArea').classList.remove('hidden');
+  document.getElementById('runWrap').classList.remove('hidden');
+  updateRunBtn();
+  setStep(2);
+}
+
+function autoMap(){
+  const nKw=['navn','name','bedrift','company','firma','kunde','kontakt','contact','client','organisasjon'];
+  const eKw=['epost','email','e-post','mail','epostadresse'];
+  const xKw=['bransje','industry','tittel','title','stilling','rolle','role','notat','note','info','beskrivelse','comment','kommentar','type','kategori'];
+  const best=(kws)=>{for(const k of kws){const i=headers.findIndex(h=>h.toLowerCase().includes(k));if(i>=0)return i}return -1};
+  const ni=best(nKw); document.getElementById('mName').value=ni>=0?ni:0;
+  const ei=best(eKw); if(ei>=0)document.getElementById('mEmail').value=ei;
+  const xi=best(xKw); if(xi>=0)document.getElementById('mExtra').value=xi;
+}
+
+function doReset(){
+  rawRows=[];headers=[];scored=[];
+  ['dz','dzEmpty','dzLoaded','previewArea','mapArea','runWrap','cardProg','cardRes'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(id==='dz'){el.classList.remove('loaded','dragover')}
+    else if(id==='dzEmpty'){el.classList.remove('hidden')}
+    else{el.classList.add('hidden')}
+  });
+  document.getElementById('fileInp').value='';
+  document.getElementById('resetBtn').classList.add('hidden');
+  setStep(1);
+}
+
+function updateRunBtn(){
+  const n=parseInt(document.getElementById('mName').value);
+  const count=rawRows.length;
+  document.getElementById('runBtnSub').textContent=`${count} leads klar · klikk for å starte`;
+}
+document.addEventListener('change',e=>{if(['mName','mEmail','mExtra'].includes(e.target.id))updateRunBtn()});
+
+/* ── LEAD TYPE ── */
+var currentLeadType='b2b';
+
+function setLeadType(type){
+  currentLeadType=type;
+  document.getElementById('btnB2B').classList.toggle('on',type==='b2b');
+  document.getElementById('btnB2C').classList.toggle('on',type==='b2c');
+
+  const hint=document.getElementById('leadTypeHint');
+  const idealLabel=document.getElementById('idealLabel');
+  const idealHint=document.getElementById('idealHint');
+  const idealInput=document.getElementById('c_ideal');
+
+  if(type==='b2b'){
+    hint.innerHTML='<strong>B2B:</strong> AI-en ser etter org.nr, bransje, stillingstittel, bedriftsstørrelse, beslutningsrolle og vekstfase. Leads uten beslutningsmyndighet scores lavere.';
+    idealLabel.textContent='Hvem er din ideelle bedriftskunde? *';
+    idealHint.textContent='Bransje, bedriftsstørrelse, stillingstittel, geografi';
+    idealInput.placeholder='Eks: Daglig leder, 5–50 ansatte, eiendomsbransjen, Norden';
+    document.getElementById('c_signals').placeholder='Eks: Beslutningstaker (ikke mellomledd) · Voksende bedrift · Annonserer aktivt · Kjent smertepunkt · Tidligere kontakt · Riktig bransje';
+  } else {
+    hint.innerHTML='<strong>B2C:</strong> AI-en ser etter geografi, boligtype, livssituasjon, alder, eierforhold og kjøpesignaler. Privatpersoner utenfor dekningsområde scores lavere.';
+    idealLabel.textContent='Hvem er din ideelle privatkunde? *';
+    idealHint.textContent='Alder, geografi, livssituasjon, boligtype';
+    idealInput.placeholder='Eks: Huseier 30–60 år i Trondheim-regionen, nyinnflyttet';
+    document.getElementById('c_signals').placeholder='Eks: Eier boligen (ikke leier) · Nylig kjøpt · Bor i dekningsområdet · Har kobberlinje (klar for fiber) · Hjemmekontor · Familie med barn';
+  }
+}
+
+/* ── ANALYSIS ── */
+async function runAnalysis(){
+  const prod=document.getElementById('c_prod').value.trim();
+  const ideal=document.getElementById('c_ideal').value.trim();
+  if(!prod||!ideal){toast('⚠ Fyll inn hva du selger og hvem din ideelle kunde er');return}
+  const nameCol=parseInt(document.getElementById('mName').value);
+  if(isNaN(nameCol)||nameCol<0){toast('⚠ Velg hvilken kolonne som er navn/bedrift');return}
+
+  const emailCol=parseInt(document.getElementById('mEmail').value);
+  const extraCol=parseInt(document.getElementById('mExtra').value);
+  const signals=document.getElementById('c_signals').value.trim();
+  const val=document.getElementById('c_val').value;
+  const cycle=document.getElementById('c_cycle').value;
+
+  const leadType=currentLeadType;
+
+  const b2bCtx=`Du er en erfaren B2B-salgsekspert. Analyser bedriftsleads og gi presis, ærlig scoring.
+BEDRIFTSKONTEKST (B2B):
+• Produkt/tjeneste: ${prod}
+• Ideell bedriftskunde: ${ideal}${signals?'\n• Tegn på varmt lead: '+signals:''}${val?'\n• Kontraktverdi: '+val:''}${cycle?'\n• Salgssyklus: '+cycle:''}
+
+B2B SCOREKRITERIER (vekt disse faktorene):
+• Beslutningsrolle: Daglig leder/direktør/eier = høy score. Mellomledere = medium. Ansatte uten budsjettansvar = lav.
+• Bedriftsstørrelse: Match med ideell kunde = høy score. For stor/liten = lav.
+• Bransjetilpasning: Kjent behov for produktet = høy score.
+• Kjøpssignaler: Aktivt søkende, tidligere kontakt, vekstfase = høy score.
+• Risikofaktorer: Allerede har konkurrentens løsning, for lite budsjett, ingen beslutningsmyndighet = lav score.`;
+
+  const b2cCtx=`Du er en erfaren B2C-salgsekspert. Analyser privatleads og gi presis, ærlig scoring.
+BEDRIFTSKONTEKST (B2C):
+• Produkt/tjeneste: ${prod}
+• Ideell privatkunde: ${ideal}${signals?'\n• Tegn på varmt lead: '+signals:''}${val?'\n• Kontraktverdi: '+val:''}${cycle?'\n• Salgssyklus: '+cycle:''}
+
+B2C SCOREKRITERIER (vekt disse faktorene):
+• Geografi: Bor i dekningsområdet = høy score. Utenfor = skip.
+• Eierforhold: Eier boligen = høy score. Leier = lav (kan ikke bestemme selv).
+• Livssituasjon: Nyinnflyttet, ny bolig, familie = høy score.
+• Kjøpssignaler: Har kobberlinje/gammel internett = klar for oppgradering. Allerede har fiber = skip.
+• Kontaktbarhet: Har oppgitt mobilnummer = høyere score enn kun e-post.
+• Risikofaktorer: Leietaker, bor i leilighetsbygg uten tillatelse, utenfor dekningsområde = lav/skip.`;
+
+  const sysCtx=(leadType==='b2b'?b2bCtx:b2cCtx)+`
+
+INSTRUKS: Svar KUN med et JSON-array. Null tekst utenfor JSON. Ingen markdown, ingen forklaring.
+Array-format per lead:
+{"id":N,"score":0-100,"kategori":"hot|warm|cold|skip","begrunnelse":"maks 12 ord på norsk","handling":"konkret neste steg maks 8 ord","konfidens":"høy|medium|lav","detalj":"2-3 setninger med dypere begrunnelse på norsk","signaler":["signal1","signal2"],"risiko":"kort risikofaktor eller tom streng"}
+
+Kategorier: hot=75-100 (kontakt umiddelbart), warm=50-74 (nurture), cold=25-49 (lav prioritet), skip=0-24 (ikke prioriter).
+Vær kritisk og ærlig. Ikke inflasjoner scores.`;
+
+  document.getElementById('runWrap').classList.add('hidden');
+  document.getElementById('cardProg').classList.remove('hidden');
+  document.getElementById('progTotal').textContent=rawRows.length;
+  setStep(3);
+  scored=[];
+  t0=Date.now();
+
+  const BATCH=4;
+  for(let i=0;i<rawRows.length;i+=BATCH){
+    const pct=Math.round(i/rawRows.length*100);
+    document.getElementById('progFill').style.width=pct+'%';
+    document.getElementById('progCount').textContent=i;
+    document.getElementById('progLabel').textContent=`Vurderer ${i+1}–${Math.min(i+BATCH,rawRows.length)} av ${rawRows.length}`;
+
+    const batch=rawRows.slice(i,i+BATCH);
+    const lines=batch.map((row,bi)=>{
+      const name=String(row[nameCol]||'Ukjent').trim();
+      const email=emailCol>=0?String(row[emailCol]||'').trim():'';
+      const extra=extraCol>=0?String(row[extraCol]||'').trim():'';
+      const rest=row.filter((_,ci)=>ci!==nameCol&&ci!==emailCol&&ci!==extraCol&&row[ci]).map(c=>String(c).slice(0,60)).join(' | ');
+      return `Lead ${i+bi+1}: "${name}"${email?' <'+email+'>':''}${extra?' ['+extra+']':''}${rest?' — '+rest.slice(0,150):''}`;
+    }).join('\n');
+
+    try{
+      const res=await fetch('https://api.anthropic.com/v1/messages',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          model:'claude-sonnet-4-20250514',
+          max_tokens:1200,
+          system:sysCtx,
+          messages:[{role:'user',content:`Score disse ${batch.length} leads:\n${lines}`}]
+        })
+      });
+      const data=await res.json();
+      const raw=data.content?.[0]?.text||'[]';
+      let parsed=[];
+      try{
+        const clean=raw.replace(/```json|```/g,'').trim();
+        const m=clean.match(/\[[\s\S]*\]/);
+        parsed=JSON.parse(m?m[0]:clean);
+      }catch(e){}
+
+      batch.forEach((row,bi)=>{
+        const p=parsed[bi]||{};
+        const name=String(row[nameCol]||`Lead ${i+bi+1}`).trim();
+        const email=emailCol>=0?String(row[emailCol]||'').trim():'';
+        const extra=extraCol>=0?String(row[extraCol]||'').trim():'';
+        const sc=Math.min(100,Math.max(0,parseInt(p.score)||35));
+        const kat=['hot','warm','cold','skip'].includes(p.kategori)?p.kategori:(sc>=75?'hot':sc>=50?'warm':sc>=25?'cold':'skip');
+        scored.push({
+          rank:0,name,email,extra,originalRow:row,
+          score:sc,kategori:kat,
+          begrunnelse:p.begrunnelse||'Utilstrekkelig data for presis analyse',
+          handling:p.handling||'Manuell vurdering anbefales',
+          konfidens:['høy','medium','lav'].includes(p.konfidens)?p.konfidens:'lav',
+          detalj:p.detalj||'',
+          signaler:Array.isArray(p.signaler)?p.signaler:[],
+          risiko:p.risiko||'',
+          approval:null
+        });
+      });
+    }catch(e){
+      batch.forEach((row,bi)=>{
+        scored.push({rank:0,name:String(row[nameCol]||`Lead ${i+bi+1}`),email:'',extra:'',originalRow:row,score:30,kategori:'cold',begrunnelse:'Analysefeil',handling:'Manuell vurdering',konfidens:'lav',detalj:'',signaler:[],risiko:''});
+      });
+    }
+    await new Promise(r=>setTimeout(r,280));
+  }
+
+  scored.sort((a,b)=>b.score-a.score);
+  scored.forEach((l,i)=>l.rank=i+1);
+  document.getElementById('progFill').style.width='100%';
+  document.getElementById('progCount').textContent=scored.length;
+  document.getElementById('progLabel').textContent='Ferdig!';
+  setTimeout(showResults,500);
+}
+
+/* ── RESULTS ── */
+function showResults(){
+  document.getElementById('cardProg').classList.add('hidden');
+  document.getElementById('cardRes').classList.remove('hidden');
+  setStep(4);
+
+  const hot=scored.filter(l=>l.kategori==='hot').length;
+  const warm=scored.filter(l=>l.kategori==='warm').length;
+  const cold=scored.filter(l=>l.kategori==='cold').length;
+  const skip=scored.filter(l=>l.kategori==='skip').length;
+  const avg=scored.length?Math.round(scored.reduce((s,l)=>s+l.score,0)/scored.length):0;
+
+  document.getElementById('sTotal').textContent=scored.length;
+  document.getElementById('sHot').textContent=hot;
+  document.getElementById('sWarm').textContent=warm;
+  document.getElementById('sCold').textContent=cold;
+  document.getElementById('sSkip').textContent=skip;
+  document.getElementById('sAvg').textContent=avg;
+
+  const elapsed=((Date.now()-t0)/1000).toFixed(0);
+  document.getElementById('resMeta').textContent=`Analysert ${scored.length} leads på ${elapsed} sekunder · ${new Date().toLocaleString('no-NO')}`;
+  renderTable();
+  toast('✓ Analyse ferdig! Last ned Excel-rapporten.');
+}
+
+function renderTable(){
+  // approval filter
+  let list;
+  if(curFilter==='approved') list=scored.filter(l=>l.approval==='approved');
+  else if(curFilter==='rejected') list=scored.filter(l=>l.approval==='rejected');
+  else if(curFilter==='all') list=scored;
+  else list=scored.filter(l=>l.kategori===curFilter);
+
+  const sorted=[...list].sort((a,b)=>{
+    if(sortField==='score') return sortDir*(b.score-a.score);
+    if(sortField==='name') return sortDir*a.name.localeCompare(b.name,'no');
+    return 0;
+  });
+  document.getElementById('resCount').textContent=sorted.length+' av '+scored.length+' leads';
+
+  const catMap={hot:{cls:'cat-hot',lbl:'🔥 Varm'},warm:{cls:'cat-warm',lbl:'☀ Lunken'},cold:{cls:'cat-cold',lbl:'❄ Kald'},skip:{cls:'cat-skip',lbl:'🚫 Skip'}};
+  const scoreColor=s=>s>=75?'var(--f2)':s>=50?'var(--gold)':s>=25?'var(--ink4)':'var(--red)';
+
+  document.getElementById('resTbody').innerHTML=sorted.map((l)=>{
+    const c=catMap[l.kategori]||catMap.cold;
+    const topRank=l.rank<=3?'top3':'';
+    const konfClass={'høy':'conf-high','medium':'conf-med','lav':'conf-low'}[l.konfidens]||'conf-low';
+    const signs=l.signaler.map(s=>`<span class="tag" style="background:var(--fl);color:var(--f2);border:1px solid var(--fm)">${h(s)}</span>`).join('');
+    const hasDetail=l.detalj||l.signaler.length||l.risiko;
+    const idx=scored.indexOf(l);
+    const approvalHtml=l.approval==='approved'
+      ? `<div style="display:flex;gap:.35rem;align-items:center">
+           <span style="font-size:.69rem;font-family:var(--mono);background:var(--fl);color:var(--f2);border:1px solid var(--fm);padding:.18rem .55rem;border-radius:100px">✓ Godkjent</span>
+           <button class="approve-btn reject" onclick="setApproval(${idx},'rejected')" title="Angre godkjenning">✕</button>
+         </div>`
+      : l.approval==='rejected'
+      ? `<div style="display:flex;gap:.35rem;align-items:center">
+           <span style="font-size:.69rem;font-family:var(--mono);background:var(--rl);color:var(--red);border:1px solid var(--rm);padding:.18rem .55rem;border-radius:100px">✗ Avvist</span>
+           <button class="approve-btn approve" onclick="setApproval(${idx},'approved')" title="Endre til godkjent">✓</button>
+         </div>`
+      : `<div style="display:flex;gap:.35rem">
+           <button class="approve-btn approve" onclick="setApproval(${idx},'approved')">✓ Godkjenn</button>
+           <button class="approve-btn reject" onclick="setApproval(${idx},'rejected')">✗</button>
+         </div>`;
+
+    return `<tr class="lead-row" data-idx="${idx}">
+      <td><div class="rank-badge ${topRank}">${l.rank}</div></td>
+      <td>
+        <div class="name-cell">${h(l.name)}</div>
+        ${l.email?`<div class="name-extra">${h(l.email)}</div>`:''}
+        ${l.extra?`<div class="name-extra" style="color:var(--ink3)">${h(l.extra)}</div>`:''}
+      </td>
+      <td>
+        <div class="score-cell">
+          <div class="score-bar"><div class="score-fill" style="width:${l.score}%;background:${scoreColor(l.score)}"></div></div>
+          <div class="score-val" style="color:${scoreColor(l.score)}">${l.score}</div>
+        </div>
+      </td>
+      <td><span class="cat ${c.cls}">${c.lbl}</span></td>
+      <td>
+        <div class="reason">${h(l.begrunnelse)}</div>
+        <div class="conf ${konfClass}">konfidens: ${l.konfidens}</div>
+      </td>
+      <td><div class="action">${h(l.handling)}</div></td>
+      <td>${approvalHtml}</td>
+    </tr>
+    ${hasDetail?`<tr class="expand-row" id="exp-${idx}">
+      <td colspan="7">
+        <div class="expand-cell">
+          <div class="expand-grid">
+            ${l.detalj?`<div class="expand-block"><label>Dyp analyse</label><p>${h(l.detalj)}</p></div>`:''}
+            ${l.signaler.length?`<div class="expand-block"><label>Identifiserte signaler</label><p>${signs}</p></div>`:''}
+            ${l.risiko?`<div class="expand-block"><label>Risikofaktor</label><p style="color:var(--red)">${h(l.risiko)}</p></div>`:''}
+          </div>
+        </div>
+      </td>
+    </tr>`:''}`;
+  }).join('');
+
+  // Update summary counts
+  const approved=scored.filter(l=>l.approval==='approved').length;
+  const rejected=scored.filter(l=>l.approval==='rejected').length;
+  if(approved||rejected){
+    const s=document.getElementById('sTotal');
+    if(s) s.textContent=scored.length;
+    updateApprovalStats(approved,rejected);
+  }
+}
+
+function setApproval(idx,status){
+  scored[idx].approval=status;
+  renderTable();
+  const name=scored[idx].name;
+  const msg=status==='approved'?`✓ ${name} godkjent`:`✗ ${name} avvist`;
+  toast(msg);
+}
+
+function updateApprovalStats(approved,rejected){
+  const sa=document.getElementById('statApproved');
+  const sr=document.getElementById('statRejected');
+  if(sa) sa.textContent=approved;
+  if(sr) sr.textContent=rejected;
+}
+
+function toggleDetail(btn,idx){
+  const row=document.getElementById('exp-'+idx);
+  if(!row)return;
+  const open=row.classList.toggle('open');
+  btn.textContent=open?'Lukk ▴':'Mer ▾';
+}
+
+function applyFilter(f,el){
+  curFilter=f;
+  document.querySelectorAll('.filter-tab').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');
+  renderTable();
+}
+
+function sortBy(field){
+  if(sortField===field) sortDir*=-1;
+  else{sortField=field;sortDir=-1}
+  document.querySelectorAll('.rt th').forEach(th=>th.classList.remove('sorted'));
+  renderTable();
+}
+
+/* ── EXCEL EXPORT ── */
+function dlExcel(){
+  if(!scored.length){toast('Ingen data');return}
+  const wb=XLSX.utils.book_new();
+  const now=new Date().toLocaleString('no-NO');
+  const prod=document.getElementById('c_prod').value.trim();
+  const ideal=document.getElementById('c_ideal').value.trim();
+  const leadTypeLabel=currentLeadType==='b2b'?'B2B — Bedriftskunder':'B2C — Privatkunder';
+
+  const hot=scored.filter(l=>l.kategori==='hot');
+  const warm=scored.filter(l=>l.kategori==='warm');
+  const approved=scored.filter(l=>l.approval==='approved');
+  const rejected=scored.filter(l=>l.approval==='rejected');
+  const avg=Math.round(scored.reduce((s,l)=>s+l.score,0)/scored.length);
+
+  const approvalLabel=l=>l.approval==='approved'?'✓ Godkjent':l.approval==='rejected'?'✗ Avvist':'— Ikke vurdert';
+
+  // SHEET 1: SAMMENDRAG
+  const sumData=[
+    ['ARCE LEAD INTELLIGENCE — ANALYSERAPPORT'],[''],
+    ['Generert:',now],['Leadtype:',leadTypeLabel],['Produkt/tjeneste:',prod],['Ideell kunde:',ideal],[''],
+    ['SAMMENDRAG','',''],
+    ['Totalt leads analysert:',scored.length],
+    ['Gjennomsnittsscore:',avg+'/100'],
+    ['Godkjent av deg:',approved.length],
+    ['Avvist av deg:',rejected.length],[''],
+    ['Kategori','Antall','Andel'],
+    ['🔥 Varme leads (75–100)',hot.length,Math.round(hot.length/scored.length*100)+'%'],
+    ['☀ Lunkne leads (50–74)',warm.length,Math.round(warm.length/scored.length*100)+'%'],
+    ['❄ Kalde leads (25–49)',scored.filter(l=>l.kategori==='cold').length,Math.round(scored.filter(l=>l.kategori==='cold').length/scored.length*100)+'%'],
+    ['🚫 Ikke prioriter (0–24)',scored.filter(l=>l.kategori==='skip').length,Math.round(scored.filter(l=>l.kategori==='skip').length/scored.length*100)+'%'],
+    [''],
+    ['DATAEIERSKAP',''],
+    ['Alle data i denne rapporten tilhører deg.','Du kan dele, slette eller arkivere denne filen fritt.'],
+    ['GDPR artikkel 20','Retten til dataportabilitet er ivaretatt ved denne eksporten.'],
+    [''],['ANBEFALING:',approved.length>0?`Start med de ${approved.length} godkjente leadene umiddelbart.`:hot.length>0?`Godkjenn de ${hot.length} varme leadene og kontakt dem innen 24 timer.`:'Gjennomgå og godkjenn leads i kolonnen "Din beslutning".'],
+  ];
+  const ws0=XLSX.utils.aoa_to_sheet(sumData);
+  ws0['!cols']=[{wch:42},{wch:35},{wch:15}];
+
+  // SHEET 2: ALLE LEADS
+  const allData=[
+    ['RANG','NAVN / BEDRIFT','E-POST','TILLEGGSINFORMASJON','SCORE (0–100)','KATEGORI','DIN BESLUTNING','AI-BEGRUNNELSE','DYPERE ANALYSE','HANDLING','SIGNALER','RISIKO','KONFIDENS',...headers],
+    ...scored.map(l=>[
+      l.rank,l.name,l.email||'',l.extra||'',l.score,
+      {hot:'🔥 Varm',warm:'☀ Lunken',cold:'❄ Kald',skip:'🚫 Ikke prioriter'}[l.kategori],
+      approvalLabel(l),
+      l.begrunnelse,l.detalj||'',l.handling,l.signaler.join(', '),l.risiko||'',l.konfidens,
+      ...l.originalRow
+    ])
+  ];
+  const ws1=XLSX.utils.aoa_to_sheet(allData);
+  ws1['!cols']=[{wch:6},{wch:30},{wch:28},{wch:20},{wch:12},{wch:16},{wch:18},{wch:40},{wch:50},{wch:35},{wch:40},{wch:25},{wch:10},...headers.map(()=>({wch:18}))];
+
+  // SHEET 3: GODKJENTE (din beslutning)
+  const approvedData=[
+    ['✓ GODKJENTE LEADS — DIN BESLUTNING ETTER AI-SCREENING'],
+    ['Disse leadene har du godkjent for kontakt · Sortert etter score'],[''],
+    ['RANG','NAVN / BEDRIFT','E-POST','SCORE','AI-KATEGORI','BEGRUNNELSE','ANBEFALT HANDLING'],
+    ...approved.map(l=>[l.rank,l.name,l.email||'',l.score,
+      {hot:'🔥 Varm',warm:'☀ Lunken',cold:'❄ Kald',skip:'Skip'}[l.kategori],
+      l.begrunnelse,l.handling])
+  ];
+  const ws_approved=XLSX.utils.aoa_to_sheet(approvedData);
+  ws_approved['!cols']=[{wch:6},{wch:30},{wch:28},{wch:10},{wch:14},{wch:40},{wch:35}];
+
+  // SHEET 4: VARME LEADS
+  const hotData=[
+    ['🔥 VARME LEADS — KONTAKT DISSE UMIDDELBART'],['Score 75–100 · Sortert etter potensialscore'],[''],
+    ['RANG','NAVN / BEDRIFT','E-POST','SCORE','BEGRUNNELSE','DYPERE ANALYSE','ANBEFALT HANDLING','SIGNALER','RISIKO','DIN BESLUTNING'],
+    ...hot.map(l=>[l.rank,l.name,l.email||'',l.score,l.begrunnelse,l.detalj||'',l.handling,l.signaler.join(', '),l.risiko||'',approvalLabel(l)])
+  ];
+  const ws2=XLSX.utils.aoa_to_sheet(hotData);
+  ws2['!cols']=[{wch:6},{wch:30},{wch:28},{wch:10},{wch:40},{wch:50},{wch:35},{wch:40},{wch:25},{wch:16}];
+
+  // SHEET 5: LUNKNE
+  const warmData=[
+    ['☀ LUNKNE LEADS — NURTURE MED INNHOLD'],['Score 50–74 · Disse trenger mer tid eller informasjon'],[''],
+    ['RANG','NAVN / BEDRIFT','E-POST','SCORE','BEGRUNNELSE','HANDLING','DIN BESLUTNING'],
+    ...warm.map(l=>[l.rank,l.name,l.email||'',l.score,l.begrunnelse,l.handling,approvalLabel(l)])
+  ];
+  const ws3=XLSX.utils.aoa_to_sheet(warmData);
+  ws3['!cols']=[{wch:6},{wch:30},{wch:28},{wch:10},{wch:40},{wch:35},{wch:16}];
+
+  XLSX.utils.book_append_sheet(wb,ws0,'📋 Sammendrag');
+  XLSX.utils.book_append_sheet(wb,ws1,'📊 Alle leads');
+  if(approved.length) XLSX.utils.book_append_sheet(wb,ws_approved,'✓ Godkjente leads');
+  XLSX.utils.book_append_sheet(wb,ws2,'🔥 Varme leads');
+  XLSX.utils.book_append_sheet(wb,ws3,'☀ Lunkne leads');
+
+  const date=new Date().toISOString().slice(0,10);
+  XLSX.writeFile(wb,`Arce_LeadScore_${date}.xlsx`);
+  toast('✓ Excel lastet ned — inkl. godkjente leads og dataeierskap-notat');
+}
+
+function copyTop(){
+  const top=scored.slice(0,10);
+  const txt='SLATED — TOPP 10 LEADS\n'+top.map(l=>`${l.rank}. ${l.name} | Score: ${l.score}/100 | ${l.handling}`).join('\n');
+  navigator.clipboard.writeText(txt).then(()=>toast('✓ Topp 10 kopiert til utklippstavlen'));
+}
+
+/* ── UI HELPERS ── */
+function setStep(n){
+  [1,2,3,4].forEach(i=>{
+    const tr=document.getElementById('tr'+i);
+    const tn=document.getElementById('tn'+i);
+    if(!tr)return;
+    if(i<n){tr.className='track-step st-done';tn.textContent='✓'}
+    else if(i===n){tr.className='track-step st-active';tn.textContent=i}
+    else{tr.className='track-step st-waiting';tn.textContent=i}
+  });
+}
+
+function h(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  clearTimeout(t._tid);
+  t._tid=setTimeout(()=>t.classList.remove('show'),3200);
+}
+</script>
+</body>
+</html>

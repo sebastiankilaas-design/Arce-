@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arce — Testportal</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,400;0,500;1,400&family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --cream:#F3F1EB;--cream2:#EAE8E1;--white:#FAFAF7;
+  --ink:#181612;--ink2:#3C3A34;--ink3:#6E6C65;--ink4:#A09D96;
+  --g:#0C4D3A;--g2:#0F6048;--g3:#128058;--gl:#EBF3EE;--gm:#ACCFC0;
+  --gold:#B8892A;--gm2:#DFC07A;--gl2:#F5EDDA;
+  --char:#1A1917;--char2:#252320;
+  --red:#C0392B;--rl:#FEF0EE;
+  --brd:#D8D5CC;--brd2:#C5C2B8;
+  --sh:0 1px 3px rgba(24,22,18,.07),0 6px 24px rgba(24,22,18,.05);
+  --sh2:0 4px 20px rgba(24,22,18,.1),0 24px 64px rgba(24,22,18,.08);
+  --serif:'Cormorant',Georgia,serif;
+  --body:'Outfit',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+}
+html,body{height:100%;background:var(--cream);font-family:var(--body);font-weight:300;color:var(--ink)}
+
+/* ─── BG ─── */
+.bg-orb{position:fixed;border-radius:50%;pointer-events:none;z-index:0}
+.o1{width:700px;height:700px;top:-250px;left:-200px;background:radial-gradient(circle,rgba(12,77,58,.45) 0%,transparent 65%);filter:blur(80px);animation:d1 14s ease-in-out infinite}
+.o2{width:500px;height:500px;bottom:-150px;right:-150px;background:radial-gradient(circle,rgba(184,137,42,.18) 0%,transparent 65%);filter:blur(90px);animation:d2 18s ease-in-out infinite}
+@keyframes d1{0%,100%{transform:translate(0,0)}50%{transform:translate(30px,-20px)}}
+@keyframes d2{0%,100%{transform:translate(0,0)}50%{transform:translate(-20px,15px)}}
+.bg-char{position:fixed;inset:0;background:var(--char);z-index:0}
+
+/* ─── SCREENS ─── */
+.screen{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column}
+#loginScreen{display:flex}
+#portalScreen{display:none;flex-direction:column}
+
+/* ─── LOGIN ─── */
+.login-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:2rem}
+.login-card{
+  background:rgba(250,250,247,.06);border:1px solid rgba(255,255,255,.1);
+  border-radius:16px;backdrop-filter:blur(32px);-webkit-backdrop-filter:blur(32px);
+  padding:2.75rem;width:100%;max-width:400px;
+  box-shadow:0 8px 40px rgba(0,0,0,.3);
+  animation:up .5s ease both;
+}
+@keyframes up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.login-logo{display:flex;align-items:center;gap:9px;margin-bottom:2rem;justify-content:center}
+.lmark{width:32px;height:32px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:6px;display:flex;align-items:center;justify-content:center}
+.lword{font-family:var(--serif);font-size:1.25rem;font-weight:500;color:rgba(255,255,255,.88);letter-spacing:.02em}
+.login-badge{
+  display:inline-flex;align-items:center;gap:6px;justify-content:center;
+  font-family:var(--mono);font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;
+  background:rgba(12,77,58,.3);border:1px solid rgba(172,207,192,.25);
+  color:var(--gm);padding:.28rem .85rem;border-radius:100px;
+  margin:0 auto 1.5rem;display:flex;width:fit-content;
+}
+.ldot{width:5px;height:5px;border-radius:50%;background:var(--g3);animation:pulse 2s ease infinite}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(18,128,88,.5)}70%{opacity:.7;box-shadow:0 0 0 5px rgba(18,128,88,0)}}
+.login-title{font-family:var(--serif);font-size:1.5rem;font-style:italic;color:rgba(255,255,255,.9);text-align:center;margin-bottom:.35rem}
+.login-sub{font-size:.78rem;color:rgba(255,255,255,.38);text-align:center;margin-bottom:2rem;line-height:1.6}
+
+.pin-label{font-size:.72rem;font-weight:500;color:rgba(255,255,255,.5);margin-bottom:.5rem;display:block;letter-spacing:.02em}
+.pin-wrap{display:flex;gap:.5rem;justify-content:center;margin-bottom:1.25rem}
+.pin-inp{
+  width:52px;height:60px;background:rgba(255,255,255,.07);
+  border:1px solid rgba(255,255,255,.15);border-radius:9px;
+  font-family:var(--mono);font-size:1.5rem;font-weight:400;
+  color:rgba(255,255,255,.9);text-align:center;outline:none;
+  transition:all .18s;caret-color:var(--gm);
+}
+.pin-inp:focus{border-color:var(--gm);background:rgba(255,255,255,.1);box-shadow:0 0 0 3px rgba(12,77,58,.2)}
+.pin-inp.filled{border-color:rgba(172,207,192,.4);background:rgba(12,77,58,.2)}
+.pin-inp.error{border-color:rgba(192,57,43,.5);background:rgba(192,57,43,.08);animation:shake .35s ease}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+.login-btn{
+  width:100%;padding:.85rem;background:var(--cream);color:var(--char);
+  border:none;border-radius:8px;font-family:var(--body);font-size:.9rem;
+  font-weight:600;cursor:pointer;transition:all .18s;letter-spacing:.01em;
+}
+.login-btn:hover{background:#fff;transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,0,0,.2)}
+.login-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
+.login-error{color:#F5A5A5;font-size:.75rem;text-align:center;margin-top:.75rem;height:1.2em;font-family:var(--mono)}
+.login-footer{text-align:center;margin-top:1.75rem;font-size:.7rem;color:rgba(255,255,255,.2);font-family:var(--mono)}
+
+/* ─── PORTAL NAV ─── */
+.portal-nav{
+  background:rgba(243,241,235,.95);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--brd);display:flex;align-items:center;
+  justify-content:space-between;padding:0 2rem;height:58px;flex-shrink:0;
+}
+.portal-logo{display:flex;align-items:center;gap:9px;text-decoration:none}
+.portal-logo-mark{width:26px;height:26px;background:var(--char);border-radius:5px;display:flex;align-items:center;justify-content:center}
+.portal-logo-word{font-family:var(--serif);font-size:1.1rem;font-weight:500;color:var(--ink);letter-spacing:.02em}
+.portal-nav-right{display:flex;align-items:center;gap:.75rem}
+.test-badge{display:flex;align-items:center;gap:5px;background:var(--gl);border:1px solid var(--gm);color:var(--g);border-radius:100px;padding:.25rem .75rem;font-family:var(--mono);font-size:.6rem;letter-spacing:.06em;text-transform:uppercase}
+.tdot{width:5px;height:5px;border-radius:50%;background:var(--g3);animation:pulse 2s ease infinite}
+.logout-btn{background:none;border:1px solid var(--brd2);border-radius:5px;padding:.35rem .85rem;font-family:var(--body);font-size:.76rem;color:var(--ink3);cursor:pointer;transition:all .15s}
+.logout-btn:hover{background:var(--cream2);color:var(--ink)}
+
+/* ─── PORTAL CONTENT ─── */
+.portal-body{flex:1;overflow-y:auto;background:var(--cream)}
+
+/* WELCOME BANNER */
+.welcome{background:var(--char);padding:2.5rem 2rem;position:relative;overflow:hidden}
+.welcome-orb{position:absolute;border-radius:50%;pointer-events:none;background:radial-gradient(circle,rgba(12,77,58,.45) 0%,transparent 65%);filter:blur(60px)}
+.welcome-inner{max-width:960px;margin:0 auto;position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:2rem;flex-wrap:wrap}
+.welcome-left{}
+.welcome-tag{font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gm);margin-bottom:.65rem;display:flex;align-items:center;gap:6px}
+.welcome-tag::before{content:'';display:block;width:14px;height:1px;background:var(--gm)}
+.welcome-h{font-family:var(--serif);font-size:clamp(1.6rem,3vw,2.2rem);font-weight:400;font-style:italic;color:rgba(255,255,255,.92);margin-bottom:.5rem;letter-spacing:-.02em}
+.welcome-sub{font-size:.82rem;color:rgba(255,255,255,.45);line-height:1.65;max-width:460px}
+.welcome-stats{display:flex;gap:1.5rem;flex-wrap:wrap}
+.wstat{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:.85rem 1.1rem;min-width:100px}
+.wstat-num{font-family:var(--serif);font-size:1.5rem;font-style:italic;color:rgba(255,255,255,.85);line-height:1}
+.wstat-label{font-size:.62rem;color:rgba(255,255,255,.3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;margin-top:.2rem}
+
+/* TOOL GRID */
+.tools-section{max-width:960px;margin:0 auto;padding:2rem}
+.tools-label{font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:var(--ink4);margin-bottom:1.1rem;display:flex;align-items:center;gap:7px}
+.tools-label::before{content:'';display:block;width:16px;height:1px;background:var(--brd2)}
+.tools-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:2rem}
+.tool-card{
+  background:var(--white);border:1.5px solid var(--brd);border-radius:12px;
+  padding:1.75rem;box-shadow:var(--sh);
+  transition:all .2s;cursor:pointer;text-decoration:none;color:inherit;
+  display:flex;flex-direction:column;gap:0;
+}
+.tool-card:hover{box-shadow:var(--sh2);border-color:var(--gm);transform:translateY(-2px)}
+.tool-card.active-tool{border-color:var(--gm);background:var(--gl)}
+.tool-icon-wrap{width:44px;height:44px;background:var(--cream2);border:1px solid var(--brd);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;margin-bottom:1rem;transition:background .2s}
+.tool-card:hover .tool-icon-wrap{background:var(--gl);border-color:var(--gm)}
+.tool-name{font-size:.92rem;font-weight:500;color:var(--ink);margin-bottom:.35rem}
+.tool-desc{font-size:.78rem;color:var(--ink3);line-height:1.6;flex:1}
+.tool-cta{display:inline-flex;align-items:center;gap:.4rem;margin-top:1.1rem;font-size:.76rem;font-weight:500;color:var(--g);font-family:var(--mono);letter-spacing:.03em}
+.tool-cta::after{content:'→';transition:transform .15s}
+.tool-card:hover .tool-cta::after{transform:translateX(3px)}
+.tool-tag{display:inline-block;margin-top:.5rem;font-family:var(--mono);font-size:.6rem;background:var(--gl);color:var(--g);border:1px solid var(--gm);padding:.1rem .5rem;border-radius:100px}
+
+/* GUIDE SECTION */
+.guide{background:var(--white);border:1px solid var(--brd);border-radius:12px;padding:1.5rem;box-shadow:var(--sh)}
+.guide-title{font-size:.88rem;font-weight:500;color:var(--ink);margin-bottom:1rem;display:flex;align-items:center;gap:.5rem}
+.guide-title::before{content:'📋';font-size:.95rem}
+.steps-list{display:flex;flex-direction:column;gap:0}
+.gstep{display:flex;gap:1rem;padding:.9rem 0;border-bottom:1px solid var(--brd)}
+.gstep:last-child{border-bottom:none}
+.gstep-num{width:22px;height:22px;border-radius:50%;background:var(--gl);border:1px solid var(--gm);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.65rem;color:var(--g);flex-shrink:0;margin-top:.1rem}
+.gstep-title{font-size:.82rem;font-weight:500;color:var(--ink);margin-bottom:.2rem}
+.gstep-desc{font-size:.76rem;color:var(--ink3);line-height:1.6}
+.gstep-link{display:inline-flex;align-items:center;gap:.3rem;margin-top:.4rem;font-size:.73rem;color:var(--g);font-weight:500;cursor:pointer;background:none;border:none;font-family:var(--body);padding:0}
+.gstep-link:hover{text-decoration:underline}
+
+/* CONTACT ROW */
+.contact-row{display:flex;align-items:center;justify-content:space-between;background:var(--char);border-radius:10px;padding:1.25rem 1.5rem;margin-top:1.25rem;flex-wrap:wrap;gap:1rem}
+.contact-text{font-size:.8rem;color:rgba(255,255,255,.55);line-height:1.6}
+.contact-text strong{color:rgba(255,255,255,.85);font-weight:400}
+.contact-btn{background:var(--cream);color:var(--char);border:none;padding:.55rem 1.25rem;border-radius:6px;font-family:var(--body);font-size:.8rem;font-weight:600;cursor:pointer;transition:all .15s;text-decoration:none;white-space:nowrap}
+.contact-btn:hover{background:#fff}
+
+/* RESPONSIVE */
+@media(max-width:640px){
+  .tools-grid{grid-template-columns:1fr}
+  .welcome-inner{flex-direction:column}
+  .portal-nav{padding:0 1.25rem}
+  .tools-section{padding:1.5rem 1.25rem}
+  .welcome{padding:2rem 1.25rem}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ LOGIN SCREEN ═══ -->
+<div class="screen" id="loginScreen">
+  <div class="bg-char"></div>
+  <div class="bg-orb o1"></div>
+  <div class="bg-orb o2"></div>
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="login-logo">
+        <div class="lmark">
+          <svg width="14" height="14" viewBox="0 0 18 18" fill="none">
+            <path d="M9 2L16 6v6l-7 4L2 12V6l7-4z" stroke="rgba(243,241,235,.8)" stroke-width="1.4" fill="none" stroke-linejoin="round"/>
+            <path d="M9 2v10M2 6l7 4 7-4" stroke="rgba(243,241,235,.6)" stroke-width="1.1" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="lword">Arce</div>
+      </div>
+
+      <div class="login-badge"><div class="ldot"></div> Lukket beta · Kun inviterte</div>
+      <div class="login-title">Testportal</div>
+      <p class="login-sub">Skriv inn PIN-koden du mottok på SMS for å få tilgang.</p>
+
+      <label class="pin-label">PIN-kode</label>
+      <div class="pin-wrap" id="pinWrap">
+        <input class="pin-inp" maxlength="1" type="text" inputmode="numeric" id="p0" oninput="pinInput(0)" onkeydown="pinKey(event,0)"/>
+        <input class="pin-inp" maxlength="1" type="text" inputmode="numeric" id="p1" oninput="pinInput(1)" onkeydown="pinKey(event,1)"/>
+        <input class="pin-inp" maxlength="1" type="text" inputmode="numeric" id="p2" oninput="pinInput(2)" onkeydown="pinKey(event,2)"/>
+        <input class="pin-inp" maxlength="1" type="text" inputmode="numeric" id="p3" oninput="pinInput(3)" onkeydown="pinKey(event,3)"/>
+      </div>
+
+      <button class="login-btn" id="loginBtn" onclick="checkPin()" disabled>Logg inn</button>
+      <div class="login-error" id="loginError"></div>
+      <div class="login-footer">Har du ikke fått kode? Kontakt arce.no</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PORTAL SCREEN ═══ -->
+<div class="screen" id="portalScreen">
+
+  <!-- NAV -->
+  <div class="portal-nav">
+    <div class="portal-logo">
+      <div class="portal-logo-mark">
+        <svg width="14" height="14" viewBox="0 0 18 18" fill="none">
+          <path d="M9 2L16 6v6l-7 4L2 12V6l7-4z" stroke="#F3F1EB" stroke-width="1.4" fill="none" stroke-linejoin="round"/>
+          <path d="M9 2v10M2 6l7 4 7-4" stroke="#F3F1EB" stroke-width="1.1" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="portal-logo-word">Arce</div>
+    </div>
+    <div class="portal-nav-right">
+      <div class="test-badge"><div class="tdot"></div> Beta · NTE Trondheim</div>
+      <button class="logout-btn" onclick="logout()">Logg ut</button>
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <div class="portal-body">
+
+    <!-- WELCOME BANNER -->
+    <div class="welcome">
+      <div class="welcome-orb" style="width:500px;height:500px;top:-200px;left:-150px"></div>
+      <div class="welcome-orb" style="width:300px;height:300px;bottom:-100px;right:-80px;background:radial-gradient(circle,rgba(184,137,42,.15) 0%,transparent 65%)"></div>
+      <div class="welcome-inner">
+        <div class="welcome-left">
+          <div class="welcome-tag">Testperiode · 14 dager gratis</div>
+          <div class="welcome-h">Velkommen til Arce, NTE.</div>
+          <p class="welcome-sub">Her er testportal for automatisert leadscoring og møtebooking. Last opp fiberleadlisten din og se hvem som er klar til å bli kunde — i dag.</p>
+        </div>
+        <div class="welcome-stats">
+          <div class="wstat">
+            <div class="wstat-num" id="statLeads">0</div>
+            <div class="wstat-label">Leads analysert</div>
+          </div>
+          <div class="wstat">
+            <div class="wstat-num" id="statMeetings">0</div>
+            <div class="wstat-label">Møter booket</div>
+          </div>
+          <div class="wstat">
+            <div class="wstat-num" id="statDays">14</div>
+            <div class="wstat-label">Dager igjen</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOOLS -->
+    <div class="tools-section">
+      <div class="tools-label">Verktøy</div>
+      <div class="tools-grid">
+
+        <a class="tool-card" href="lead-intelligence.html" target="_blank">
+          <div class="tool-icon-wrap">🎯</div>
+          <div class="tool-name">Lead Intelligence</div>
+          <div class="tool-desc">Last opp din lead-liste fra SuperOffice eller Excel. AI-en analyserer hvert lead, gir score 0–100 og forteller deg hvem du skal ringe — og hva du skal si.</div>
+          <div class="tool-tag">Excel inn · Excel ut</div>
+          <div class="tool-cta">Åpne verktøyet</div>
+        </a>
+
+        <a class="tool-card" href="slated-agent.html" target="_blank">
+          <div class="tool-icon-wrap">🤖</div>
+          <div class="tool-name">AI Booking-agent</div>
+          <div class="tool-desc">Start samtaler med varme leads direkte. AI-agenten kontakter, kvalifiserer og booker møter automatisk på e-post og SMS — du overvåker og justerer.</div>
+          <div class="tool-tag">24/7 aktiv</div>
+          <div class="tool-cta">Åpne agenten</div>
+        </a>
+
+      </div>
+
+      <!-- GUIDE -->
+      <div class="guide">
+        <div class="guide-title">Slik kommer du i gang — 3 steg</div>
+        <div class="steps-list">
+          <div class="gstep">
+            <div class="gstep-num">1</div>
+            <div>
+              <div class="gstep-title">Eksporter leadlisten din fra SuperOffice</div>
+              <div class="gstep-desc">Gå til SuperOffice → Utvalg → Eksporter til Excel. Du trenger navn, e-post og telefon. Eventuelle notater om kunden hjelper AI-en med bedre scoring.</div>
+              <button class="gstep-link" onclick="document.getElementById('exportHelp').style.display=document.getElementById('exportHelp').style.display==='none'?'block':'none'">Vis eksempel på kolonner ↓</button>
+              <div id="exportHelp" style="display:none;margin-top:.65rem;background:var(--cream);border:1px solid var(--brd);border-radius:7px;padding:.75rem;font-size:.75rem;font-family:var(--mono);color:var(--ink3);line-height:1.8">
+                Fornavn · Etternavn · E-post · Telefon · Postnummer · Status<br>
+                <span style="color:var(--ink4)">— øvrige kolonner analyseres automatisk</span>
+              </div>
+            </div>
+          </div>
+          <div class="gstep">
+            <div class="gstep-num">2</div>
+            <div>
+              <div class="gstep-title">Last opp i Lead Intelligence</div>
+              <div class="gstep-desc">Dra Excel-filen inn i Lead Intelligence-verktøyet. Beskriv at dere selger fiber til private i Trondheim-regionen. AI-en scorer alle leads på under 2 minutter og lager en ferdig handlingsplan.</div>
+              <button class="gstep-link" onclick="window.open('lead-intelligence.html','_blank')">Åpne Lead Intelligence →</button>
+            </div>
+          </div>
+          <div class="gstep">
+            <div class="gstep-num">3</div>
+            <div>
+              <div class="gstep-title">Start med topp 10 varme leads</div>
+              <div class="gstep-desc">Ta de 10 med høyest score og legg dem inn i Booking-agenten. AI-en sender første melding og følger opp automatisk. Du ser alle samtaler i sanntid og kan overta når som helst.</div>
+              <button class="gstep-link" onclick="window.open('slated-agent.html','_blank')">Åpne Booking-agenten →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTACT -->
+      <div class="contact-row">
+        <div class="contact-text">
+          <strong>Spørsmål? Vi er tilgjengelig.</strong><br>
+          Ring eller SMS direkte — du trenger ikke vente på support-kø.
+        </div>
+        <a class="contact-btn" href="mailto:hei@arce.no">Send e-post →</a>
+      </div>
+
+    </div><!-- /tools-section -->
+  </div><!-- /portal-body -->
+</div><!-- /portalScreen -->
+
+<script>
+/*
+  ═══════════════════════════════════════════════
+  PIN-KODE — BYTT DENNE BEFORE DU SENDER TIL NTE
+  Standard: 2847
+  Bytt til hva du vil — f.eks. 9163
+  ═══════════════════════════════════════════════
+*/
+var CORRECT_PIN = '2847';
+
+/* Auto-fill if previously logged in */
+if(sessionStorage.getItem('arce_auth') === 'ok') unlock();
+
+function pinInput(idx){
+  var val = document.getElementById('p'+idx).value;
+  // Only allow digits
+  document.getElementById('p'+idx).value = val.replace(/\D/g,'');
+  if(document.getElementById('p'+idx).value && idx < 3){
+    document.getElementById('p'+(idx+1)).focus();
+  }
+  updateLoginBtn();
+  clearError();
+}
+
+function pinKey(e, idx){
+  if(e.key === 'Backspace' && !document.getElementById('p'+idx).value && idx > 0){
+    document.getElementById('p'+(idx-1)).focus();
+  }
+  if(e.key === 'Enter') checkPin();
+  if(e.key === 'ArrowLeft' && idx > 0) document.getElementById('p'+(idx-1)).focus();
+  if(e.key === 'ArrowRight' && idx < 3) document.getElementById('p'+(idx+1)).focus();
+}
+
+function getPin(){
+  return [0,1,2,3].map(function(i){ return document.getElementById('p'+i).value; }).join('');
+}
+
+function updateLoginBtn(){
+  document.getElementById('loginBtn').disabled = getPin().length < 4;
+}
+
+function clearError(){
+  document.getElementById('loginError').textContent = '';
+  [0,1,2,3].forEach(function(i){ document.getElementById('p'+i).classList.remove('error'); });
+}
+
+function checkPin(){
+  var pin = getPin();
+  if(pin.length < 4) return;
+  if(pin === CORRECT_PIN){
+    sessionStorage.setItem('arce_auth','ok');
+    unlock();
+  } else {
+    [0,1,2,3].forEach(function(i){
+      document.getElementById('p'+i).classList.add('error');
+      document.getElementById('p'+i).value = '';
+    });
+    document.getElementById('loginError').textContent = 'Feil PIN-kode. Prøv igjen.';
+    document.getElementById('p0').focus();
+    updateLoginBtn();
+  }
+}
+
+function unlock(){
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('portalScreen').style.display = 'flex';
+  startDayCount();
+}
+
+function logout(){
+  sessionStorage.removeItem('arce_auth');
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('portalScreen').style.display = 'none';
+  [0,1,2,3].forEach(function(i){ document.getElementById('p'+i).value=''; });
+  updateLoginBtn();
+  document.getElementById('p0').focus();
+}
+
+/* Countdown timer — starts from when they first logged in */
+function startDayCount(){
+  var startKey = 'arce_start';
+  if(!sessionStorage.getItem(startKey)){
+    sessionStorage.setItem(startKey, Date.now().toString());
+  }
+  var start = parseInt(sessionStorage.getItem(startKey));
+  var elapsed = Math.floor((Date.now() - start) / (1000*60*60*24));
+  var remaining = Math.max(0, 14 - elapsed);
+  document.getElementById('statDays').textContent = remaining;
+}
+
+/* Focus first pin on load */
+document.getElementById('p0').focus();
+</script>
+</body>
+</html>
