@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arce — Pitchdeck</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#181612;--ink2:#3C3A34;--ink3:#6E6C65;--ink4:#A09D96;
+  --cream:#F3F1EB;--cream2:#EAE8E1;--white:#FAFAF7;
+  --char:#1A1917;--char2:#252320;--char3:#2E2C28;
+  --g:#0C4D3A;--g2:#0F6048;--g3:#128058;--gl:#EBF3EE;--gm:#ACCFC0;
+  --gold:#B8892A;--gm2:#DFC07A;--gl2:#F5EDDA;
+  --brd:#D8D5CC;
+  --serif:'Cormorant',Georgia,serif;
+  --body:'Outfit',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+}
+html{font-size:15px;scroll-behavior:smooth}
+body{
+  background:var(--char);color:var(--cream);
+  font-family:var(--body);font-weight:300;
+  overflow-x:hidden;
+}
+
+/* SLIDE */
+.slide{
+  min-height:100vh;width:100%;
+  display:flex;flex-direction:column;
+  justify-content:center;
+  padding:5rem 8%;
+  position:relative;overflow:hidden;
+  border-bottom:1px solid rgba(255,255,255,.06);
+}
+.slide-light{background:var(--cream);color:var(--ink);border-bottom:1px solid var(--brd)}
+.slide-green{background:var(--g);color:var(--cream)}
+.slide-num{
+  position:absolute;top:2rem;right:2.5rem;
+  font-family:var(--mono);font-size:.62rem;color:rgba(255,255,255,.2);letter-spacing:.1em;
+}
+.slide-light .slide-num{color:rgba(24,22,18,.2)}
+
+/* ORB BACKGROUNDS */
+.orb{position:absolute;border-radius:50%;pointer-events:none}
+.orb-green{background:radial-gradient(circle,rgba(12,77,58,.5) 0%,transparent 65%);filter:blur(80px)}
+.orb-gold{background:radial-gradient(circle,rgba(184,137,42,.2) 0%,transparent 65%);filter:blur(90px)}
+
+/* TYPOGRAPHY */
+.tag{
+  display:inline-flex;align-items:center;gap:7px;
+  font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--gm);margin-bottom:1rem;
+}
+.tag::before{content:'';display:block;width:16px;height:1px;background:var(--gm)}
+.tag-dark{color:var(--g)}
+.tag-dark::before{background:var(--g)}
+
+h1.display{
+  font-family:var(--serif);font-size:clamp(3rem,7vw,6rem);
+  font-weight:400;line-height:1.03;letter-spacing:-.02em;
+  color:rgba(255,255,255,.93);margin-bottom:1.25rem;
+}
+h1.display em{font-style:italic;color:var(--gm2)}
+h2.section-h{
+  font-family:var(--serif);font-size:clamp(2.2rem,4.5vw,4rem);
+  font-weight:400;line-height:1.06;letter-spacing:-.015em;margin-bottom:1.25rem;
+}
+h2.section-h em{font-style:italic;color:var(--gm2)}
+.slide-light h2.section-h em{color:var(--g)}
+h3.card-title{
+  font-family:var(--serif);font-size:1.5rem;font-weight:500;
+  font-style:italic;letter-spacing:-.01em;margin-bottom:.5rem;
+}
+p.lead{font-size:1rem;line-height:1.8;color:rgba(255,255,255,.55);max-width:580px}
+p.lead-dark{font-size:1rem;line-height:1.8;color:var(--ink3);max-width:560px}
+p.body-txt{font-size:.88rem;line-height:1.75;color:rgba(255,255,255,.5)}
+p.body-dark{font-size:.88rem;line-height:1.75;color:var(--ink3)}
+
+/* HIGHLIGHT PILL */
+.pill{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:.22rem .75rem;border-radius:100px;
+  font-size:.68rem;font-family:var(--mono);
+}
+.pill-green{background:rgba(12,77,58,.35);border:1px solid rgba(172,207,192,.3);color:var(--gm)}
+.pill-gold{background:rgba(184,137,42,.2);border:1px solid rgba(223,192,122,.3);color:var(--gm2)}
+.pill-light-green{background:var(--gl);border:1px solid var(--gm);color:var(--g)}
+
+/* STAT BLOCK */
+.stat-row{display:flex;align-items:flex-start;gap:3rem;flex-wrap:wrap;margin-top:2rem}
+.stat{display:flex;flex-direction:column;gap:.25rem}
+.stat-num{font-family:var(--serif);font-size:3.5rem;font-weight:400;font-style:italic;line-height:1;letter-spacing:-.03em;color:rgba(255,255,255,.9)}
+.stat-num.gold{color:var(--gm2)}
+.stat-label{font-size:.72rem;color:rgba(255,255,255,.38);font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase}
+.stat-sep{width:1px;height:60px;background:rgba(255,255,255,.08);align-self:center}
+
+/* PROBLEM CARDS */
+.problem-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:2.5rem}
+.problem-card{
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
+  border-radius:12px;padding:1.75rem;
+}
+.problem-card.highlighted{border-color:rgba(184,137,42,.3);background:rgba(184,137,42,.06)}
+.prob-icon{font-size:1.35rem;margin-bottom:.85rem;display:block}
+.prob-title{font-size:.92rem;font-weight:500;color:rgba(255,255,255,.85);margin-bottom:.4rem}
+.prob-desc{font-size:.78rem;color:rgba(255,255,255,.4);line-height:1.65}
+.prob-cost{
+  display:inline-block;margin-top:.75rem;
+  background:rgba(192,57,43,.15);border:1px solid rgba(192,57,43,.25);
+  color:#F5A5A5;font-family:var(--mono);font-size:.65rem;
+  padding:.15rem .55rem;border-radius:100px;
+}
+
+/* SOLUTION GRID */
+.solution-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-top:2rem}
+.solution-card{
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
+  border-radius:10px;padding:1.5rem;
+}
+.sol-num{font-family:var(--mono);font-size:.6rem;color:var(--gm);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.6rem}
+.sol-title{font-size:.9rem;font-weight:500;color:rgba(255,255,255,.88);margin-bottom:.35rem}
+.sol-desc{font-size:.78rem;color:rgba(255,255,255,.42);line-height:1.6}
+.sol-tag{display:inline-block;margin-top:.6rem;font-family:var(--mono);font-size:.6rem;background:rgba(12,77,58,.3);border:1px solid rgba(172,207,192,.25);color:var(--gm);padding:.12rem .55rem;border-radius:100px}
+
+/* TIMELINE */
+.timeline{display:flex;flex-direction:column;gap:0;margin-top:2rem;max-width:680px}
+.tl-step{
+  display:flex;gap:1.25rem;padding:1.25rem 0;
+  border-bottom:1px solid rgba(255,255,255,.07);
+}
+.tl-step:first-child{border-top:1px solid rgba(255,255,255,.07)}
+.tl-left{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:36px}
+.tl-dot{width:10px;height:10px;border-radius:50%;background:var(--gm);border:2px solid var(--g3);flex-shrink:0}
+.tl-line{flex:1;width:1px;background:rgba(255,255,255,.1)}
+.tl-n{font-family:var(--mono);font-size:.6rem;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.08em;margin-top:.2rem}
+.tl-title{font-size:.9rem;font-weight:500;color:rgba(255,255,255,.85);margin-bottom:.25rem}
+.tl-desc{font-size:.78rem;color:rgba(255,255,255,.42);line-height:1.6}
+.tl-badge{display:inline-block;margin-top:.4rem;font-size:.62rem;font-family:var(--mono);background:rgba(12,77,58,.3);color:var(--gm);border:1px solid rgba(172,207,192,.2);padding:.1rem .5rem;border-radius:100px}
+
+/* TESTI */
+.testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;margin-top:2rem}
+.testi-card{
+  background:var(--white);border:1px solid var(--brd);
+  border-radius:12px;padding:1.5rem;
+}
+.testi-stars{color:var(--gold);font-size:.8rem;letter-spacing:2px;margin-bottom:.75rem}
+.testi-q{font-family:var(--serif);font-size:1rem;font-style:italic;color:var(--ink2);line-height:1.6;margin-bottom:.85rem}
+.testi-av{display:flex;align-items:center;gap:.65rem;border-top:1px solid var(--brd);padding-top:.75rem}
+.av-circle{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:600}
+.av-a{background:var(--gl);color:var(--g);border:1px solid var(--gm)}
+.av-b{background:var(--gl2);color:#8A6510;border:1px solid #DFC07A}
+.av-c{background:#EEF0FD;color:#3B4CB0;border:1px solid #C5CAF2}
+.testi-name{font-size:.78rem;font-weight:500;color:var(--ink)}
+.testi-role{font-size:.68rem;color:var(--ink4)}
+.testi-result{font-family:var(--mono);font-size:.62rem;background:var(--gl);color:var(--g);border:1px solid var(--gm);padding:.12rem .5rem;border-radius:100px;display:inline-block;margin-top:.4rem}
+
+/* PRICE TABLE SLIDE */
+.price-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;margin-top:2rem}
+.price-box{border-radius:12px;padding:1.75rem}
+.price-box-dark{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08)}
+.price-box-featured{background:rgba(12,77,58,.2);border:1px solid rgba(172,207,192,.3)}
+.pb-name{font-family:var(--serif);font-size:1.2rem;font-weight:500;color:rgba(255,255,255,.88);margin-bottom:.25rem}
+.pb-for{font-size:.72rem;color:rgba(255,255,255,.35);margin-bottom:1.1rem;line-height:1.5}
+.pb-price{font-size:2rem;font-weight:300;color:rgba(255,255,255,.9);letter-spacing:-.03em;line-height:1;margin-bottom:.2rem}
+.pb-note{font-size:.65rem;color:rgba(255,255,255,.3);font-family:var(--mono);margin-bottom:1.25rem}
+.pb-feat{list-style:none;display:flex;flex-direction:column;gap:.4rem}
+.pb-feat li{font-size:.76rem;color:rgba(255,255,255,.5);display:flex;align-items:flex-start;gap:.5rem;line-height:1.45}
+.pb-feat li::before{content:'✓';color:var(--gm);font-weight:600;flex-shrink:0;margin-top:.05rem}
+.pb-feat li.no{color:rgba(255,255,255,.2)}
+.pb-feat li.no::before{content:'—';color:rgba(255,255,255,.15)}
+
+/* CTA SLIDE */
+.cta-center{text-align:center;display:flex;flex-direction:column;align-items:center;gap:1.5rem}
+.cta-headline{
+  font-family:var(--serif);font-size:clamp(3rem,7vw,5.5rem);
+  font-weight:400;line-height:1.05;letter-spacing:-.025em;
+  color:rgba(255,255,255,.93);
+}
+.cta-headline em{font-style:italic;color:var(--gm2)}
+.cta-sub{font-size:.95rem;color:rgba(255,255,255,.4);max-width:480px;text-align:center;line-height:1.75}
+.cta-btn{
+  background:var(--cream);color:var(--char);border:none;
+  padding:.85rem 2.5rem;border-radius:6px;
+  font-family:var(--body);font-size:.95rem;font-weight:600;
+  cursor:pointer;text-decoration:none;display:inline-block;
+  transition:all .18s;letter-spacing:.01em;
+}
+.cta-btn:hover{background:#fff;transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.3)}
+.cta-contact{font-family:var(--mono);font-size:.72rem;color:rgba(255,255,255,.28);letter-spacing:.06em;margin-top:.5rem}
+
+/* NAV DOTS */
+.nav-dots{
+  position:fixed;right:1.5rem;top:50%;transform:translateY(-50%);
+  z-index:100;display:flex;flex-direction:column;gap:8px;
+}
+.nav-dot{
+  width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.2);
+  cursor:pointer;transition:all .2s;border:none;padding:0;
+}
+.nav-dot.on{background:var(--gm);transform:scale(1.4)}
+
+/* ARCE LOGO IN SLIDES */
+.slide-logo{
+  position:absolute;top:2rem;left:2.5rem;
+  display:flex;align-items:center;gap:8px;text-decoration:none;
+}
+.slide-logo-mark{width:24px;height:24px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:4px;display:flex;align-items:center;justify-content:center}
+.slide-logo-mark.dark{background:var(--char);border-color:rgba(255,255,255,.1)}
+.slide-logo-word{font-family:var(--serif);font-size:1rem;font-weight:500;color:rgba(255,255,255,.6);letter-spacing:.02em}
+.slide-light .slide-logo-word{color:var(--ink3)}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .slide{padding:4rem 6%}
+  .problem-grid,.solution-grid,.testi-grid,.price-row{grid-template-columns:1fr}
+  .stat-row{gap:1.75rem}
+  .price-row{max-width:440px}
+}
+@media(max-width:600px){
+  .slide{padding:3rem 5%}
+  .stat-num{font-size:2.6rem}
+  .nav-dots{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV DOTS -->
+<div class="nav-dots" id="navDots"></div>
+
+<!-- ═══════════════════════════════════
+     SLIDE 1: COVER
+═══════════════════════════════════ -->
+<div class="slide" id="s1">
+  <div class="orb orb-green" style="width:700px;height:700px;top:-200px;left:-200px"></div>
+  <div class="orb orb-gold" style="width:500px;height:500px;bottom:-100px;right:-100px"></div>
+  <div class="slide-num">01 / 10</div>
+
+  <div class="tag">Konfidensielt pitchdokument · 2025</div>
+
+  <h1 class="display" style="max-width:800px">
+    Møtene fyller seg.<br>
+    Du gjør <em>ingenting.</em>
+  </h1>
+
+  <p class="lead" style="margin-bottom:2.5rem">
+    Arce er Norges første fullt automatiserte AI-agent for leadscoring og møtebooking. Resultater fra dag én. Ingen opplæring. Ingen ansettelser.
+  </p>
+
+  <div style="display:flex;align-items:center;gap:1.25rem;flex-wrap:wrap">
+    <div class="pill pill-green">AI-drevet · 24/7 aktiv</div>
+    <div class="pill pill-gold">Resultater fra dag én</div>
+    <div class="pill pill-green">Fungerer med eksisterende CRM</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     SLIDE 2: PROBLEMET
+═══════════════════════════════════ -->
+<div class="slide" id="s2">
+  <div class="orb orb-green" style="width:500px;height:500px;top:-150px;right:-100px;opacity:.4"></div>
+  <div class="slide-logo"><div class="slide-logo-mark"><svg width="12" height="12" viewBox="0 0 18 18" fill="none"><path d="M9 2L16 6v6l-7 4L2 12V6l7-4z" stroke="rgba(243,241,235,.7)" stroke-width="1.5" fill="none" stroke-linejoin="round"/><path d="M9 2v10M2 6l7 4 7-4" stroke="rgba(243,241,235,.5)" stroke-width="1.2" stroke-linejoin="round"/></svg></div><div class="slide-logo-word">Arce</div></div>
+  <div class="slide-num">02 / 10</div>
+
+  <div class="tag">Problemet</div>
+  <h2 class="section-h">Du mister penger <em>akkurat nå.</em></h2>
+  <p class="lead" style="margin-bottom:0">Hvert lead som ikke får svar innen 5 minutter har 80% sjanse for å gå til konkurrenten. Ingen rekker det manuelt.</p>
+
+  <div class="problem-grid">
+    <div class="problem-card">
+      <span class="prob-icon">⏱</span>
+      <div class="prob-title">For treg oppfølging</div>
+      <div class="prob-desc">Leads kontaktet etter 5 minutter er 21× vanskeligere å konvertere enn de som får svar umiddelbart.</div>
+      <div class="prob-cost">Opptil 80% av leads tapt</div>
+    </div>
+    <div class="problem-card highlighted">
+      <span class="prob-icon">⏳</span>
+      <div class="prob-title">Tid kastet bort på booking</div>
+      <div class="prob-desc">En gjennomsnittlig selger bruker 15–20 timer per uke på booking, purring og kalender-kaos. Det er tid som burde brukes på å selge.</div>
+      <div class="prob-cost">40% av arbeidstiden</div>
+    </div>
+    <div class="problem-card">
+      <span class="prob-icon">👻</span>
+      <div class="prob-title">No-shows ødelegger flyten</div>
+      <div class="prob-desc">1 av 3 bookede møter ender som no-show uten automatisert oppfølging og påminnelser.</div>
+      <div class="prob-cost">33% av møtene bortkastet</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     SLIDE 3: LØSNINGEN
+═══════════════════════════════════ -->
+<div class="slide" id="s3">
+  <div class="slide-logo"><div class="slide-logo-mark"><svg width="12" height="12" viewBox="0 0 18 18" fill="none"><path d="M9 2L16 6v6l-7 4L2 12V6l7-4z" stroke="rgba(243,241,235,.7)" stroke-width="1.5" fill="none" stroke-linejoin="round"/><path d="M9 2v10M2 6l7 4 7-4" stroke="rgba(243,241,235,.5)" stroke-width="1.2" stroke-linejoin="round"/></svg></div><div class="slide-logo-word">Arce</div></div>
+  <div class="slide-num">03 / 10</div>
+
+  <div class="tag">Løsningen</div>
+  <h2 class="section-h">To produkter.<br><em>Én sannhet.</em></h2>
+  <p class="lead">Arce leverer to AI-verktøy som jobber side om side — og gjør det arbeidet salgsteamet ditt aldri rekker.</p>
+
+  <div class="solution-grid">
+    <div class="solution-card">
+      <div class="sol-num">Produkt 01</div>
+      <div class="sol-title">Lead Intelligence</div>
+      <div class="sol-desc">Last opp kundelisten din. AI-en analyserer hvert enkelt lead, gir en score fra 0–100, og forteller deg hvem du skal ringe — og hva du skal si. Du laster ned et ferdig Excel-ark med handlingsplan.</div>
+      <div class="sol-tag">Excel inn · Excel ut · Ingen CRM-bytte</div>
+    </div>
+    <div class="solution-card">
+      <div class="sol-num">Produkt 02</div>
+      <div class="sol-title">AI Booking-agent</div>
+      <div class="sol-desc">En AI-agent som kontakter leads på e-post, SMS og WhatsApp, kvalifiserer dem med naturlig samtale, forhandler tidspunkt og legger møtet direkte i kalenderen. Uten at du gjør noe. 24/7.</div>
+      <div class="sol-tag">Klar til bruk samme dag · &lt;2 min responstid</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     SLIDE 4: SLIK FUNGERER DET
+═══════════════════════════════════ -->
+<div class="slide" id="s4">
+  <div class="slide-logo"><div class="slide-logo-mark"><svg width="12" height="12" viewBox="0 0 18 18" fill="none"><path d="M9 2L16 6v6l-7 4L2 12V6l7-4z" stroke="rgba(243,241,235,.7)" stroke-width="1.5" fill="none" stroke-linejoin="round"/><path d="M9 2v10M2 6l7 4 7-4" stroke="rgba(243,241,235,.5)" stroke-width="1.2" stroke-linejoin="round"/></svg></div><div class="slide-logo-word">Arce</div></div>
+  <div class="slide-num">04 / 10</div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:6rem;align-items:center">
+    <div>
+      <div class="tag">Slik fungerer det</div>
+      <h2 class="section-h">Fra første lead til booket møte — <em>på 30 minutter.</em></h2>
+      <p class="lead">Arce setter seg opp på under en halvtime. Ingen IT-avdeling. Ingen kode. Ingen opplæringsperiode.</p>
+    </div>
+    <div class="timeline">
+      <div class="tl-step">
+        <div class="tl-left"><div class="tl-dot"></div><div class="tl-line"></div></div>
+        <div>
+          <div class="tl-n">Dag 1 — 30 min</div>
+          <div class="tl-title">Koble til og konfigurer</div>
+          <div class="tl-desc">Koble til kalender og e-post. Fortell Arce hvem din ideelle kunde er — på vanlig norsk. Ingen teknisk kunnskap kreves.</div>
+          <div class="tl-badge">Onboarding-guide medfølger</div>
+        </div>
+      </div>
+      <div class="tl-step">
+        <div class="tl-left"><div class="tl-dot"></div><div class="tl-line"></div></div>
+        <div>
+          <div class="tl-n">Dag 1 — Innen 2 timer</div>
+          <div class="tl-title">Første leads kontaktes</div>
+          <div class="tl-desc">Importer eksisterende leads eller fyll inn nye. Arce begynner å sende personlige meldinger umiddelbart.</div>
+          <div class="tl-badge">&lt;2 min responstid på hvert svar</div>
+        </div>
+      </div>
+      <div class="tl-step">
+        <div class="tl-left"><div class="tl-dot"></div><div class="tl-line"></div></div>
+        <div>
+          <div class="tl-n">Dag 1–3</div>
+          <div class="tl-title">Møter dukker opp i kalenderen</div>
+          <div class="tl-desc">Arce kvalifiserer, forhandler tidspunkt og legger møtet rett i kalenderen din. Du gjør ingenting.</div>
+          <div class="tl-badge">Bekreftelse og påminnelse sendes automatisk</div>
+        </div>
+      </div>
+      <div class="tl-step">
+        <div class="tl-left"><div class="tl-dot" style="background:var(--gm2);border-color:var(--gold)"></div></div>
+        <div>
+          <div class="tl-n">Uke 1 og fremover</div>
+          <div class="tl-title">Du møter opp og lukker</div>
+          <div class="tl-desc">Kun kvalifiserte, bekreftede møter med beslutningstakere. Arce fortsetter mens du selger.</div>
+          <div class="tl-badge" style="background:rgba(184,137,42,.2);border-color:rgba(223,192,122,.3);color:var(--gm2)">Skalerer automatisk med volumet ditt</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     SLIDE 5: RESULTATER
+═══════════════════════════════════ -->
+<div class="slide" id="s5">
+  <div class="orb orb-green" style="width:600px;height:600px;bottom:-200px;right:-150px;opacity:.35"></div>
+  <div class="slide-logo"><div class="slide-logo-mark"><svg width="12" height="12" viewBox="0 0 18 18" fill="none"><path d="M9 2L16 6v6l-7 4L2 12V6l7-4z" stroke="rgba(243,241,235,.7)" stroke-width="1.5" fill="none" stroke-linejoin="round"/><path d="M9 2v10M2 6l7 4 7-4" stroke="rgba(243,241,235,.5)" stroke-width="1.2" stroke-linejoin="round"/></svg></div><div class="slide-logo-word">Arce</div></div>
+  <div class="slide-num">05 / 10</div>
+
+  <div class="tag">Resultater</div>
+  <h2 class="section-h">Tall som <em>taler for seg.</em></h2>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-num">3×</div>
+      <div class="stat-label">Flere møter booket per uke</div>
+    </div>
+    <div class="stat-sep"></div>
+    <div class="stat">
+      <div class="stat-num gold">84%</div>
+      <div class="stat-label">Møteshow-rate (vs 67% snitt)</div>
+    </div>
+    <div class="stat-sep"></div>
+    <div class="stat">
+      <div class="stat-num">&lt;2min</div>
+      <div class="stat-label">Responstid på leads</div>
+    </div>
+    <div class="stat-sep"></div>
+    <div class="stat">
+      <div class="stat-num gold">24/7</div>
+      <div class="stat-label">Alltid aktiv, aldri syk</div>
+    </div>
+  </div>
+
+  <div class="testi-grid" style="margin-top:3rem">
+    <div class="testi-card">
+      <div class="testi-stars">★★★★★</div>
+      <div class="testi-q">Vi gikk fra 8 til 27 bookede møter per uke. Arce svarer på leads mens vi sover — og kvalifiserer dem bedre enn vi klarte manuelt.</div>
+      <div class="testi-av">
+        <div class="av-circle av-a">TH</div>
+        <div><div class="testi-name">Thomas Haugen</div><div class="testi-role">Daglig leder, Haugen Eiendom</div></div>
+      </div>
+      <div class="testi-result">+238% møter · Uke 1</div>
+    </div>
+    <div class="testi-card">
+      <div class="testi-stars">★★★★★</div>
+      <div class="testi-q">Salgsteamet brukte 60% av tiden på booking. Nå bruker de den på å selge. Investeringen betalte seg i løpet av første uke.</div>
+      <div class="testi-av">
+        <div class="av-circle av-b">KL</div>
+        <div><div class="testi-name">Kristin Larsen</div><div class="testi-role">Salgssjef, Nordvik AS</div></div>
+      </div>
+      <div class="testi-result">60% mer produktivitet</div>
+    </div>
+    <div class="testi-card">
+      <div class="testi-stars">★★★★★</div>
+      <div class="testi-q">Arce er som å ha en heltids bookingassistent for en brøkdel av prisen. Anbefaler det til alle som jobber med salg.</div>
+      <div class="testi-av">
+        <div class="av-circle av-c">MV</div>
+        <div><div class="testi-name">Magnus Vold</div><div class="testi-role">Selvstendig konsulent</div></div>
+      </div>
+      <div class="testi-result">20+ timer spart / uke</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     SLIDE 6: INGEN CRM-BYTTE
+═══════════════════════════════════ -->
+<div class="slide slide-light" id="s6">
+  <div class="slide-logo"><div class="slide-logo-mark dark"><svg width="12" height="12" viewBox="0 0 18 18" fill="none"><path d="M9 2L16 6v6l-7 4L2 12V6l7-4z" stroke="rgba(243,241,235,.8)" stroke-width="1.5" fill="none" stroke-linejoin="round"/><path d="M9 2v10M2 6l7 4 7-4" stroke="rgba(243,241,235,.6)" stroke-width="1.2" stroke-linejoin="round"/></svg></div><div class="slide-logo-word" style="color:var(--ink3)">Arce</div></div>
+  <div class="slide-num" style="color:rgba(24,22,18,.2)">06 / 10</div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:6rem;align-items:center">
+    <div>
+      <div class="tag tag-dark">Ingen friksjon</div>
+      <h2 class="section-h" style="color:var(--ink)">Bytt ingenting.<br><em>Legg til alt.</em></h2>
+      <p class="lead-dark" style="margin-bottom:1.5rem">Arce er ikke et CRM-system. Det er et intelligensverktøy som legger seg <strong>oppå</strong> systemene du allerede bruker. Ingen migrering. Ingen opplæring av hele selskapet.</p>
+      <div style="display:flex;flex-direction:column;gap:.75rem">
+        <div style="display:flex;align-items:center;gap:.75rem;padding:.85rem 1rem;background:var(--white);border:1px solid var(--brd);border-radius:8px">
+          <span style="font-size:1rem">✅</span>
+          <div><div style="font-size:.84rem;font-weight:500;color:var(--ink)">Har du HubSpot, Salesforce eller Pipedrive?</div><div style="font-size:.74rem;color:var(--ink3)">Koble det på — alt synkroniserer automatisk. Valgfritt, ikke påkrevd.</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:.75rem;padding:.85rem 1rem;background:var(--white);border:1px solid var(--brd);border-radius:8px">
+          <span style="font-size:1rem">✅</span>
+          <div><div style="font-size:.84rem;font-weight:500;color:var(--ink)">Har du Google Calendar eller Outlook?</div><div style="font-size:.74rem;color:var(--ink3)">Møter bookes direkte i kalenderen din. Kreves for booking-agenten.</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:.75rem;padding:.85rem 1rem;background:var(--white);border:1px solid var(--brd);border-radius:8px">
+          <span style="font-size:1rem">✅</span>
+          <div><div style="font-size:.84rem;font-weight:500;color:var(--ink)">Ingen CRM fra før?</div><div style="font-size:.74rem;color:var(--ink3)">Arce fungerer perfekt standalone. Excel inn, Excel ut. Ingenting annet kreves.</div></div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div style="background:var(--cream);border:1px solid var(--brd);border-radius:12px;padding:2rem">
+        <div style="font-size:.65rem;font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--ink4);margin-bottom:1.25rem">Du trenger kun:</div>
+        <div style="display:flex;flex-direction:column;gap:.85rem">
+          <div style="display:flex;align-items:center;gap:.85rem">
+            <div style="width:36px;height:36px;background:var(--gl);border:1px solid var(--gm);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0">✉</div>
+            <div><div style="font-size:.82rem;font-weight:500;color:var(--ink)">E-postkonto (Gmail / Outlook)</div><div style="font-size:.72rem;color:var(--ink4)">Gratis · Har du allerede</div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:.85rem">
+            <div style="width:36px;height:36px;background:var(--gl);border:1px solid var(--gm);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0">📅</div>
+            <div><div style="font-size:.82rem;font-weight:500;color:var(--ink)">Kalender (Google / Outlook)</div><div style="font-size:.72rem;color:var(--ink4)">Gratis · Har du allerede</div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:.85rem">
+            <div style="width:36px;height:36px;background:var(--gl);border:1px solid var(--gm);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0">🤖</div>
+            <div><div style="font-size:.82rem;font-weight:500;color:var(--ink)">Arce-abonnement</div><div style="font-size:.72rem;color:var(--ink4)">Fra kr 3 490/mnd · Alt inkludert</div></div>
+          </div>
+        </div>
+        <div style="margin-top:1.5rem;padding:.85rem 1rem;background:var(--gl);border:1px solid var(--gm);border-radius:8px;font-size:.78rem;color:var(--g);line-height:1.6">
+          <strong>Totalt du betaler:</strong> Én faktura til Arce per måned. Ingenting annet er nødvendig.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     SLIDE 7: FOR HVEM
+═══════════════════════════════════ -->
+<div class="slide" id="s7">
+  <div class="orb orb-green" style="width:600px;height:600px;top:-150px;right:-100px;opacity:.3"></div>
+  <div class="slide-logo"><div class="slide-logo-mark"><svg width="12" height="12" viewBox="0 0 18 18" fill="none"><path d="M9 2L16 6v6l-7 4L2 12V6l7-4z" stroke="rgba(243,241,235,.7)" stroke-width="1.5" fill="none" stroke-linejoin="round"/><path d="M9 2v10M2 6l7 4 7-4" stroke="rgba(243,241,235,.5)" stroke-width="1.2" stroke-linejoin="round"/></svg></div><div class="slide-logo-word">Arce</div></div>
+  <div class="slide-num">07 / 10</div>
+
+  <div class="tag">For hvem</div>
+  <h2 class="section-h">Passer for alle<br>som <em>selger møter.</em></h2>
+
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.07);border-radius:12px;overflow:hidden;margin-top:2rem">
+    <div style="background:rgba(255,255,255,.03);padding:1.75rem;transition:background .2s">
+      <span style="font-size:1.35rem;margin-bottom:.85rem;display:block">🏠</span>
+      <div style="font-size:.9rem;font-weight:500;color:rgba(255,255,255,.88);margin-bottom:.35rem">Eiendomsmeglere</div>
+      <div style="font-size:.76rem;color:rgba(255,255,255,.38);line-height:1.6">Book visninger og verdivurderinger automatisk. Aldri mist et lead til en annen megler.</div>
+    </div>
+    <div style="background:rgba(255,255,255,.03);padding:1.75rem">
+      <span style="font-size:1.35rem;margin-bottom:.85rem;display:block">💼</span>
+      <div style="font-size:.9rem;font-weight:500;color:rgba(255,255,255,.88);margin-bottom:.35rem">Konsulenter & coaches</div>
+      <div style="font-size:.76rem;color:rgba(255,255,255,.38);line-height:1.6">Fyll opp kalenderen med kvalifiserte kunder uten epost-ping-pong.</div>
+    </div>
+    <div style="background:rgba(255,255,255,.03);padding:1.75rem">
+      <span style="font-size:1.35rem;margin-bottom:.85rem;display:block">📊</span>
+      <div style="font-size:.9rem;font-weight:500;color:rgba(255,255,255,.88);margin-bottom:.35rem">B2B-salg & SaaS</div>
+      <div style="font-size:.76rem;color:rgba(255,255,255,.38);line-height:1.6">Kortere salgssyklus og høyere win-rate med automatisert demo-booking og oppfølging.</div>
+    </div>
+    <div style="background:rgba(255,255,255,.03);padding:1.75rem">
+      <span style="font-size:1.35rem;margin-bottom:.85rem;display:block">🏥</span>
+      <div style="font-size:.9rem;font-weight:500;color:rgba(255,255,255,.88);margin-bottom:.35rem">Helse & velvære</div>
+      <div style="font-size:.76rem;color:rgba(255,255,255,.38);line-height:1.6">Fyll time-boken automatisk og reduser no-shows med smarte påminnelser.</div>
+    </div>
+  </div>
+
+  <div style="margin-top:2rem;padding:1.25rem 1.5rem;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;display:flex;align-items:center;gap:1rem;max-width:680px">
+    <span style="font-size:1.1rem;flex-shrink:0">💡</span>
+    <div style="font-size:.82rem;color:rgba(255,255,255,.5);line-height:1.65">
+      <strong style="color:rgba(255,255,255,.8)">Arce passer for alle bransjer der du selger møter.</strong> Har du en kunde som vil kjøpe, men prosessen med å booke dem inn tar tid? Da er Arce løsningen.
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     SLIDE 8: PRISER
+═══════════════════════════════════ -->
+<div class="slide" id="s8">
+  <div class="slide-logo"><div class="slide-logo-mark"><svg width="12" height="12" viewBox="0 0 18 18" fill="none"><path d="M9 2L16 6v6l-7 4L2 12V6l7-4z" stroke="rgba(243,241,235,.7)" stroke-width="1.5" fill="none" stroke-linejoin="round"/><path d="M9 2v10M2 6l7 4 7-4" stroke="rgba(243,241,235,.5)" stroke-width="1.2" stroke-linejoin="round"/></svg></div><div class="slide-logo-word">Arce</div></div>
+  <div class="slide-num">08 / 10</div>
+
+  <div class="tag">Priser</div>
+  <h2 class="section-h">Arce betaler <em>for seg selv.</em></h2>
+  <p class="lead" style="margin-bottom:0">En Vekst-kunde som scorer én ekstra kontrakt i måneden har allerede betalt abonnementet mange ganger over.</p>
+
+  <div class="price-row">
+    <div class="price-box price-box-dark">
+      <div class="pb-name">Solo</div>
+      <div class="pb-for">For deg som jobber alene og vil slutte å miste leads til konkurrenten.</div>
+      <div class="pb-price">kr 3 490<span style="font-size:1rem;color:rgba(255,255,255,.4)">/mnd</span></div>
+      <div class="pb-note">14 dager gratis · Avslutt når som helst</div>
+      <ul class="pb-feat">
+        <li>50 bookede avtaler / mnd</li>
+        <li>E-postkommunikasjon</li>
+        <li>Automatiske påminnelser</li>
+        <li>Responstid &lt;15 min</li>
+        <li class="no">SMS & WhatsApp</li>
+        <li class="no">Lead Intelligence</li>
+        <li class="no">CRM-integrasjon</li>
+      </ul>
+    </div>
+    <div class="price-box price-box-featured">
+      <div style="font-family:var(--mono);font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;color:var(--gm);margin-bottom:.5rem">Mest populær</div>
+      <div class="pb-name">Vekst</div>
+      <div class="pb-for">For team som vil skalere salget uten å ansette flere.</div>
+      <div class="pb-price">kr 5 490<span style="font-size:1rem;color:rgba(255,255,255,.4)">/mnd</span></div>
+      <div class="pb-note">14 dager gratis · Alt inkludert</div>
+      <ul class="pb-feat">
+        <li><strong style="color:rgba(255,255,255,.88)">Ubegrensede</strong> bookede avtaler</li>
+        <li>E-post + SMS + WhatsApp</li>
+        <li>Lead Intelligence-verktøy</li>
+        <li>CRM-integrasjon (valgfritt)</li>
+        <li>Responstid &lt;2 min</li>
+        <li>Analytikk-dashboard</li>
+        <li>Prioritert support</li>
+      </ul>
+    </div>
+    <div class="price-box price-box-dark">
+      <div class="pb-name">Agency</div>
+      <div class="pb-for">For byråer som vil selge Arce til egne kunder under eget navn.</div>
+      <div class="pb-price">kr 8 990<span style="font-size:1rem;color:rgba(255,255,255,.4)">/mnd</span></div>
+      <div class="pb-note">White-label · API · Dedikert manager</div>
+      <ul class="pb-feat">
+        <li>Alt i Vekst</li>
+        <li>White-label — ditt navn</li>
+        <li>Full API-tilgang</li>
+        <li>Ubegrenset brukere</li>
+        <li>AI trent på din bransje</li>
+        <li>Kvartalsvise strategimøter</li>
+        <li>SLA 99,9% oppetid</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     SLIDE 9: ROI KALKULATOR
+═══════════════════════════════════ -->
+<div class="slide slide-light" id="s9">
+  <div class="slide-logo"><div class="slide-logo-mark dark"><svg width="12" height="12" viewBox="0 0 18 18" fill="none"><path d="M9 2L16 6v6l-7 4L2 12V6l7-4z" stroke="rgba(243,241,235,.8)" stroke-width="1.5" fill="none" stroke-linejoin="round"/><path d="M9 2v10M2 6l7 4 7-4" stroke="rgba(243,241,235,.6)" stroke-width="1.2" stroke-linejoin="round"/></svg></div><div class="slide-logo-word" style="color:var(--ink3)">Arce</div></div>
+  <div class="slide-num">09 / 10</div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:6rem;align-items:center">
+    <div>
+      <div class="tag tag-dark">Regnestykket</div>
+      <h2 class="section-h" style="color:var(--ink)">Hva koster det deg<br><em>å ikke bruke Arce?</em></h2>
+      <p class="lead-dark">Regnestykket er enkelt. Det som ikke er enkelt er å gjøre det manuelt — det er der Arce overtar.</p>
+    </div>
+    <div>
+      <div style="background:var(--white);border:1px solid var(--brd);border-radius:14px;padding:2rem;box-shadow:0 4px 20px rgba(24,22,18,.08)">
+        <div style="font-size:.65rem;font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--ink4);margin-bottom:1.25rem">Eksempel — Vekst-plan · 1 mnd</div>
+        <div style="display:flex;flex-direction:column;gap:.85rem;margin-bottom:1.5rem">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:.65rem 0;border-bottom:1px solid var(--brd)">
+            <div style="font-size:.82rem;color:var(--ink3)">Gjennomsnittlig kontraktverdi</div>
+            <div style="font-family:var(--mono);font-size:.82rem;color:var(--ink);font-weight:500">kr 50 000</div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:.65rem 0;border-bottom:1px solid var(--brd)">
+            <div style="font-size:.82rem;color:var(--ink3)">Ekstra møter / mnd med Arce</div>
+            <div style="font-family:var(--mono);font-size:.82rem;color:var(--ink);font-weight:500">+8 møter</div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:.65rem 0;border-bottom:1px solid var(--brd)">
+            <div style="font-size:.82rem;color:var(--ink3)">Konverteringsrate</div>
+            <div style="font-family:var(--mono);font-size:.82rem;color:var(--ink);font-weight:500">20%</div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:.65rem 0;border-bottom:1px solid var(--brd)">
+            <div style="font-size:.82rem;color:var(--ink3)">Ekstra omsetning / mnd</div>
+            <div style="font-family:var(--serif);font-size:1.1rem;font-style:italic;color:var(--g);font-weight:500">kr 80 000</div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:.65rem 0;border-bottom:1px solid var(--brd)">
+            <div style="font-size:.82rem;color:var(--ink3)">Arce Vekst-abonnement</div>
+            <div style="font-family:var(--mono);font-size:.82rem;color:var(--red)">– kr 5 490</div>
+          </div>
+        </div>
+        <div style="background:var(--gl);border:1px solid var(--gm);border-radius:8px;padding:1rem 1.25rem;display:flex;justify-content:space-between;align-items:center">
+          <div style="font-size:.82rem;font-weight:500;color:var(--g)">Netto gevinst første måned</div>
+          <div style="font-family:var(--serif);font-size:1.6rem;font-style:italic;color:var(--g);font-weight:500">kr 74 510</div>
+        </div>
+        <div style="margin-top:.75rem;font-size:.7rem;color:var(--ink4);text-align:center;font-family:var(--mono)">ROI: 1 356% · Basert på konservative estimater</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     SLIDE 10: CTA
+═══════════════════════════════════ -->
+<div class="slide" id="s10" style="min-height:100vh">
+  <div class="orb orb-green" style="width:800px;height:800px;top:-250px;left:-250px;opacity:.6"></div>
+  <div class="orb orb-gold" style="width:600px;height:600px;bottom:-200px;right:-200px;opacity:.4"></div>
+  <div class="slide-num">10 / 10</div>
+
+  <div class="cta-center">
+    <div class="tag" style="margin-bottom:1.25rem">Kom i gang i dag</div>
+    <div class="cta-headline">
+      Slutt å la leads<br>gå til <em>konkurrenten.</em>
+    </div>
+    <p class="cta-sub">
+      Sett opp Arce på 30 minutter. Se møter dukke opp i kalenderen din innen 24 timer. Ingen binding — avslutt når du vil.
+    </p>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:1rem;margin-top:1rem">
+      <a class="cta-btn" href="index.html">Start 14 dager gratis →</a>
+      <div class="cta-contact">Eller kontakt oss direkte · arce.no</div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.07);border-radius:10px;overflow:hidden;margin-top:3.5rem;max-width:640px;width:100%">
+      <div style="background:rgba(255,255,255,.03);padding:1.25rem;text-align:center">
+        <div style="font-family:var(--serif);font-size:1.6rem;font-style:italic;color:rgba(255,255,255,.85);line-height:1;margin-bottom:.3rem">30 min</div>
+        <div style="font-size:.65rem;color:rgba(255,255,255,.3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.07em">Oppsettid</div>
+      </div>
+      <div style="background:rgba(255,255,255,.03);padding:1.25rem;text-align:center">
+        <div style="font-family:var(--serif);font-size:1.6rem;font-style:italic;color:rgba(255,255,255,.85);line-height:1;margin-bottom:.3rem">Dag 1</div>
+        <div style="font-size:.65rem;color:rgba(255,255,255,.3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.07em">Første møter</div>
+      </div>
+      <div style="background:rgba(255,255,255,.03);padding:1.25rem;text-align:center">
+        <div style="font-family:var(--serif);font-size:1.6rem;font-style:italic;color:rgba(255,255,255,.85);line-height:1;margin-bottom:.3rem">0 kr</div>
+        <div style="font-size:.65rem;color:rgba(255,255,255,.3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.07em">Oppstartskostnad</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* Navigation dots */
+const slides=document.querySelectorAll('.slide');
+const dotsEl=document.getElementById('navDots');
+slides.forEach((_,i)=>{
+  const d=document.createElement('button');
+  d.className='nav-dot'+(i===0?' on':'');
+  d.onclick=()=>slides[i].scrollIntoView({behavior:'smooth'});
+  dotsEl.appendChild(d);
+});
+
+/* Update active dot on scroll */
+const dots=document.querySelectorAll('.nav-dot');
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      const idx=[...slides].indexOf(e.target);
+      dots.forEach((d,i)=>d.classList.toggle('on',i===idx));
+    }
+  });
+},{threshold:.5});
+slides.forEach(s=>obs.observe(s));
+
+/* Keyboard navigation */
+document.addEventListener('keydown',e=>{
+  const current=[...dots].findIndex(d=>d.classList.contains('on'));
+  if(e.key==='ArrowDown'||e.key==='PageDown'){
+    const next=Math.min(current+1,slides.length-1);
+    slides[next].scrollIntoView({behavior:'smooth'});
+  } else if(e.key==='ArrowUp'||e.key==='PageUp'){
+    const prev=Math.max(current-1,0);
+    slides[prev].scrollIntoView({behavior:'smooth'});
+  }
+});
+</script>
+</body>
+</html>
