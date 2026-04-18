@@ -551,10 +551,11 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-weight:3
       </div>
       <div class="card">
         <div class="card-head"><div class="card-title">Kommende avtaler</div></div>
-        <div class="appt-list">
-          <div class="appt-item"><div class="appt-time-col"><div class="appt-date">I dag</div><div class="appt-time">14:00</div></div><div class="appt-info"><div class="appt-name">—</div><div class="appt-meta">Video · Google Meet · 30 min · Booket av Arce AI</div></div><div class="appt-actions"><button class="appt-btn" onclick="showToast('📧 Påminnelse sendt!')">Minn på</button><button class="appt-btn danger" onclick="showToast('Avtale kansellert')">Kanseller</button></div></div>
-          <div class="appt-item"><div class="appt-time-col"><div class="appt-date">I morgen</div><div class="appt-time">10:30</div></div><div class="appt-info"><div class="appt-name">—</div><div class="appt-meta">Telefon · 20 min · Booket av Arce AI</div></div><div class="appt-actions"><button class="appt-btn" onclick="showToast('📧 Påminnelse sendt!')">Minn på</button><button class="appt-btn danger" onclick="showToast('Avtale kansellert')">Kanseller</button></div></div>
-          <div class="appt-item"><div class="appt-time-col"><div class="appt-date">Tors</div><div class="appt-time">09:00</div></div><div class="appt-info"><div class="appt-name">—</div><div class="appt-meta">Video · Zoom · 45 min · Booket av Arce AI</div></div><div class="appt-actions"><button class="appt-btn" onclick="showToast('📧 Påminnelse sendt!')">Minn på</button><button class="appt-btn danger" onclick="showToast('Avtale kansellert')">Kanseller</button></div></div>
+        <div class="appt-list" id="allApptList">
+          <div style="text-align:center;padding:2.5rem;color:var(--muted);font-size:.82rem">
+            Ingen kommende avtaler.<br>
+            <span style="color:var(--f2)">Avtaler booket av Arce-agenten vises her automatisk.</span>
+          </div>
         </div>
       </div>
     </div>
