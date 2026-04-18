@@ -862,13 +862,49 @@ function connectTwilio(){
 }
 
 /* ── ADD LEAD ── */
+var _currentOrg = null; // set after Supabase loads
+
 function openAddLead(){
-  const name=prompt('Navn på lead:');
+  // Check subscription
+  if(!_currentOrg){
+    showSubscriptionGate();
+    return;
+  }
+  var trialEnd = _currentOrg.trial_ends_at ? new Date(_currentOrg.trial_ends_at) : null;
+  var hasStripe = _currentOrg.stripe_subscription_id;
+  var trialActive = trialEnd && trialEnd > new Date();
+
+  if(!hasStripe && !trialActive){
+    showSubscriptionGate();
+    return;
+  }
+  if(_currentOrg.tokens_remaining <= 0){
+    showToast('Ingen tokens igjen. Kjøp tokens for å fortsette.');
+    window.location.href='tokens.html';
+    return;
+  }
+
+  // Allowed — show simple add form
+  var name=prompt('Navn på lead:');
   if(!name)return;
-  const email=prompt('E-post:');
-  if(!email)return;
-  showToast(`✓ ${name} lagt til — AI-agent kontakter innen 2 minutter`);
-  document.getElementById('newLeadsBadge').textContent=parseInt(document.getElementById('newLeadsBadge').textContent)+1;
+  var email=prompt('E-post (valgfritt):');
+  showToast('✓ '+name+' lagt til — AI-agent kontakter innen 2 minutter');
+}
+
+function showSubscriptionGate(){
+  var overlay=document.createElement('div');
+  overlay.id='subGate';
+  overlay.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(24,22,18,.6);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:1.5rem';
+  overlay.innerHTML='\
+    <div style="background:var(--bg1);border:1px solid var(--border2);border-radius:16px;padding:2.5rem;max-width:420px;width:100%;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,.4)">\
+      <div style="font-size:1.75rem;margin-bottom:.75rem">🔒</div>\
+      <div style="font-family:var(--serif);font-size:1.5rem;font-style:italic;color:var(--text);margin-bottom:.5rem">Abonnement påkrevd</div>\
+      <p style="font-size:.84rem;color:var(--muted);line-height:1.7;margin-bottom:1.5rem">For å legge til leads og starte AI-agenten trenger du et aktivt abonnement. Kom i gang med 14 dager gratis.</p>\
+      <a href="checkout.html" style="display:block;background:#0C4D3A;color:#fff;padding:.85rem;border-radius:8px;font-family:var(--sans);font-size:.9rem;font-weight:600;text-decoration:none;margin-bottom:.65rem">Start 14 dager gratis →</a>\
+      <button onclick="document.getElementById(\'subGate\').remove()" style="background:transparent;border:1px solid var(--border2);color:var(--muted);padding:.6rem 1.5rem;border-radius:7px;font-family:var(--sans);font-size:.8rem;cursor:pointer;width:100%">Avbryt</button>\
+    </div>';
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click',function(e){if(e.target===overlay)overlay.remove();});
 }
 </script>
 
@@ -921,6 +957,9 @@ async function loadDashboardData() {
       });
       return loadDashboardData();
     }
+
+    // Store org globally for subscription checks
+    _currentOrg = org;
 
     // Update token display
     const pct = Math.round(org.tokens_remaining / org.tokens_monthly_limit * 100);
