@@ -362,7 +362,15 @@ async function doSignup() {
   });
   setLoading('signupBtn', false);
   if (error) { showMsg(error.message, 'error'); return; }
-  showMsg('Konto opprettet! Sjekk e-posten din for bekreftelse.', 'success');
+  // Auto-login after signup — no email confirmation needed
+  const { error: loginErr } = await sb.auth.signInWithPassword({ email, password: pass });
+  if (loginErr) {
+    showMsg('Konto opprettet! Logg inn for å fortsette.', 'success');
+    setTimeout(function(){ showLogin(); }, 1500);
+    return;
+  }
+  showMsg('Konto opprettet! Sender deg til dashboardet…', 'success');
+  setTimeout(function(){ window.location.href = 'dashboard.html'; }, 800);
 }
 
 async function doForgot() {

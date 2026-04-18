@@ -527,12 +527,11 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-weight:3
         </div>
         <table class="leads-table">
           <thead><tr><th>Navn</th><th>Status</th><th>Kanal</th><th>Kvalifisert</th><th>Siste aktivitet</th><th></th></tr></thead>
-          <tbody>
-            <tr onclick="openPanel('marte')" style="cursor:pointer"><td><div class="lead-name"><div class="lead-av">MO</div>—</div></td><td><span class="pill pill-active">Under samtale</span></td><td><span class="ch-badge">✉ E-post</span></td><td><span class="pill pill-booked">Ja</span></td><td>2 min siden</td><td><button class="appt-btn" onclick="event.stopPropagation();openPanel('marte')">Se samtale</button></td></tr>
-            <tr onclick="openPanel('lars')" style="cursor:pointer"><td><div class="lead-name"><div class="lead-av">LH</div>—</div></td><td><span class="pill pill-booked">Booket</span></td><td><span class="ch-badge">💬 SMS</span></td><td><span class="pill pill-booked">Ja</span></td><td>14 min siden</td><td><button class="appt-btn" onclick="event.stopPropagation();openPanel('lars')">Se samtale</button></td></tr>
-            <tr onclick="openPanel('kari')" style="cursor:pointer"><td><div class="lead-name"><div class="lead-av">KN</div>—</div></td><td><span class="pill pill-waiting">Venter på svar</span></td><td><span class="ch-badge">✉ E-post</span></td><td><span class="pill pill-waiting">Pågår</span></td><td>1 time siden</td><td><button class="appt-btn" onclick="event.stopPropagation();openPanel('kari')">Se samtale</button></td></tr>
-            <tr onclick="openPanel('erik')" style="cursor:pointer"><td><div class="lead-name"><div class="lead-av">EB</div>—</div></td><td><span class="pill pill-active">Under samtale</span></td><td><span class="ch-badge">✉ E-post</span></td><td><span class="pill pill-waiting">Pågår</span></td><td>3 timer siden</td><td><button class="appt-btn" onclick="event.stopPropagation();openPanel('erik')">Se samtale</button></td></tr>
-            <tr><td><div class="lead-name"><div class="lead-av">SJ</div>—</div></td><td><span class="pill pill-lost">Tapt</span></td><td><span class="ch-badge">💬 SMS</span></td><td><span class="pill pill-lost">Nei</span></td><td>2 dager siden</td><td><button class="appt-btn">Gjenopprett</button></td></tr>
+          <tbody id="allLeadsBody">
+            <tr><td colspan="6" style="text-align:center;padding:2.5rem;color:var(--muted);font-size:.82rem">
+              Ingen leads ennå.<br>
+              <a href="lead-intelligence.html" target="_blank" style="color:var(--f2);font-weight:500">Åpne Lead Intelligence for å laste opp og score leads →</a>
+            </td></tr>
           </tbody>
         </table>
       </div>
@@ -545,10 +544,10 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-weight:3
         <p>Alle bookede og kommende møter</p>
       </div>
       <div class="stats-row">
-        <div class="stat-card"><div class="stat-label">Denne uken</div><div class="stat-val">8</div><div class="stat-delta delta-up">↑ +2 vs forrige uke</div></div>
+        <div class="stat-card"><div class="stat-label">Denne uken</div><div class="stat-val" id="appt-week">—</div><div class="stat-delta delta-neutral">Bookede møter</div></div>
         <div class="stat-card"><div class="stat-label">Denne måneden</div><div class="stat-val" id="appt-month">—</div><div class="stat-delta delta-neutral">Bookede møter</div></div>
-        <div class="stat-card"><div class="stat-label">No-shows</div><div class="stat-val">3</div><div class="stat-delta delta-neutral">11% rate</div></div>
-        <div class="stat-card"><div class="stat-label">Snitt møtelengde</div><div class="stat-val">28m</div><div class="stat-delta delta-neutral">Stabilt</div></div>
+        <div class="stat-card"><div class="stat-label">No-shows</div><div class="stat-val" id="appt-noshow">—</div><div class="stat-delta delta-neutral">Ikke møtt opp</div></div>
+        <div class="stat-card"><div class="stat-label">Snitt møtelengde</div><div class="stat-val" id="appt-duration">—</div><div class="stat-delta delta-neutral">Snitt møtelengde</div></div>
       </div>
       <div class="card">
         <div class="card-head"><div class="card-title">Kommende avtaler</div></div>
@@ -565,26 +564,27 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-weight:3
       <div class="page-head"><h1>Analytikk</h1><p>Dyptgående ytelsesdata for AI-agenten din</p></div>
       <div class="stats-row">
         <div class="stat-card"><div class="stat-label">Totale leads kontaktet</div><div class="stat-val" id="an-leads">—</div><div class="stat-delta delta-neutral">Totalt</div></div>
-        <div class="stat-card"><div class="stat-label">Konverteringsrate</div><div class="stat-val">18%</div><div class="stat-delta delta-up">↑ +3% vs snitt</div></div>
-        <div class="stat-card"><div class="stat-label">Gj.snitt responstid</div><div class="stat-val">1m 42s</div><div class="stat-delta delta-up">↑ Raskere enn 95%</div></div>
+        <div class="stat-card"><div class="stat-label">Konverteringsrate</div><div class="stat-val" id="an-conv">—</div><div class="stat-delta delta-neutral">Leads → møter</div></div>
+        <div class="stat-card"><div class="stat-label">Gj.snitt responstid</div><div class="stat-val" id="an-response">—</div><div class="stat-delta delta-neutral">Gjennomsnitt</div></div>
         <div class="stat-card"><div class="stat-label">Inntekt generert*</div><div class="stat-val" id="an-revenue">—</div><div class="stat-delta delta-neutral">Estimert pipeline</div></div>
       </div>
       <div class="grid2-eq">
         <div class="card"><div class="card-head"><div class="card-title">Bookinger per uke (siste 4 uker)</div></div>
           <div style="padding:1rem 1.25rem">
             <div class="chart-bars" style="height:90px">
-              <div class="bar-wrap"><div class="bar filled" style="height:55%"></div><div class="bar-label">Uke 1</div></div>
-              <div class="bar-wrap"><div class="bar filled" style="height:70%"></div><div class="bar-label">Uke 2</div></div>
-              <div class="bar-wrap"><div class="bar filled" style="height:85%"></div><div class="bar-label">Uke 3</div></div>
-              <div class="bar-wrap"><div class="bar filled" style="height:100%"></div><div class="bar-label">Uke 4</div></div>
+              <div class="bar-wrap"><div class="bar" style="height:5%;opacity:.2"></div><div class="bar-label">Uke 1</div></div>
+              <div class="bar-wrap"><div class="bar" style="height:5%;opacity:.2"></div><div class="bar-label">Uke 2</div></div>
+              <div class="bar-wrap"><div class="bar" style="height:5%;opacity:.2"></div><div class="bar-label">Uke 3</div></div>
+              <div class="bar-wrap"><div class="bar" style="height:5%;opacity:.2"></div><div class="bar-label">Uke 4</div></div>
             </div>
           </div>
         </div>
         <div class="card"><div class="card-head"><div class="card-title">Kanal-fordeling</div></div>
           <div style="padding:1rem 1.25rem;display:flex;flex-direction:column;gap:.75rem">
-            <div><div style="display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:.3rem"><span>E-post</span><span style="font-family:var(--mono);color:var(--f2)">68%</span></div><div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden"><div style="height:100%;width:68%;background:var(--f2);border-radius:3px"></div></div></div>
-            <div><div style="display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:.3rem"><span>SMS</span><span style="font-family:var(--mono);color:var(--gold)">24%</span></div><div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden"><div style="height:100%;width:24%;background:var(--gold);border-radius:3px"></div></div></div>
-            <div><div style="display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:.3rem"><span>WhatsApp</span><span style="font-family:var(--mono);color:var(--blue)">8%</span></div><div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden"><div style="height:100%;width:8%;background:var(--blue);border-radius:3px"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:.3rem"><span>E-post</span><span style="font-family:var(--mono);color:var(--muted)" id="ch-email">—</span></div><div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden"><div id="ch-email-bar" style="height:100%;width:0%;background:var(--f2);border-radius:3px"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:.3rem"><span>SMS</span><span style="font-family:var(--mono);color:var(--muted)" id="ch-sms">—</span></div><div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden"><div id="ch-sms-bar" style="height:100%;width:0%;background:var(--gold);border-radius:3px"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:.3rem"><span>WhatsApp</span><span style="font-family:var(--mono);color:var(--muted)" id="ch-wa">—</span></div><div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden"><div id="ch-wa-bar" style="height:100%;width:0%;background:var(--blue);border-radius:3px"></div></div></div>
+            <div style="text-align:center;font-size:.72rem;color:var(--muted);margin-top:.5rem">Data vises etter første aktiverte samtale</div>
           </div>
         </div>
       </div>
