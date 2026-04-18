@@ -932,5 +932,124 @@ function openAddLead(){
   document.getElementById('newLeadsBadge').textContent=parseInt(document.getElementById('newLeadsBadge').textContent)+1;
 }
 </script>
+
+<!-- Supabase — live data -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+const SUPA_URL  = 'https://iupyilakdxmtiawkishs.supabase.co';
+const SUPA_KEY  = 'sb_publishable_0BbaazLbWJCL0JUVAJPKKQ_ilY6ZJ0t';
+
+let _sb = null;
+try { _sb = supabase.createClient(SUPA_URL, SUPA_KEY); } catch(e) { console.warn('Supabase init failed', e); }
+
+async function loadDashboardData() {
+  if (!_sb) return;
+  try {
+    // Check auth
+    const { data: { session } } = await _sb.auth.getSession();
+    if (!session) {
+      // No session — show demo data, don't redirect
+      console.log('No session — showing demo dashboard');
+      return;
+    }
+
+    const email = session.user.email;
+    const name  = session.user.user_metadata?.full_name || email.split('@')[0];
+
+    // Update user display
+    const userEls = document.querySelectorAll('.user-name, .nav-user-name');
+    userEls.forEach(el => el.textContent = name);
+
+    // Get org
+    const { data: org } = await _sb
+      .from('organizations')
+      .select('*')
+      .eq('email', email)
+      .single();
+
+    if (!org) {
+      // First login — create org
+      await _sb.from('organizations').insert({
+        name: session.user.user_metadata?.full_name || email.split('@')[0],
+        email: email,
+        plan: 'vekst',
+        tokens_remaining: 3000000,
+        tokens_monthly_limit: 3000000
+      });
+      return loadDashboardData();
+    }
+
+    // Update token display
+    const pct = Math.round(org.tokens_remaining / org.tokens_monthly_limit * 100);
+    const tokenEls = document.querySelectorAll('.token-pct, #tokenPct');
+    tokenEls.forEach(el => el.textContent = pct + '%');
+
+    // Show token warning if needed
+    if (pct < 20) {
+      const warn = document.createElement('div');
+      warn.style.cssText = 'position:fixed;bottom:1.5rem;right:1.5rem;z-index:999;background:#1A1917;color:#fff;padding:.75rem 1.1rem;border-radius:8px;font-size:.78rem;max-width:320px;border:1px solid rgba(255,255,255,.1);box-shadow:0 4px 20px rgba(0,0,0,.3)';
+      warn.innerHTML = pct === 0
+        ? '🛑 <strong>Ingen tokens igjen.</strong> AI-analyser er satt på pause. <a href="tokens.html" style="color:#ACCFC0">Kjøp tokens →</a>'
+        : `⚠️ <strong>${pct}% tokens igjen.</strong> Fyll på for å unngå avbrudd. <a href="tokens.html" style="color:#ACCFC0">Kjøp tokens →</a>`;
+      document.body.appendChild(warn);
+      setTimeout(() => warn.style.opacity = '0', 8000);
+    }
+
+    // Load lead stats
+    const { data: leads, count: leadCount } = await _sb
+      .from('leads')
+      .select('*', { count: 'exact' })
+      .eq('org_id', org.id);
+
+    if (leads) {
+      const hot      = leads.filter(l => l.kategori === 'hot').length;
+      const approved = leads.filter(l => l.approval === 'approved').length;
+      const pending  = leads.filter(l => l.approval === 'pending').length;
+
+      // Update stat cards
+      const statEls = {
+        'stat-leads':    leadCount || 0,
+        'stat-hot':      hot,
+        'stat-approved': approved,
+        'stat-pending':  pending
+      };
+      Object.entries(statEls).forEach(([id, val]) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = val;
+      });
+    }
+
+    // Load booking stats
+    const { data: bookings } = await _sb
+      .from('bookings')
+      .select('*')
+      .eq('org_id', org.id);
+
+    if (bookings) {
+      const confirmed  = bookings.filter(b => b.status === 'confirmed').length;
+      const completed  = bookings.filter(b => b.status === 'completed').length;
+      const showRate   = bookings.length > 0
+        ? Math.round(completed / bookings.length * 100) + '%'
+        : '—';
+
+      const bEls = {
+        'stat-bookings':  confirmed,
+        'stat-completed': completed,
+        'stat-showrate':  showRate
+      };
+      Object.entries(bEls).forEach(([id, val]) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = val;
+      });
+    }
+
+  } catch(e) {
+    console.error('Dashboard load error:', e);
+  }
+}
+
+// Run on load
+if (_sb) loadDashboardData();
+</script>
 </body>
 </html>

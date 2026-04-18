@@ -771,15 +771,20 @@ body{background:var(--cream);color:var(--ink);font-family:var(--body);font-weigh
   <!-- FOOTER -->
   <div class="footer">
     <div class="footer-inner">
-      <div class="footer-logo-text">Arce</div>
+      <div>
+        <div class="footer-logo-text">Arce</div>
+        <div style="font-size:.65rem;color:rgba(255,255,255,.2);font-family:var(--mono);margin-top:.35rem">Org.nr: [FYLL INN] · [Adresse], Norge</div>
+      </div>
       <div class="footer-links">
         <a href="#" onclick="showView('leads');return false">Lead Intelligence</a>
         <a href="#" onclick="showView('booking');return false">Booking & Møter</a>
         <a href="#" onclick="showView('priser');return false">Priser</a>
-        <a href="#">Personvern</a>
-        <a href="#">Vilkår</a>
+        <a href="personvern.html">Personvern</a>
+        <a href="vilkaar.html">Vilkår</a>
+        <a href="databehandleravtale.html">Databehandleravtale</a>
+        <a href="cookies.html">Cookies</a>
       </div>
-      <div class="footer-copy">© 2025 Arce AS · Norge</div>
+      <div class="footer-copy">© 2025 Arce AS · hei@arce.no</div>
     </div>
   </div>
 </div>
@@ -1198,17 +1203,49 @@ body{background:var(--cream);color:var(--ink);font-family:var(--body);font-weigh
       <div class="footer-logo-text">Arce</div>
       <div class="footer-links">
         <a href="#" onclick="showView('home');return false">Hjem</a>
-        <a href="#">Personvern</a>
-        <a href="#">Vilkår</a>
+        <a href="personvern.html">Personvern</a>
+        <a href="vilkaar.html">Vilkår</a>
+        <a href="cookies.html">Cookies</a>
       </div>
-      <div class="footer-copy">© 2025 Arce AS · Norge</div>
+      <div class="footer-copy">© 2025 Arce AS · Org.nr: [FYLL INN] · hei@arce.no</div>
+    </div>
+  </div>
+</div>
+
+<!-- COOKIE BANNER -->
+<div id="cookieBanner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:9999;background:var(--char);border-top:1px solid rgba(255,255,255,.1);padding:1rem 2rem;box-shadow:0 -4px 20px rgba(0,0,0,.2)">
+  <div style="max-width:1180px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:1.5rem;flex-wrap:wrap">
+    <div style="display:flex;align-items:flex-start;gap:.75rem;flex:1;min-width:240px">
+      <span style="font-size:1rem;flex-shrink:0">🍪</span>
+      <div>
+        <div style="font-size:.82rem;color:rgba(255,255,255,.85);font-weight:500;margin-bottom:.15rem">Vi bruker informasjonskapsler</div>
+        <div style="font-size:.74rem;color:rgba(255,255,255,.4);line-height:1.55">Nødvendige cookies er på for at siden skal fungere. Med samtykke bruker vi også funksjonelle cookies. <a href="cookies.html" style="color:var(--gm)">Les mer</a></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:.6rem;flex-shrink:0">
+      <button onclick="setCookieConsent('necessary')" style="background:transparent;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6);padding:.42rem .9rem;border-radius:5px;font-family:var(--body);font-size:.75rem;cursor:pointer">Kun nødvendige</button>
+      <button onclick="setCookieConsent('all')" style="background:var(--cream);color:var(--char);border:none;padding:.42rem 1rem;border-radius:5px;font-family:var(--body);font-size:.75rem;font-weight:600;cursor:pointer">Godta alle</button>
     </div>
   </div>
 </div>
 
 <script>
-/* ─── NAV & VIEWS — defined first so onclick works immediately ─── */
-const views=['home','leads','booking','priser','kontakt'];
+/* ─── COOKIE CONSENT ─── */
+function setCookieConsent(level){
+  localStorage.setItem('arce_cookie_consent',level);
+  document.getElementById('cookieBanner').style.display='none';
+}
+window.openCookieBanner=function(){document.getElementById('cookieBanner').style.display='block'};
+(function(){
+  if(!localStorage.getItem('arce_cookie_consent')){
+    setTimeout(function(){document.getElementById('cookieBanner').style.display='block';},1200);
+  }
+})();
+</script>
+
+<script>
+/* ─── NAV & VIEWS ─── */
+var views=['home','leads','booking','priser','kontakt'];
 function showView(id){
   views.forEach(function(v){
     var el=document.getElementById('view-'+v);
@@ -1284,8 +1321,8 @@ document.querySelectorAll('.fade-in').forEach(function(el){ io.observe(el); });
   Erstatt disse to verdiene med dine prosjektopplysninger.
   Finn dem på: supabase.com → ditt prosjekt → Settings → API
 */
-var SUPABASE_URL  = 'https://YOUR_PROJECT_ID.supabase.co';
-var SUPABASE_ANON = 'YOUR_ANON_PUBLIC_KEY';
+var SUPABASE_URL  = 'https://iupyilakdxmtiawkishs.supabase.co';
+var SUPABASE_ANON = 'sb_publishable_0BbaazLbWJCL0JUVAJPKKQ_ilY6ZJ0t';
 
 function renderNavAuth(session){
   var el=document.getElementById('nav-auth');

@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arce — Kjøp tokens</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,400;0,500;1,400&family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --cream:#F3F1EB;--cream2:#EAE8E1;--white:#FAFAF7;
+  --ink:#181612;--ink2:#3C3A34;--ink3:#6E6C65;--ink4:#A09D96;
+  --g:#0C4D3A;--g2:#0F6048;--gl:#EBF3EE;--gm:#ACCFC0;
+  --gold:#B8892A;--gl2:#F5EDDA;--gm2:#DFC07A;
+  --char:#1A1917;--char2:#252320;
+  --red:#C0392B;--rl:#FEF0EE;
+  --brd:#D8D5CC;--brd2:#C5C2B8;
+  --sh:0 1px 3px rgba(24,22,18,.07),0 6px 24px rgba(24,22,18,.05);
+  --sh2:0 4px 20px rgba(24,22,18,.1),0 24px 64px rgba(24,22,18,.08);
+  --serif:'Cormorant',Georgia,serif;
+  --body:'Outfit',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+}
+html{font-size:15px}
+body{background:var(--cream);color:var(--ink);font-family:var(--body);font-weight:300;min-height:100vh}
+
+/* NAV */
+.nav{display:flex;align-items:center;justify-content:space-between;padding:0 2rem;height:60px;background:rgba(243,241,235,.96);backdrop-filter:blur(20px);border-bottom:1px solid var(--brd);position:sticky;top:0;z-index:100}
+.logo{display:flex;align-items:center;gap:9px;text-decoration:none}
+.logo-mark{width:28px;height:28px;background:var(--char);border-radius:5px;display:flex;align-items:center;justify-content:center}
+.logo-word{font-family:var(--serif);font-size:1.15rem;font-weight:500;color:var(--ink);letter-spacing:.02em}
+.nav-back{font-size:.8rem;color:var(--ink3);text-decoration:none;transition:color .15s}
+.nav-back:hover{color:var(--ink)}
+
+/* PAGE */
+.page{max-width:960px;margin:0 auto;padding:3rem 2rem 5rem}
+
+/* HEADER */
+.page-tag{font-family:var(--mono);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--g);display:flex;align-items:center;gap:7px;margin-bottom:.85rem}
+.page-tag::before{content:'';display:block;width:16px;height:1px;background:var(--g)}
+.page-h{font-family:var(--serif);font-size:clamp(1.8rem,3.5vw,2.6rem);font-style:italic;font-weight:400;color:var(--ink);margin-bottom:.5rem;letter-spacing:-.02em}
+.page-sub{font-size:.9rem;color:var(--ink3);max-width:520px;line-height:1.75;margin-bottom:2.5rem}
+
+/* CURRENT BALANCE */
+.balance-card{
+  background:var(--char);border-radius:14px;padding:1.75rem 2rem;
+  margin-bottom:2rem;display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:1.5rem;position:relative;overflow:hidden;
+}
+.balance-orb{position:absolute;width:350px;height:350px;top:-150px;right:-100px;background:radial-gradient(circle,rgba(12,77,58,.45) 0%,transparent 65%);filter:blur(60px);pointer-events:none}
+.balance-left{position:relative}
+.balance-label{font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:.4rem}
+.balance-num{font-family:var(--serif);font-size:2.5rem;font-style:italic;color:rgba(255,255,255,.92);line-height:1;letter-spacing:-.03em}
+.balance-unit{font-size:.8rem;color:rgba(255,255,255,.4);margin-left:.3rem}
+.balance-plan{display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:100px;padding:.2rem .75rem;font-family:var(--mono);font-size:.62rem;color:rgba(255,255,255,.5);margin-top:.6rem}
+.balance-right{display:flex;flex-direction:column;gap:.6rem;align-items:flex-end;position:relative}
+.balance-stat{text-align:right}
+.bstat-num{font-family:var(--mono);font-size:.9rem;color:rgba(255,255,255,.75)}
+.bstat-label{font-size:.65rem;color:rgba(255,255,255,.3);font-family:var(--mono)}
+
+/* PROGRESS BAR */
+.token-bar-wrap{background:var(--white);border:1px solid var(--brd);border-radius:10px;padding:1.25rem 1.5rem;margin-bottom:2rem}
+.token-bar-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.65rem}
+.token-bar-label{font-size:.8rem;font-weight:500;color:var(--ink2)}
+.token-bar-pct{font-family:var(--mono);font-size:.72rem;color:var(--ink3)}
+.token-bar-track{height:8px;background:var(--cream2);border-radius:100px;overflow:hidden}
+.token-bar-fill{height:100%;border-radius:100px;transition:width .6s ease;background:var(--g)}
+.token-bar-fill.warn{background:var(--gold)}
+.token-bar-fill.critical{background:var(--red)}
+.token-bar-meta{display:flex;justify-content:space-between;margin-top:.5rem;font-size:.7rem;color:var(--ink4);font-family:var(--mono)}
+
+/* WARNING BANNER */
+.warn-banner{
+  display:none;
+  background:var(--gl2);border:1px solid var(--gm2);border-radius:10px;
+  padding:1rem 1.25rem;margin-bottom:1.5rem;
+  align-items:flex-start;gap:.75rem;
+}
+.warn-banner.show{display:flex}
+.warn-banner.critical{background:var(--rl);border-color:#F5C6C2}
+.warn-icon{font-size:1.1rem;flex-shrink:0;margin-top:.05rem}
+.warn-title{font-size:.84rem;font-weight:500;color:var(--gold);margin-bottom:.2rem}
+.warn-banner.critical .warn-title{color:var(--red)}
+.warn-text{font-size:.76rem;color:var(--ink3);line-height:1.6}
+.warn-text strong{color:var(--ink2)}
+
+/* TOKEN PACKAGES */
+.packages-label{font-family:var(--mono);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink4);display:flex;align-items:center;gap:7px;margin-bottom:1.1rem}
+.packages-label::before{content:'';display:block;width:14px;height:1px;background:var(--brd2)}
+.packages{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem}
+.pkg{
+  background:var(--white);border:1.5px solid var(--brd);border-radius:12px;
+  padding:1.4rem;cursor:pointer;transition:all .2s;position:relative;
+}
+.pkg:hover{border-color:var(--brd2);box-shadow:var(--sh2);transform:translateY(-2px)}
+.pkg.selected{border-color:var(--g);background:var(--gl)}
+.pkg.popular::before{
+  content:'Mest valgt';position:absolute;top:-1px;left:50%;transform:translateX(-50%);
+  background:var(--g);color:#fff;font-family:var(--mono);font-size:.58rem;
+  letter-spacing:.07em;text-transform:uppercase;padding:.25rem .75rem;
+  border-radius:0 0 6px 6px;white-space:nowrap;
+}
+.pkg-tokens{font-family:var(--serif);font-size:1.5rem;font-style:italic;color:var(--ink);line-height:1;margin-bottom:.25rem;letter-spacing:-.02em}
+.pkg-token-unit{font-size:.72rem;color:var(--ink4);font-family:var(--mono);margin-bottom:.85rem}
+.pkg-price{font-size:1.35rem;font-weight:300;color:var(--ink);letter-spacing:-.02em;margin-bottom:.2rem}
+.pkg-price sup{font-size:.85rem;vertical-align:super}
+.pkg-per{font-size:.65rem;color:var(--ink4);font-family:var(--mono);margin-bottom:.85rem}
+.pkg-divider{border:none;border-top:1px solid var(--brd);margin-bottom:.85rem}
+.pkg-leads{font-size:.76rem;color:var(--ink3);line-height:1.6}
+.pkg-leads span{color:var(--g);font-weight:500}
+.pkg-savings{display:inline-block;background:var(--gl2);color:var(--gold);border:1px solid var(--gm2);border-radius:100px;font-family:var(--mono);font-size:.6rem;padding:.1rem .5rem;margin-top:.5rem}
+
+/* ESTIMATOR */
+.estimator{background:var(--white);border:1px solid var(--brd);border-radius:12px;padding:1.5rem;margin-bottom:1.5rem;box-shadow:var(--sh)}
+.est-title{font-size:.88rem;font-weight:500;color:var(--ink);margin-bottom:1.1rem;display:flex;align-items:center;gap:.5rem}
+.est-title::before{content:'🧮';font-size:.9rem}
+.est-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.85rem;margin-bottom:1rem}
+.est-field label{display:block;font-size:.7rem;color:var(--ink3);margin-bottom:.35rem;font-weight:400}
+.est-inp{width:100%;background:var(--cream);border:1px solid var(--brd2);border-radius:6px;padding:.5rem .75rem;font-family:var(--mono);font-size:.82rem;color:var(--ink);outline:none;transition:border-color .15s}
+.est-inp:focus{border-color:var(--g)}
+.est-result{background:var(--cream);border-radius:8px;padding:.85rem 1rem;display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;border:1px solid var(--brd)}
+.est-res-item{text-align:center}
+.est-res-num{font-family:var(--serif);font-size:1.25rem;font-style:italic;color:var(--g);line-height:1;margin-bottom:.2rem}
+.est-res-label{font-size:.65rem;color:var(--ink4);font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em}
+
+/* CHECKOUT AREA */
+.checkout-area{background:var(--white);border:1px solid var(--brd);border-radius:12px;overflow:hidden;box-shadow:var(--sh)}
+.checkout-head{padding:1.25rem 1.5rem;border-bottom:1px solid var(--brd);background:var(--cream);display:flex;align-items:center;justify-content:space-between}
+.checkout-title{font-size:.88rem;font-weight:500;color:var(--ink)}
+.checkout-summary{font-family:var(--mono);font-size:.72rem;color:var(--g);background:var(--gl);border:1px solid var(--gm);border-radius:5px;padding:.2rem .65rem}
+.checkout-body{padding:1.5rem}
+.field{margin-bottom:.85rem}
+.field label{display:block;font-size:.72rem;font-weight:500;color:var(--ink2);margin-bottom:.38rem}
+.inp{width:100%;background:var(--cream);border:1px solid var(--brd2);border-radius:7px;padding:.65rem .9rem;font-family:var(--body);font-size:.84rem;color:var(--ink);outline:none;transition:all .18s}
+.inp:focus{border-color:var(--g);background:var(--white);box-shadow:0 0 0 3px rgba(12,77,58,.07)}
+.stripe-field{background:var(--cream);border:1px solid var(--brd2);border-radius:7px;padding:.68rem .9rem;min-height:42px;transition:all .18s}
+.stripe-field.StripeElement--focus{border-color:var(--g);background:var(--white);box-shadow:0 0 0 3px rgba(12,77,58,.07)}
+.stripe-err{color:var(--red);font-size:.74rem;margin-top:.35rem;display:none;padding:.4rem .65rem;background:var(--rl);border-radius:5px}
+.submit-btn{width:100%;padding:.88rem;background:var(--g);color:#fff;border:none;border-radius:8px;font-family:var(--body);font-size:.92rem;font-weight:600;cursor:pointer;transition:all .18s;box-shadow:0 3px 16px rgba(12,77,58,.2);display:flex;align-items:center;justify-content:center;gap:.6rem;margin-top:1rem;letter-spacing:.01em}
+.submit-btn:hover{background:var(--g2);transform:translateY(-1px)}
+.submit-btn:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+.spin{width:15px;height:15px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.micro{text-align:center;font-size:.7rem;color:var(--ink4);margin-top:.65rem;display:flex;align-items:center;justify-content:center;gap:.4rem}
+
+/* SUCCESS */
+.success-screen{display:none;flex-direction:column;align-items:center;text-align:center;padding:2.5rem}
+.success-ring{width:56px;height:56px;border-radius:50%;background:var(--gl);border:1.5px solid var(--gm);display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin-bottom:1.1rem;animation:pop .35s ease}
+@keyframes pop{0%{transform:scale(.5);opacity:0}70%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
+.success-h{font-family:var(--serif);font-size:1.5rem;font-style:italic;color:var(--ink);margin-bottom:.4rem}
+.success-p{font-size:.82rem;color:var(--ink3);line-height:1.7;margin-bottom:1.5rem}
+.success-btn{background:var(--g);color:#fff;border:none;border-radius:7px;padding:.7rem 1.5rem;font-family:var(--body);font-size:.88rem;font-weight:500;cursor:pointer;text-decoration:none;display:inline-block}
+
+/* RESPONSIVE */
+@media(max-width:780px){
+  .packages{grid-template-columns:1fr 1fr}
+  .est-row{grid-template-columns:1fr}
+  .balance-card{flex-direction:column;align-items:flex-start}
+  .balance-right{align-items:flex-start;flex-direction:row;gap:1.5rem;flex-wrap:wrap}
+}
+@media(max-width:500px){
+  .packages{grid-template-columns:1fr}
+  .est-result{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="logo" href="index.html">
+    <div class="logo-mark">
+      <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
+        <path d="M9 2L16 6v6l-7 4L2 12V6l7-4z" stroke="#F3F1EB" stroke-width="1.4" fill="none" stroke-linejoin="round"/>
+        <path d="M9 2v10M2 6l7 4 7-4" stroke="#F3F1EB" stroke-width="1.1" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="logo-word">Arce</div>
+  </a>
+  <a class="nav-back" href="dashboard.html">← Dashboard</a>
+</nav>
+
+<div class="page">
+
+  <div class="page-tag">Token-saldo</div>
+  <h1 class="page-h">Fyll på med tokens.</h1>
+  <p class="page-sub">Tokens brukes til AI-analyse av leads og booking-samtaler. Abonnementet ditt inkluderer et månedlig budsjett. Kjøp ekstra her når du trenger mer.</p>
+
+  <!-- CURRENT BALANCE -->
+  <div class="balance-card">
+    <div class="balance-orb"></div>
+    <div class="balance-left">
+      <div class="balance-label">Gjenværende tokens</div>
+      <div>
+        <span class="balance-num" id="balanceNum">2 400 000</span>
+        <span class="balance-unit">tokens</span>
+      </div>
+      <div class="balance-plan">
+        <span>●</span> Vekst-plan · 3 000 000 / mnd
+      </div>
+    </div>
+    <div class="balance-right">
+      <div class="balance-stat">
+        <div class="bstat-num" id="statLeadsLeft">~6 000</div>
+        <div class="bstat-label">Leads igjen</div>
+      </div>
+      <div class="balance-stat">
+        <div class="bstat-num" id="statConvsLeft">~800</div>
+        <div class="bstat-label">Samtaler igjen</div>
+      </div>
+      <div class="balance-stat">
+        <div class="bstat-num" id="statDaysLeft">18 dager</div>
+        <div class="bstat-label">Til ny periode</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROGRESS BAR -->
+  <div class="token-bar-wrap">
+    <div class="token-bar-header">
+      <span class="token-bar-label">Månedlig forbruk</span>
+      <span class="token-bar-pct" id="barPct">80% igjen</span>
+    </div>
+    <div class="token-bar-track">
+      <div class="token-bar-fill" id="tokenBarFill" style="width:80%"></div>
+    </div>
+    <div class="token-bar-meta">
+      <span>600 000 brukt</span>
+      <span>Fylles på <span id="refillDate">1. mai</span></span>
+    </div>
+  </div>
+
+  <!-- WARNING BANNERS (shown dynamically) -->
+  <div class="warn-banner" id="warnBanner">
+    <span class="warn-icon">⚠️</span>
+    <div>
+      <div class="warn-title">Du nærmer deg grensen</div>
+      <div class="warn-text">Du har <strong id="warnTokens">500 000 tokens</strong> igjen — nok til omtrent <strong id="warnLeads">1 250 leads</strong> eller <strong id="warnConvs">165 samtaler</strong>. <strong>Dataene dine er trygge</strong> — ingenting slettes. Kjøp ekstra tokens under for å fortsette uten avbrudd.</div>
+    </div>
+  </div>
+
+  <div class="warn-banner critical" id="critBanner">
+    <span class="warn-icon">🛑</span>
+    <div>
+      <div class="warn-title">AI-analyser er satt på pause</div>
+      <div class="warn-text"><strong>Du er tom for tokens.</strong> Leads og kundedata er trygt lagret — ingenting er slettet. Kjøp tokens under for å gjenoppta umiddelbart. Abonnementet ditt fylles på automatisk <strong id="critRefill">1. mai</strong>.</div>
+    </div>
+  </div>
+
+  <!-- CALCULATOR -->
+  <div class="estimator">
+    <div class="est-title">Beregn hva du trenger</div>
+    <div class="est-row">
+      <div class="est-field">
+        <label>Leads du vil score</label>
+        <input class="est-inp" type="number" id="estLeads" value="1000" min="0" oninput="calcEstimate()"/>
+      </div>
+      <div class="est-field">
+        <label>Booking-samtaler</label>
+        <input class="est-inp" type="number" id="estConvs" value="200" min="0" oninput="calcEstimate()"/>
+      </div>
+      <div class="est-field">
+        <label>Oppfølgings-SMS/e-post</label>
+        <input class="est-inp" type="number" id="estMsgs" value="300" min="0" oninput="calcEstimate()"/>
+      </div>
+    </div>
+    <div class="est-result">
+      <div class="est-res-item">
+        <div class="est-res-num" id="estTokens">740 000</div>
+        <div class="est-res-label">Tokens trengs</div>
+      </div>
+      <div class="est-res-item">
+        <div class="est-res-num" id="estPkg">1 pakke</div>
+        <div class="est-res-label">Anbefalt kjøp</div>
+      </div>
+      <div class="est-res-item">
+        <div class="est-res-num" id="estCost">kr 149</div>
+        <div class="est-res-label">Estimert kostnad</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOKEN PACKAGES -->
+  <div class="packages-label">Velg pakke</div>
+  <div class="packages">
+    <div class="pkg" id="pkg-500" onclick="selectPkg(500000, 149, this)">
+      <div class="pkg-tokens">500 000</div>
+      <div class="pkg-token-unit">tokens</div>
+      <div class="pkg-price"><sup>kr</sup>149</div>
+      <div class="pkg-per">kr 0,30 / 1 000 tokens</div>
+      <hr class="pkg-divider">
+      <div class="pkg-leads">~<span>1 250</span> leads<br>eller ~<span>165</span> samtaler</div>
+    </div>
+    <div class="pkg popular" id="pkg-2000" onclick="selectPkg(2000000, 449, this)">
+      <div class="pkg-tokens">2 000 000</div>
+      <div class="pkg-token-unit">tokens</div>
+      <div class="pkg-price"><sup>kr</sup>449</div>
+      <div class="pkg-per">kr 0,22 / 1 000 tokens</div>
+      <hr class="pkg-divider">
+      <div class="pkg-leads">~<span>5 000</span> leads<br>eller ~<span>665</span> samtaler</div>
+      <div class="pkg-savings">Spar 27%</div>
+    </div>
+    <div class="pkg" id="pkg-5000" onclick="selectPkg(5000000, 999, this)">
+      <div class="pkg-tokens">5 000 000</div>
+      <div class="pkg-token-unit">tokens</div>
+      <div class="pkg-price"><sup>kr</sup>999</div>
+      <div class="pkg-per">kr 0,20 / 1 000 tokens</div>
+      <hr class="pkg-divider">
+      <div class="pkg-leads">~<span>12 500</span> leads<br>eller ~<span>1 665</span> samtaler</div>
+      <div class="pkg-savings">Spar 33%</div>
+    </div>
+    <div class="pkg" id="pkg-15000" onclick="selectPkg(15000000, 2499, this)">
+      <div class="pkg-tokens">15 000 000</div>
+      <div class="pkg-token-unit">tokens</div>
+      <div class="pkg-price"><sup>kr</sup>2 499</div>
+      <div class="pkg-per">kr 0,17 / 1 000 tokens</div>
+      <hr class="pkg-divider">
+      <div class="pkg-leads">~<span>37 500</span> leads<br>eller ~<span>5 000</span> samtaler</div>
+      <div class="pkg-savings">Spar 44%</div>
+    </div>
+  </div>
+
+  <!-- CHECKOUT -->
+  <div class="checkout-area">
+    <div class="checkout-head">
+      <div class="checkout-title">Betal og fyll på umiddelbart</div>
+      <div class="checkout-summary" id="checkoutSummary">Velg pakke over</div>
+    </div>
+    <div id="checkoutFormView">
+      <div class="checkout-body">
+        <div id="noPkgMsg" style="text-align:center;padding:2rem;color:var(--ink4);font-size:.84rem">← Velg en pakke over for å fortsette</div>
+        <div id="checkoutFields" style="display:none">
+          <div class="field">
+            <label>E-post for kvittering</label>
+            <input class="inp" type="email" id="tokenEmail" placeholder="din@bedrift.no" autocomplete="email"/>
+          </div>
+          <div class="field">
+            <label>Kortnummer</label>
+            <div class="stripe-field" id="token-card-element"></div>
+            <div class="stripe-err" id="token-card-error"></div>
+          </div>
+          <div style="background:var(--gl);border:1px solid var(--gm);border-radius:7px;padding:.7rem 1rem;font-size:.76rem;color:var(--g);margin-top:.5rem">
+            ✓ Tokens legges til kontoen din <strong>umiddelbart</strong> etter betaling
+          </div>
+          <button class="submit-btn" id="tokenSubmitBtn" onclick="handleTokenPurchase()">
+            <span class="spin" id="tokenSpin"></span>
+            <span id="tokenSubmitLabel">Betal og fyll på</span>
+          </button>
+          <div class="micro">🔒 Sikret med Stripe · Kryptert · Ingen abonnement</div>
+        </div>
+      </div>
+    </div>
+    <div class="success-screen" id="tokenSuccessView">
+      <div class="success-ring">✓</div>
+      <div class="success-h">Tokens er lagt til!</div>
+      <p class="success-p" id="tokenSuccessMsg">500 000 tokens er lagt til kontoen din. Du kan nå fortsette å bruke AI-analyser uten avbrudd.</p>
+      <a class="success-btn" href="dashboard.html">Tilbake til dashboard →</a>
+    </div>
+  </div>
+
+</div>
+
+<!-- Stripe.js -->
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+/*
+  STRIPE — sett inn din publishable key:
+  dashboard.stripe.com → Developers → API keys
+*/
+var STRIPE_PK = 'pk_test_SETT_INN_DIN_STRIPE_KEY_HER';
+
+/*
+  STRIPE PRICE IDs for token packages
+  Opprett disse som "one-time" products i Stripe Dashboard:
+*/
+var TOKEN_PRICE_IDS = {
+  500000:   'price_TOKEN_500K_ID',
+  2000000:  'price_TOKEN_2M_ID',
+  5000000:  'price_TOKEN_5M_ID',
+  15000000: 'price_TOKEN_15M_ID'
+};
+
+var selectedTokens = 0;
+var selectedPrice  = 0;
+var stripe = null;
+var cardEl = null;
+
+/* ── PACKAGE SELECTION ── */
+function selectPkg(tokens, price, el) {
+  document.querySelectorAll('.pkg').forEach(function(p){ p.classList.remove('selected'); });
+  el.classList.add('selected');
+  selectedTokens = tokens;
+  selectedPrice  = price;
+
+  var fmt = function(n){ return n >= 1000000 ? (n/1000000).toFixed(n%1000000===0?0:1)+' M' : (n/1000).toFixed(0)+' 000'; };
+  document.getElementById('checkoutSummary').textContent = fmt(tokens) + ' tokens · kr ' + price.toLocaleString('nb-NO');
+  document.getElementById('noPkgMsg').style.display = 'none';
+  document.getElementById('checkoutFields').style.display = 'block';
+  document.getElementById('tokenSubmitLabel').textContent = 'Betal kr ' + price.toLocaleString('nb-NO') + ' →';
+
+  initStripe();
+}
+
+/* ── STRIPE INIT ── */
+function initStripe() {
+  if (cardEl) return;
+  try {
+    stripe = Stripe(STRIPE_PK);
+    var elements = stripe.elements();
+    cardEl = elements.create('card', {
+      style: {
+        base: { fontFamily:"'Outfit',sans-serif", fontSize:'14px', color:'#181612', fontWeight:'300', '::placeholder': { color:'#A09D96' } },
+        invalid: { color:'#C0392B' }
+      },
+      hidePostalCode: true
+    });
+    cardEl.mount('#token-card-element');
+    cardEl.on('change', function(e){
+      var err = document.getElementById('token-card-error');
+      if(e.error){ err.textContent=e.error.message; err.style.display='block'; }
+      else { err.style.display='none'; }
+    });
+  } catch(e) {
+    document.getElementById('token-card-element').innerHTML = '<span style="font-size:.75rem;color:var(--ink4);font-family:var(--mono)">⚠ Stripe ikke konfigurert — demo-modus</span>';
+  }
+}
+
+/* ── PURCHASE ── */
+async function handleTokenPurchase() {
+  if (!selectedTokens) return;
+  var email = document.getElementById('tokenEmail').value.trim();
+  if (!email) { alert('Legg inn e-post for kvittering.'); return; }
+
+  setLoading(true);
+
+  if (!stripe || !cardEl) {
+    await delay(1500);
+    showSuccess();
+    setLoading(false);
+    return;
+  }
+
+  try {
+    var result = await stripe.createPaymentMethod({
+      type: 'card', card: cardEl,
+      billing_details: { email: email }
+    });
+    if (result.error) {
+      document.getElementById('token-card-error').textContent = result.error.message;
+      document.getElementById('token-card-error').style.display = 'block';
+      setLoading(false);
+      return;
+    }
+    /*
+      POST to your backend:
+      /api/purchase-tokens with:
+      { paymentMethodId, email, tokens: selectedTokens, priceId: TOKEN_PRICE_IDS[selectedTokens] }
+
+      Backend:
+      1. Create/find Stripe customer
+      2. Create PaymentIntent for selectedPrice NOK
+      3. Confirm payment
+      4. On success: UPDATE organizations SET tokens_remaining = tokens_remaining + selectedTokens WHERE email = email
+      5. INSERT INTO token_purchases (tokens_bought, amount_nok, stripe_payment_id)
+    */
+    await delay(1500);
+    showSuccess();
+  } catch(e) {
+    alert('Noe gikk galt. Prøv igjen.');
+  }
+  setLoading(false);
+}
+
+function showSuccess() {
+  var fmt = function(n){ return (n/1000000 >= 1) ? (n/1000000).toLocaleString('nb-NO') + ' millioner' : (n/1000).toLocaleString('nb-NO') + ' 000'; };
+  document.getElementById('tokenSuccessMsg').textContent =
+    fmt(selectedTokens) + ' tokens er lagt til kontoen din umiddelbart. Du kan nå fortsette AI-analyser uten avbrudd.';
+  document.getElementById('checkoutFormView').style.display = 'none';
+  document.getElementById('tokenSuccessView').style.display = 'flex';
+  // Update balance display
+  updateBalance(parseInt(document.getElementById('balanceNum').textContent.replace(/\s/g,'')) + selectedTokens);
+}
+
+function setLoading(on) {
+  var btn = document.getElementById('tokenSubmitBtn');
+  var sp  = document.getElementById('tokenSpin');
+  btn.disabled = on;
+  sp.style.display = on ? 'block' : 'none';
+  if(on) document.getElementById('tokenSubmitLabel').textContent = 'Behandler...';
+  else document.getElementById('tokenSubmitLabel').textContent = 'Betal kr ' + selectedPrice.toLocaleString('nb-NO') + ' →';
+}
+
+function delay(ms) { return new Promise(function(r){ setTimeout(r,ms); }); }
+
+/* ── BALANCE DISPLAY ── */
+function updateBalance(tokens) {
+  document.getElementById('balanceNum').textContent = tokens.toLocaleString('nb-NO');
+  document.getElementById('statLeadsLeft').textContent = '~' + Math.floor(tokens/400).toLocaleString('nb-NO');
+  document.getElementById('statConvsLeft').textContent = '~' + Math.floor(tokens/3000).toLocaleString('nb-NO');
+  var pct = Math.min(100, Math.round(tokens / 3000000 * 100));
+  document.getElementById('barPct').textContent = pct + '% igjen';
+  var fill = document.getElementById('tokenBarFill');
+  fill.style.width = pct + '%';
+  fill.className = 'token-bar-fill' + (pct < 20 ? ' critical' : pct < 40 ? ' warn' : '');
+  // Show/hide warning banners
+  document.getElementById('warnBanner').classList.toggle('show', pct < 20 && pct > 0);
+  document.getElementById('critBanner').classList.toggle('show', pct === 0 || tokens <= 0);
+  if(pct < 20 && pct > 0) {
+    document.getElementById('warnTokens').textContent = tokens.toLocaleString('nb-NO') + ' tokens';
+    document.getElementById('warnLeads').textContent = Math.floor(tokens/400).toLocaleString('nb-NO') + ' leads';
+    document.getElementById('warnConvs').textContent = Math.floor(tokens/3000).toLocaleString('nb-NO') + ' samtaler';
+  }
+}
+
+/* ── ESTIMATOR ── */
+function calcEstimate() {
+  var leads = parseInt(document.getElementById('estLeads').value) || 0;
+  var convs = parseInt(document.getElementById('estConvs').value) || 0;
+  var msgs  = parseInt(document.getElementById('estMsgs').value)  || 0;
+  var total = leads * 400 + convs * 3000 + msgs * 200;
+  document.getElementById('estTokens').textContent = total.toLocaleString('nb-NO');
+
+  var pkg, cost;
+  if(total <= 500000)       { pkg='1× 500K';  cost='kr 149'; }
+  else if(total <= 2000000) { pkg='1× 2M';    cost='kr 449'; }
+  else if(total <= 5000000) { pkg='1× 5M';    cost='kr 999'; }
+  else                      { pkg='1× 15M';   cost='kr 2 499'; }
+  document.getElementById('estPkg').textContent = pkg;
+  document.getElementById('estCost').textContent = cost;
+}
+
+/* Set refill date */
+var d = new Date(); d.setMonth(d.getMonth()+1); d.setDate(1);
+var months=['januar','februar','mars','april','mai','juni','juli','august','september','oktober','november','desember'];
+var refillStr = '1. ' + months[d.getMonth()];
+document.getElementById('refillDate').textContent = refillStr;
+document.getElementById('critRefill').textContent = refillStr;
+
+// Init estimate
+calcEstimate();
+</script>
+</body>
+</html>
