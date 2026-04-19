@@ -331,9 +331,19 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-weight:3
       <div class="sb-section-label">Oversikt</div>
       <ul class="sb-nav">
         <li><a href="#" class="active" onclick="showView('overview',this)"><span class="nav-icon">◈</span> Dashboard</a></li>
-        <li><a href="#" onclick="showView('leads',this)"><span class="nav-icon">◎</span> Leads <span class="nav-badge amber" id="newLeadsBadge" style="display:none">0</span></a></li>
+        <li><a href="kundebase.html"><span class="nav-icon">◎</span> Kundebase</a></li>
         <li><a href="#" onclick="showView('appointments',this)"><span class="nav-icon">▦</span> Avtaler</a></li>
         <li><a href="#" onclick="showView('analytics',this)"><span class="nav-icon">◉</span> Analytikk</a></li>
+      </ul>
+    </div>
+
+    <div class="sb-divider"></div>
+
+    <div class="sb-section">
+      <div class="sb-section-label">Verktøy</div>
+      <ul class="sb-nav">
+        <li><a href="legg-til-lead.html"><span class="nav-icon">➕</span> Legg til lead</a></li>
+        <li><a href="bulk-rewind.html"><span class="nav-icon">🔄</span> Vinn tilbake</a></li>
       </ul>
     </div>
 
@@ -895,6 +905,15 @@ function loadFollowUps() {
   document.getElementById('followUpsCard').style.display = 'block';
   document.getElementById('followUpCount').textContent = due.length + (due.length === 1 ? ' lead' : ' leads');
 
+  // Browser notification for today's follow-ups (one per session)
+  var todaysDue = due.filter(function(l){
+    return new Date(l.followUpDate).toDateString() === new Date().toDateString();
+  });
+  if (todaysDue.length && !sessionStorage.getItem('arce_notified_today')) {
+    sessionStorage.setItem('arce_notified_today','1');
+    maybeNotify(todaysDue);
+  }
+
   var list = document.getElementById('followUpsList');
   list.innerHTML = '';
   due.slice(0, 8).forEach(function(l) {
@@ -916,6 +935,29 @@ function loadFollowUps() {
       '<button onclick="copyLeadScript(' + l.id + ')" style="background:var(--cream2);border:1px solid var(--brd);border-radius:6px;padding:.3rem .6rem;font-size:.7rem;cursor:pointer;color:var(--ink3);font-family:var(--body)">Kopier script</button>';
     list.appendChild(row);
   });
+}
+
+function maybeNotify(leads) {
+  if (!('Notification' in window)) return;
+  if (Notification.permission === 'granted') {
+    sendNotification(leads);
+  } else if (Notification.permission !== 'denied') {
+    // Ask for permission
+    Notification.requestPermission().then(function(p){
+      if (p === 'granted') sendNotification(leads);
+    });
+  }
+}
+
+function sendNotification(leads) {
+  var title = leads.length === 1 ? 'Oppfølging i dag: ' + leads[0].name : leads.length + ' oppfølginger i dag';
+  var body  = leads.length === 1
+    ? 'Score ' + (leads[0].score||'—') + '/100 · Klikk for å åpne'
+    : leads.slice(0,3).map(l => '• ' + l.name).join('\n') + (leads.length > 3 ? '\n...' : '');
+  try {
+    var n = new Notification(title, { body: body, silent: false });
+    n.onclick = function(){ window.focus(); n.close(); };
+  } catch(e){}
 }
 
 function copyLeadScript(id) {
