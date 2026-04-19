@@ -354,7 +354,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-weight:3
       <div class="sb-avatar">NK</div>
       <div class="sb-user-info">
         <div class="sb-user-name" id="sidebarUserName">Laster…</div>
-        <div class="sb-user-plan" id="sidebarUserPlan">Vekst-plan</div>
+        <div class="sb-user-plan" id="sidebarUserPlan"></div>
       </div>
       <div class="sb-user-btn" onclick="showToast('Innstillinger åpnes…')">⚙</div>
     </div>
@@ -651,7 +651,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-weight:3
       <div class="page-head"><h1>Innstillinger</h1><p>Konto og abonnement</p></div>
       <div class="settings-grid">
         <div class="setting-card"><h3>Bedriftsinformasjon</h3><p>Oppdater informasjonen Arce bruker i kommunikasjon.</p><input class="setting-input" placeholder="Bedriftsnavn" placeholder="Bedriftsnavn"/><input class="setting-input" placeholder="Bransje" placeholder="Bransje"/><input class="setting-input" placeholder="Nettside" placeholder="Nettside"/><button class="setting-save" onclick="showToast('✓ Lagret')">Lagre</button></div>
-        <div class="setting-card"><h3>Abonnement</h3><p>Du er på <strong>Vekst-planen</strong> — kr 1 799/mnd.</p><div class="toggle-row"><div><div class="toggle-label">Vekst-plan</div><div class="toggle-sub">Aktiv · Fornyes 1. feb 2025</div></div><span class="pill pill-booked">Aktiv</span></div><br><button class="setting-save" onclick="showToast('Sender deg til fakturasiden…')">Administrer abonnement</button></div>
+        <div class="setting-card"><h3>Abonnement</h3><p>Ditt aktive abonnement hos Arce.</p><div class="toggle-row"><div><div class="toggle-label" id="planName">—</div><div class="toggle-sub" id="planStatus">Laster…</div></div><span class="pill pill-booked" id="planBadge">Aktiv</span></div><br><button class="setting-save" onclick="showToast('Kontakt hei@arcesales.no for endringer i abonnement.')">Administrer abonnement</button></div>
         <div class="setting-card"><h3>Kontaktinformasjon</h3><p>E-posten vi sender varslinger til.</p><input class="setting-input" placeholder="E-post" placeholder="E-post"/><input class="setting-input" placeholder="Telefon" placeholder="Telefon"/><button class="setting-save" onclick="showToast('✓ Lagret')">Lagre</button></div>
         <div class="setting-card"><h3>Sikkerhetsinnstillinger</h3><p>Passord og tilgang.</p><div class="toggle-row"><div><div class="toggle-label">To-faktor autentisering</div><div class="toggle-sub">Anbefalt</div></div><div class="toggle" onclick="this.classList.toggle('on')"></div></div><div class="toggle-row"><div><div class="toggle-label">Innloggingsvarsler</div><div class="toggle-sub">E-post ved ny innlogging</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div></div>
       </div>
@@ -963,6 +963,22 @@ async function loadDashboardData() {
 
     // Update token display
     const pct = Math.round(org.tokens_remaining / org.tokens_monthly_limit * 100);
+
+    // Update plan name in sidebar and settings
+    var planNames = {solo:'Solo', vekst:'Vekst', agency:'Agency'};
+    var planLabel = planNames[org.plan] || (org.plan ? org.plan.charAt(0).toUpperCase()+org.plan.slice(1) : '—');
+    var trialEnd = org.trial_ends_at ? new Date(org.trial_ends_at) : null;
+    var trialActive = trialEnd && trialEnd > new Date();
+    var sp = document.getElementById('sidebarUserPlan');
+    if (sp) sp.textContent = planLabel + (trialActive ? ' · Prøveperiode' : '');
+    var pn = document.getElementById('planName');
+    if (pn) pn.textContent = planLabel + '-planen';
+    var ps = document.getElementById('planStatus');
+    if (ps) ps.textContent = trialActive
+      ? 'Prøveperiode · Avsluttes ' + trialEnd.toLocaleDateString('nb-NO')
+      : (org.stripe_subscription_id ? 'Aktiv' : 'Ingen aktiv plan');
+    var pb = document.getElementById('planBadge');
+    if (pb) { pb.textContent = trialActive ? 'Prøveperiode' : 'Aktiv'; }
     const tokenEls = document.querySelectorAll('.token-pct, #tokenPct');
     tokenEls.forEach(el => el.textContent = pct + '%');
 
