@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arce — Kundebase</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,400;0,500;1,400;1,500&family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --cream:#F3F1EB;--cream2:#EAE8E1;--white:#FAFAF7;
+  --ink:#181612;--ink2:#3C3A34;--ink3:#6E6C65;--ink4:#A09D96;
+  --g:#0C4D3A;--g2:#0F6048;--gl:#EBF3EE;--gm:#ACCFC0;
+  --gold:#B8892A;--gl2:#F5EDDA;--gm2:#DFC07A;
+  --red:#C0392B;--rl:#FEF0EE;
+  --char:#1A1917;--brd:#D8D5CC;--brd2:#C5C2B8;
+  --serif:'Cormorant',Georgia,serif;
+  --body:'Outfit',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+  --sh:0 2px 8px rgba(24,22,18,.06),0 8px 32px rgba(24,22,18,.05);
+}
+html{font-size:15px;background:var(--cream)}
+body{font-family:var(--body);font-weight:300;color:var(--ink);min-height:100vh}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:0 2rem;height:58px;background:rgba(243,241,235,.96);backdrop-filter:blur(20px);border-bottom:1px solid var(--brd);position:sticky;top:0;z-index:50}
+.logo{display:flex;align-items:center;gap:9px;text-decoration:none}
+.logo-mark{width:26px;height:26px;background:var(--char);border-radius:5px;display:flex;align-items:center;justify-content:center}
+.logo-word{font-family:var(--serif);font-size:1.1rem;font-weight:500;color:var(--ink);letter-spacing:.02em}
+.nav-right{display:flex;align-items:center;gap:1rem}
+.nav-link{font-size:.78rem;color:var(--ink3);text-decoration:none;transition:color .15s}
+.nav-link:hover{color:var(--ink)}
+.nav-cta{background:var(--char);color:#fff;border-radius:7px;padding:.45rem 1rem;font-size:.78rem;text-decoration:none;transition:all .15s}
+.nav-cta:hover{background:#2C2A27}
+
+.page{max-width:1200px;margin:0 auto;padding:2rem 1.5rem 5rem}
+.page-tag{font-family:var(--mono);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--g);display:flex;align-items:center;gap:7px;margin-bottom:.7rem}
+.page-tag::before{content:'';display:block;width:14px;height:1px;background:var(--g)}
+.page-h{font-family:var(--serif);font-size:2.2rem;font-style:italic;font-weight:400;color:var(--ink);margin-bottom:.35rem}
+.page-sub{font-size:.85rem;color:var(--ink3);margin-bottom:1.75rem;line-height:1.7}
+
+/* STATS BAR */
+.stats-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.75rem;margin-bottom:1.5rem}
+.stat-card{background:var(--white);border:1px solid var(--brd);border-radius:10px;padding:1rem 1.2rem}
+.stat-label{font-family:var(--mono);font-size:.58rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink4);margin-bottom:.25rem}
+.stat-val{font-family:var(--serif);font-size:1.75rem;font-style:italic;color:var(--ink);line-height:1}
+.stat-sub{font-size:.7rem;color:var(--ink3);margin-top:.2rem}
+
+/* LAYOUT */
+.layout{display:grid;grid-template-columns:380px 1fr;gap:1.25rem;align-items:flex-start}
+@media(max-width:900px){.layout{grid-template-columns:1fr}}
+
+/* FILTER SIDEBAR */
+.side{background:var(--white);border:1px solid var(--brd);border-radius:12px;padding:1.25rem;box-shadow:var(--sh);position:sticky;top:74px;max-height:calc(100vh - 90px);overflow-y:auto}
+.side-section{margin-bottom:1.25rem}
+.side-title{font-family:var(--mono);font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink4);margin-bottom:.6rem;display:flex;align-items:center;gap:6px}
+.side-title::before{content:'';display:block;width:12px;height:1px;background:var(--brd2)}
+.search-inp{width:100%;background:var(--cream);border:1px solid var(--brd2);border-radius:7px;padding:.55rem .85rem;font-family:var(--body);font-size:.82rem;color:var(--ink);outline:none}
+.search-inp:focus{border-color:var(--g);background:var(--white)}
+.chips{display:flex;flex-wrap:wrap;gap:.35rem}
+.chip{background:var(--cream2);border:1px solid var(--brd);border-radius:100px;padding:.25rem .7rem;font-size:.7rem;color:var(--ink3);cursor:pointer;font-family:var(--mono);transition:all .15s;user-select:none}
+.chip.on{background:var(--gl);border-color:var(--gm);color:var(--g);font-weight:500}
+.chip:hover{border-color:var(--g);color:var(--g)}
+
+/* LEAD CARDS */
+.leads-grid{display:flex;flex-direction:column;gap:.6rem}
+.empty{background:var(--white);border:1.5px dashed var(--brd2);border-radius:14px;padding:3rem 1.5rem;text-align:center;color:var(--ink3)}
+.empty-icon{font-size:2rem;display:block;margin-bottom:.5rem;opacity:.4}
+.empty-title{font-family:var(--serif);font-size:1.2rem;font-style:italic;color:var(--ink);margin-bottom:.35rem}
+.empty-sub{font-size:.82rem;color:var(--ink3);margin-bottom:1rem}
+.empty-btn{display:inline-block;background:var(--char);color:#fff;padding:.6rem 1.4rem;border-radius:8px;font-size:.82rem;text-decoration:none}
+.empty-btn:hover{background:#2C2A27}
+
+.lead-card{background:var(--white);border:1px solid var(--brd);border-radius:10px;padding:1rem 1.2rem;box-shadow:var(--sh);cursor:pointer;transition:all .15s;display:grid;grid-template-columns:auto 1fr auto;gap:1rem;align-items:center}
+.lead-card:hover{border-color:var(--brd2);transform:translateY(-1px);box-shadow:0 4px 14px rgba(24,22,18,.08)}
+.lead-score{font-family:var(--serif);font-size:1.5rem;font-style:italic;color:var(--ink);line-height:1;min-width:40px;text-align:center}
+.lead-info h3{font-size:.92rem;font-weight:500;color:var(--ink);margin-bottom:.15rem}
+.lead-info .lead-meta{font-size:.72rem;color:var(--ink3);font-family:var(--mono);display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:.25rem}
+.lead-info .lead-title-txt{font-size:.76rem;color:var(--ink3);line-height:1.5}
+.lead-cat{font-family:var(--mono);font-size:.62rem;padding:.15rem .55rem;border-radius:100px}
+.lead-cat-hot{background:#FEEBDE;color:#B0380A}
+.lead-cat-warm{background:var(--gl2);color:var(--gold)}
+.lead-cat-cold{background:#E8EEF9;color:#1E40AF}
+.lead-cat-skip{background:var(--cream2);color:var(--ink4)}
+.followup-flag{display:inline-flex;align-items:center;gap:.2rem;font-size:.65rem;color:#6B4CB8;font-family:var(--mono);background:#EFE9F7;border:1px solid #C9B8E7;padding:.1rem .5rem;border-radius:100px;margin-left:.35rem}
+.followup-flag.due{background:#FEEBDE;border-color:#F4C39B;color:#B0380A}
+
+/* MODAL */
+.modal{display:none;position:fixed;inset:0;z-index:999;background:rgba(24,22,18,.6);backdrop-filter:blur(8px);align-items:flex-start;justify-content:center;padding:2rem 1.5rem;overflow-y:auto}
+.modal.show{display:flex}
+.modal-box{background:var(--white);border-radius:14px;max-width:720px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3);overflow:hidden}
+.modal-head{background:var(--char);padding:1.5rem 1.75rem;color:#fff;position:relative}
+.modal-close{position:absolute;top:1rem;right:1.25rem;background:rgba(255,255,255,.1);border:none;color:#fff;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center}
+.modal-close:hover{background:rgba(255,255,255,.2)}
+.modal-name{font-family:var(--serif);font-size:1.6rem;font-style:italic;margin-bottom:.3rem}
+.modal-meta{font-size:.78rem;color:rgba(255,255,255,.7);font-family:var(--mono)}
+.modal-body{padding:1.5rem 1.75rem}
+.timeline{margin-top:1rem;position:relative;padding-left:1.5rem}
+.timeline::before{content:'';position:absolute;left:8px;top:0;bottom:0;width:2px;background:var(--brd)}
+.tl-item{position:relative;margin-bottom:1.25rem;padding-bottom:.5rem}
+.tl-item::before{content:'';position:absolute;left:-1.5rem;top:.3rem;width:16px;height:16px;border-radius:50%;background:var(--white);border:3px solid var(--g)}
+.tl-date{font-family:var(--mono);font-size:.65rem;color:var(--ink4);margin-bottom:.25rem}
+.tl-score{display:inline-flex;align-items:center;gap:.3rem;margin-bottom:.4rem}
+.tl-note{background:var(--cream);border:1px solid var(--brd);border-radius:8px;padding:.7rem .9rem;font-size:.8rem;color:var(--ink2);line-height:1.6;margin-bottom:.4rem}
+.tl-steps{list-style:none;padding-left:0;margin-top:.5rem}
+.tl-steps li{font-size:.76rem;color:var(--ink3);padding:.2rem 0;padding-left:1rem;position:relative}
+.tl-steps li::before{content:'→';position:absolute;left:0;color:var(--g)}
+.tl-section-title{font-family:var(--mono);font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink4);margin:.6rem 0 .35rem}
+.tl-script{background:var(--gl);border:1px solid var(--gm);border-radius:8px;padding:.7rem .9rem;font-size:.78rem;color:var(--g);line-height:1.6;font-style:italic}
+
+.modal-actions{display:flex;gap:.6rem;padding:1rem 1.75rem;background:var(--cream);border-top:1px solid var(--brd);flex-wrap:wrap}
+.btn-sm{padding:.55rem 1rem;border-radius:7px;font-size:.78rem;cursor:pointer;border:1px solid var(--brd2);background:var(--white);color:var(--ink2);font-family:var(--body);transition:all .15s;text-decoration:none;display:inline-flex;align-items:center;gap:.3rem}
+.btn-sm:hover{border-color:var(--g);color:var(--g)}
+.btn-sm-primary{background:var(--g);color:#fff;border-color:var(--g)}
+.btn-sm-primary:hover{background:var(--g2);color:#fff}
+.btn-sm-danger{background:transparent;border-color:#F5C6C2;color:var(--red)}
+.btn-sm-danger:hover{background:var(--rl)}
+
+.toast{position:fixed;bottom:2rem;right:2rem;background:var(--char);color:rgba(255,255,255,.9);padding:.65rem 1.1rem;border-radius:8px;font-size:.8rem;font-family:var(--mono);opacity:0;transition:opacity .2s;pointer-events:none;z-index:999}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="logo" href="index.html">
+    <div class="logo-mark">
+      <svg width="14" height="14" viewBox="0 0 18 18" fill="none">
+        <path d="M9 2L16 6v6l-7 4L2 12V6l7-4z" stroke="#F3F1EB" stroke-width="1.4" fill="none" stroke-linejoin="round"/>
+        <path d="M9 2v10M2 6l7 4 7-4" stroke="#F3F1EB" stroke-width="1.1" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="logo-word">Arce</div>
+  </a>
+  <div class="nav-right">
+    <a class="nav-link" href="dashboard.html">← Dashboard</a>
+    <a class="nav-cta" href="legg-til-lead.html">+ Ny lead</a>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="page-tag">Kundebase</div>
+  <h1 class="page-h">Alle leads.</h1>
+  <p class="page-sub">Søk, filtrer, klikk inn på en lead for å se hele tidslinjen og relevante handlinger.</p>
+
+  <!-- STATS -->
+  <div class="stats-bar">
+    <div class="stat-card"><div class="stat-label">Totalt</div><div class="stat-val" id="statTotal">0</div></div>
+    <div class="stat-card" style="border-color:#F4C39B"><div class="stat-label">🔥 Varme</div><div class="stat-val" id="statHot" style="color:#B0380A">0</div></div>
+    <div class="stat-card" style="border-color:var(--gm2)"><div class="stat-label">⚡ Potensial</div><div class="stat-val" id="statWarm" style="color:var(--gold)">0</div></div>
+    <div class="stat-card" style="border-color:#C9B8E7"><div class="stat-label">📅 Oppfølging</div><div class="stat-val" id="statDue" style="color:#6B4CB8">0</div><div class="stat-sub">Neste 7 dager</div></div>
+  </div>
+
+  <!-- LAYOUT -->
+  <div class="layout">
+    <!-- FILTERS -->
+    <aside class="side">
+      <div class="side-section">
+        <div class="side-title">Søk</div>
+        <input class="search-inp" id="searchInp" placeholder="Navn, sted, bransje…" oninput="renderLeads()"/>
+      </div>
+      <div class="side-section">
+        <div class="side-title">Kategori</div>
+        <div class="chips" id="catChips">
+          <span class="chip on" data-val="all" onclick="setFilter('cat',this)">Alle</span>
+          <span class="chip" data-val="hot" onclick="setFilter('cat',this)">🔥 Varm</span>
+          <span class="chip" data-val="warm" onclick="setFilter('cat',this)">⚡ Potensial</span>
+          <span class="chip" data-val="cold" onclick="setFilter('cat',this)">❄ Kald</span>
+        </div>
+      </div>
+      <div class="side-section">
+        <div class="side-title">Type</div>
+        <div class="chips" id="typeChips">
+          <span class="chip on" data-val="all" onclick="setFilter('type',this)">Alle</span>
+          <span class="chip" data-val="b2c" onclick="setFilter('type',this)">B2C</span>
+          <span class="chip" data-val="b2b" onclick="setFilter('type',this)">B2B</span>
+          <span class="chip" data-val="taptkunde" onclick="setFilter('type',this)">Tapt kunde</span>
+          <span class="chip" data-val="inbound" onclick="setFilter('type',this)">Inbound</span>
+        </div>
+      </div>
+      <div class="side-section">
+        <div class="side-title">Status</div>
+        <div class="chips" id="statusChips">
+          <span class="chip on" data-val="all" onclick="setFilter('status',this)">Alle</span>
+          <span class="chip" data-val="due" onclick="setFilter('status',this)">📅 Skal følges opp</span>
+          <span class="chip" data-val="silent" onclick="setFilter('status',this)">💀 Stille &gt; 14 dager</span>
+        </div>
+      </div>
+      <div class="side-section">
+        <div class="side-title">Sorter</div>
+        <div class="chips" id="sortChips">
+          <span class="chip on" data-val="newest" onclick="setFilter('sort',this)">Nyeste først</span>
+          <span class="chip" data-val="score" onclick="setFilter('sort',this)">Høyest score</span>
+          <span class="chip" data-val="followup" onclick="setFilter('sort',this)">Oppfølging først</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- LEADS -->
+    <main>
+      <div id="leadsGrid" class="leads-grid"></div>
+    </main>
+  </div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="modal" id="detailModal" onclick="if(event.target===this)closeDetail()">
+  <div class="modal-box">
+    <div class="modal-head">
+      <button class="modal-close" onclick="closeDetail()">✕</button>
+      <div class="modal-name" id="mdName">—</div>
+      <div class="modal-meta" id="mdMeta">—</div>
+    </div>
+    <div class="modal-body" id="mdBody"></div>
+    <div class="modal-actions" id="mdActions"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var filters = { cat:'all', type:'all', status:'all', sort:'newest' };
+var allLeads = JSON.parse(localStorage.getItem('arce_quick_leads') || '[]');
+
+function setFilter(k, el){
+  var group = el.parentElement;
+  group.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+  filters[k] = el.dataset.val;
+  renderLeads();
+}
+
+function computeStats(){
+  document.getElementById('statTotal').textContent = allLeads.length;
+  document.getElementById('statHot').textContent  = allLeads.filter(l=>l.kategori==='hot').length;
+  document.getElementById('statWarm').textContent = allLeads.filter(l=>l.kategori==='warm').length;
+  var in7 = new Date(); in7.setDate(in7.getDate()+7);
+  document.getElementById('statDue').textContent = allLeads.filter(l => {
+    if(!l.followUpDate) return false;
+    return new Date(l.followUpDate) <= in7;
+  }).length;
+}
+
+function renderLeads(){
+  var q = document.getElementById('searchInp').value.toLowerCase().trim();
+  var grid = document.getElementById('leadsGrid');
+  var now = new Date();
+  var silentCutoff = new Date(); silentCutoff.setDate(silentCutoff.getDate()-14);
+
+  var leads = allLeads.filter(function(l){
+    if(q && !((l.name||'').toLowerCase().includes(q) || (l.location||'').toLowerCase().includes(q) || (l.industry||'').toLowerCase().includes(q))) return false;
+    if(filters.cat !== 'all' && l.kategori !== filters.cat) return false;
+    if(filters.type !== 'all' && l.leadType !== filters.type) return false;
+    if(filters.status === 'due'){
+      if(!l.followUpDate) return false;
+      if(new Date(l.followUpDate) > now) return false;
+    }
+    if(filters.status === 'silent'){
+      if(new Date(l.created) > silentCutoff) return false;
+    }
+    return true;
+  });
+
+  // Sort
+  if(filters.sort === 'newest') leads.sort((a,b)=>new Date(b.created)-new Date(a.created));
+  else if(filters.sort === 'score') leads.sort((a,b)=>(b.score||0)-(a.score||0));
+  else if(filters.sort === 'followup'){
+    leads.sort((a,b)=>{
+      if(!a.followUpDate) return 1;
+      if(!b.followUpDate) return -1;
+      return new Date(a.followUpDate)-new Date(b.followUpDate);
+    });
+  }
+
+  if(!leads.length){
+    if(!allLeads.length){
+      grid.innerHTML = '<div class="empty"><span class="empty-icon">🌱</span><div class="empty-title">Ingen leads enda</div><div class="empty-sub">Registrer første samtale så starter historikken her.</div><a class="empty-btn" href="legg-til-lead.html">+ Legg til første lead</a></div>';
+    } else {
+      grid.innerHTML = '<div class="empty"><span class="empty-icon">🔎</span><div class="empty-title">Ingen treff</div><div class="empty-sub">Ingen leads matcher filtrene. Prøv å tøme søket.</div></div>';
+    }
+    return;
+  }
+
+  grid.innerHTML = '';
+  leads.forEach(function(l){
+    var catLabel = {hot:'🔥 Varm',warm:'⚡ Potensial',cold:'❄ Kald',skip:'✕ Skip'}[l.kategori] || '—';
+    var typeLabel = {b2c:'B2C',b2b:'B2B',taptkunde:'Tapt kunde',inbound:'Inbound'}[l.leadType] || '';
+    var d = new Date(l.created);
+    var followFlag = '';
+    if(l.followUpDate){
+      var fd = new Date(l.followUpDate);
+      var due = fd <= now;
+      followFlag = '<span class="followup-flag'+(due?' due':'')+'">📅 '+fd.toLocaleDateString('nb-NO')+'</span>';
+    }
+    var silenceCount = Math.floor((now - new Date(l.created))/(1000*60*60*24));
+    var silenceTag = silenceCount > 14 ? '<span class="followup-flag" style="background:#FEF0EE;border-color:#F5C6C2;color:#C0392B">💀 '+silenceCount+' dager</span>' : '';
+
+    var card = document.createElement('div');
+    card.className = 'lead-card';
+    card.onclick = function(){ openDetail(l.id); };
+    card.innerHTML =
+      '<div class="lead-score">'+(l.score||'—')+'</div>'+
+      '<div class="lead-info">'+
+        '<h3>'+esc(l.name||'—')+'</h3>'+
+        '<div class="lead-meta">'+
+          '<span class="lead-cat lead-cat-'+(l.kategori||'skip')+'">'+catLabel+'</span>'+
+          (typeLabel?' · '+typeLabel:'')+
+          (l.location?' · '+esc(l.location):'')+
+          ' · '+d.toLocaleDateString('nb-NO')+
+        '</div>'+
+        '<div class="lead-title-txt">'+esc(l.tittel||(l.note?l.note.slice(0,100):'—'))+'</div>'+
+      '</div>'+
+      '<div style="display:flex;flex-direction:column;gap:.3rem;align-items:flex-end">'+followFlag+silenceTag+'</div>';
+    grid.appendChild(card);
+  });
+}
+
+function openDetail(id){
+  var l = allLeads.find(x => x.id === id);
+  if(!l) return;
+  window._currentLead = l;
+
+  var catLabel = {hot:'🔥 Varm lead',warm:'⚡ Potensial',cold:'❄ Kald',skip:'✕ Skip'}[l.kategori] || '—';
+  var typeLabel = {b2c:'Privatkunde',b2b:'Bedriftskunde',taptkunde:'Tapt kunde',inbound:'Inbound'}[l.leadType] || '';
+
+  document.getElementById('mdName').textContent = l.name || '—';
+  document.getElementById('mdMeta').innerHTML =
+    'Score <strong style="color:#fff">'+(l.score||'—')+'/100</strong> · '+catLabel+
+    (typeLabel?' · '+typeLabel:'')+
+    (l.location?' · '+esc(l.location):'');
+
+  // All related leads with same name
+  var name = (l.name||'').toLowerCase();
+  var related = allLeads.filter(function(x){ return (x.name||'').toLowerCase() === name; });
+  related.sort((a,b)=>new Date(b.created)-new Date(a.created));
+
+  var body = document.getElementById('mdBody');
+  var html = '';
+  if(related.length > 1){
+    html += '<div style="background:var(--gl2);border:1px solid var(--gm2);border-radius:8px;padding:.75rem 1rem;margin-bottom:1rem;font-size:.8rem;color:var(--gold)">🔄 <strong>'+related.length+' samtaler</strong> registrert med denne kontakten. Tidslinjen viser utviklingen.</div>';
+  }
+  if(l.contact){
+    html += '<div style="display:flex;gap:.5rem;margin-bottom:1rem;font-size:.8rem;color:var(--ink3)">📞 '+esc(l.contact)+'</div>';
+  }
+  if(l.industry){
+    html += '<div style="font-size:.78rem;color:var(--ink3);margin-bottom:.5rem">Bransje: '+esc(l.industry)+'</div>';
+  }
+
+  html += '<div class="timeline">';
+  related.forEach(function(r){
+    var rd = new Date(r.created);
+    var catCol = {hot:'#B0380A',warm:'var(--gold)',cold:'#1E40AF',skip:'var(--ink4)'}[r.kategori]||'var(--ink4)';
+    var catBg = {hot:'#FEEBDE',warm:'var(--gl2)',cold:'#E8EEF9',skip:'var(--cream2)'}[r.kategori]||'var(--cream2)';
+    html += '<div class="tl-item">';
+    html += '<div class="tl-date">'+rd.toLocaleDateString('nb-NO',{day:'numeric',month:'long',year:'numeric'})+' · kl '+rd.toLocaleTimeString('nb-NO',{hour:'2-digit',minute:'2-digit'})+'</div>';
+    html += '<div class="tl-score"><span style="background:'+catBg+';color:'+catCol+';font-family:var(--mono);font-size:.65rem;padding:.15rem .55rem;border-radius:100px">Score '+(r.score||'—')+'/100</span> <strong style="margin-left:.4rem;color:var(--ink);font-size:.85rem">'+esc(r.tittel||'—')+'</strong></div>';
+    if(r.note){
+      html += '<div class="tl-section-title">Notat</div>';
+      html += '<div class="tl-note">'+esc(r.note)+'</div>';
+    }
+    if(r.signals && r.signals.length){
+      html += '<div class="tl-section-title">Signaler</div>';
+      html += '<div style="display:flex;flex-wrap:wrap;gap:.25rem;margin-bottom:.4rem">'+r.signals.map(s=>'<span style="background:var(--cream2);font-family:var(--mono);font-size:.65rem;padding:.1rem .5rem;border-radius:100px;color:var(--ink3)">'+esc(s)+'</span>').join('')+'</div>';
+    }
+    if(r.neste && r.neste.length){
+      html += '<div class="tl-section-title">Neste steg</div>';
+      html += '<ul class="tl-steps">'+r.neste.map(s=>'<li>'+esc(s)+'</li>').join('')+'</ul>';
+    }
+    if(r.script){
+      html += '<div class="tl-section-title">Oppfølgingsmelding</div>';
+      html += '<div class="tl-script">'+esc(r.script)+'</div>';
+    }
+    html += '</div>';
+  });
+  html += '</div>';
+  body.innerHTML = html;
+
+  // Actions
+  var acts = document.getElementById('mdActions');
+  var phoneClean = (l.contact||'').replace(/\s/g,'');
+  var hasPhone = /^\+?\d{8,}$/.test(phoneClean);
+  acts.innerHTML =
+    (hasPhone ? '<a class="btn-sm btn-sm-primary" href="tel:'+phoneClean+'">📞 Ring</a>' : '')+
+    (hasPhone && l.script ? '<a class="btn-sm" href="sms:'+phoneClean+'?body='+encodeURIComponent(l.script)+'">💬 Send SMS</a>' : '')+
+    '<button class="btn-sm" onclick="copyScript()">📋 Kopier script</button>'+
+    '<a class="btn-sm" href="legg-til-lead.html">➕ Oppfølging</a>'+
+    '<button class="btn-sm btn-sm-danger" onclick="deleteLead('+l.id+')" style="margin-left:auto">🗑 Slett</button>';
+
+  document.getElementById('detailModal').classList.add('show');
+}
+
+function closeDetail(){ document.getElementById('detailModal').classList.remove('show'); }
+
+function copyScript(){
+  var l = window._currentLead;
+  if(!l||!l.script) return;
+  navigator.clipboard.writeText(l.script).then(()=>toast('✓ Script kopiert'));
+}
+
+function deleteLead(id){
+  if(!confirm('Slette denne leaden? Kan ikke angres.')) return;
+  allLeads = allLeads.filter(x => x.id !== id);
+  localStorage.setItem('arce_quick_leads', JSON.stringify(allLeads));
+  closeDetail();
+  computeStats();
+  renderLeads();
+  toast('✓ Slettet');
+}
+
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function toast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t=setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+/* Init */
+computeStats();
+renderLeads();
+</script>
+</body>
+</html>

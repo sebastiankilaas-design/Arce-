@@ -484,6 +484,15 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-weight:3
         </div>
       </div>
 
+      <!-- FOLLOW-UPS DUE TODAY -->
+      <div class="card" id="followUpsCard" style="margin-bottom:1rem;display:none">
+        <div class="card-head">
+          <div class="card-title">📅 Oppfølginger i dag</div>
+          <span style="font-size:.72rem;color:var(--ink4);font-family:var(--mono)" id="followUpCount">0</span>
+        </div>
+        <div id="followUpsList" style="display:flex;flex-direction:column"></div>
+      </div>
+
       <!-- UPCOMING APPOINTMENTS -->
       <div class="card">
         <div class="card-head">
@@ -864,6 +873,67 @@ function connectTwilio(){
 /* ── ADD LEAD ── */
 var _currentOrg = null; // set after Supabase loads
 
+// Load follow-ups from local storage (from legg-til-lead.html)
+function loadFollowUps() {
+  var leads = JSON.parse(localStorage.getItem('arce_quick_leads') || '[]');
+  var today = new Date();
+  today.setHours(0,0,0,0);
+  var tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+
+  var due = leads.filter(function(l) {
+    if (!l.followUpDate) return false;
+    var d = new Date(l.followUpDate);
+    return d <= tomorrow;
+  });
+
+  if (!due.length) {
+    document.getElementById('followUpsCard').style.display = 'none';
+    return;
+  }
+
+  document.getElementById('followUpsCard').style.display = 'block';
+  document.getElementById('followUpCount').textContent = due.length + (due.length === 1 ? ' lead' : ' leads');
+
+  var list = document.getElementById('followUpsList');
+  list.innerHTML = '';
+  due.slice(0, 8).forEach(function(l) {
+    var catIcon = {hot:'🔥',warm:'⚡',cold:'❄'}[l.kategori] || '○';
+    var catColor = l.kategori === 'hot' ? '#B0380A' : l.kategori === 'warm' ? 'var(--gold)' : 'var(--ink3)';
+    var d = new Date(l.followUpDate);
+    var isToday = d.toDateString() === new Date().toDateString();
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:.6rem .2rem;border-bottom:1px solid var(--brd);gap:.75rem';
+    row.innerHTML =
+      '<div style="flex:1;min-width:0">' +
+        '<div style="font-size:.82rem;color:var(--ink);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' +
+          catIcon + ' ' + escapeHtml(l.name) +
+        '</div>' +
+        '<div style="font-size:.7rem;color:' + catColor + ';margin-top:.15rem;font-family:var(--mono)">' +
+          (isToday ? 'I DAG' : d.toLocaleDateString('nb-NO')) + ' · score ' + (l.score||'—') + '/100' +
+        '</div>' +
+      '</div>' +
+      '<button onclick="copyLeadScript(' + l.id + ')" style="background:var(--cream2);border:1px solid var(--brd);border-radius:6px;padding:.3rem .6rem;font-size:.7rem;cursor:pointer;color:var(--ink3);font-family:var(--body)">Kopier script</button>';
+    list.appendChild(row);
+  });
+}
+
+function copyLeadScript(id) {
+  var leads = JSON.parse(localStorage.getItem('arce_quick_leads') || '[]');
+  var lead = leads.find(l => l.id === id);
+  if (!lead || !lead.script) return;
+  navigator.clipboard.writeText(lead.script).then(function() {
+    showToast('✓ Script kopiert for ' + lead.name);
+  });
+}
+
+function escapeHtml(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// Run on load
+document.addEventListener('DOMContentLoaded', function() { setTimeout(loadFollowUps, 500); });
+
 function openAddLead(){
   // Check subscription
   if(!_currentOrg){
@@ -884,11 +954,8 @@ function openAddLead(){
     return;
   }
 
-  // Allowed — show simple add form
-  var name=prompt('Navn på lead:');
-  if(!name)return;
-  var email=prompt('E-post (valgfritt):');
-  showToast('✓ '+name+' lagt til — AI-agent kontakter innen 2 minutter');
+  // Open full AI-powered lead entry page
+  window.location.href = 'legg-til-lead.html';
 }
 
 function showSubscriptionGate(){
