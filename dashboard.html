@@ -795,7 +795,7 @@ async function sendPanelMsg(){
 
   try{
     const hist=panelHistory.slice(-6).map(m=>({role:m.ai?'assistant':'user',content:m.text}));
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
+    const res=await fetch('/.netlify/functions/analyze',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
@@ -844,7 +844,7 @@ async function testAgent(){
   testHistory.push({role:'user',content:txt});
 
   try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
+    const res=await fetch('/.netlify/functions/analyze',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({

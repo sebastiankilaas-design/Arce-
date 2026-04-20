@@ -459,7 +459,7 @@ async function sendMessage() {
   addTyping();
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch('/.netlify/functions/analyze', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({
@@ -519,6 +519,37 @@ Hva kan jeg hjelpe deg med?
 }
 
 init();
+</script>
+<!-- Subscription gate -->
+<div id="subGate" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(10,10,8,.95);backdrop-filter:blur(12px);align-items:center;justify-content:center;padding:2rem">
+  <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:2.5rem;max-width:420px;width:100%;text-align:center">
+    <div style="font-size:2rem;margin-bottom:1rem">🔒</div>
+    <div style="font-family:'Fraunces',Georgia,serif;font-size:1.5rem;font-style:italic;color:rgba(255,255,255,.92);margin-bottom:.5rem">Krever abonnement</div>
+    <p style="font-size:.82rem;color:rgba(255,255,255,.45);line-height:1.7;margin-bottom:1.5rem">Booking-agenten er tilgjengelig for alle Arce-abonnenter. Start gratis i 14 dager.</p>
+    <a href="checkout.html" style="display:block;background:#F3F1EB;color:#1A1917;padding:.85rem;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:600;text-decoration:none;margin-bottom:.75rem">Start 14 dager gratis →</a>
+    <a href="auth.html" style="display:block;font-size:.78rem;color:rgba(255,255,255,.35);text-decoration:none">Har konto? Logg inn</a>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+(async function(){
+  var SUPA_URL = 'https://iupyilakdxmtiawkishs.supabase.co';
+  var SUPA_KEY = 'sb_publishable_0BbaazLbWJCL0JUVAJPKKQ_ilY6ZJ0t';
+  var gate = document.getElementById('subGate');
+  gate.style.display = 'none';
+  try {
+    var sb = supabase.createClient(SUPA_URL, SUPA_KEY);
+    var { data: { session } } = await sb.auth.getSession();
+    if (!session) { gate.style.display='flex'; return; }
+    var { data: org } = await sb.from('organizations').select('trial_ends_at,is_active,stripe_subscription_id').eq('email',session.user.email).single();
+    if (!org) { gate.style.display='flex'; return; }
+    var trialActive = org.trial_ends_at && new Date(org.trial_ends_at) > new Date();
+    if (!trialActive && !org.stripe_subscription_id && !org.is_active) {
+      gate.style.display='flex';
+    }
+  } catch(e) { console.warn('Auth check failed',e); }
+})();
 </script>
 </body>
 </html>

@@ -310,6 +310,17 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-weight:3
   </div>
 </div>
 
+<!-- SUBSCRIPTION GATE -->
+<div id="subGate" style="display:none;position:fixed;inset:0;z-index:999;background:rgba(243,241,235,.97);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;padding:2rem">
+  <div style="background:#fff;border:1px solid #D8D5CC;border-radius:16px;padding:2.5rem;max-width:440px;width:100%;text-align:center;box-shadow:0 8px 40px rgba(24,22,18,.1)">
+    <div style="font-size:2rem;margin-bottom:1rem">🔒</div>
+    <div style="font-family:'Cormorant',Georgia,serif;font-size:1.6rem;font-style:italic;color:#181612;margin-bottom:.5rem">Krever abonnement</div>
+    <p style="font-size:.85rem;color:#6E6C65;line-height:1.7;margin-bottom:1.5rem">Lead Intelligence er tilgjengelig for alle Arce-abonnenter. Start en 14-dagers gratis prøveperiode — ingen binding, ingen belastning nå.</p>
+    <a href="checkout.html" style="display:block;background:#0C4D3A;color:#fff;padding:.85rem;border-radius:8px;font-family:'Outfit',sans-serif;font-size:.9rem;font-weight:600;text-decoration:none;margin-bottom:.75rem">Start 14 dager gratis →</a>
+    <a href="auth.html" style="display:block;font-size:.78rem;color:#6E6C65;text-decoration:none">Har konto? Logg inn</a>
+  </div>
+</div>
+
 <!-- MAIN -->
 <div class="main">
 
@@ -749,7 +760,7 @@ Vær kritisk og ærlig. Ikke inflasjoner scores.`;
     }).join('\n');
 
     try{
-      const res=await fetch('https://api.anthropic.com/v1/messages',{
+      const res=await fetch('/.netlify/functions/analyze',{
         method:'POST',
         headers:{'Content-Type':'application/json'},
         body:JSON.stringify({
@@ -1070,6 +1081,54 @@ function toast(msg){
   clearTimeout(t._tid);
   t._tid=setTimeout(()=>t.classList.remove('show'),3200);
 }
+</script>
+
+<!-- Subscription gate check -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+(async function(){
+  var SUPA_URL = 'https://iupyilakdxmtiawkishs.supabase.co';
+  var SUPA_KEY = 'sb_publishable_0BbaazLbWJCL0JUVAJPKKQ_ilY6ZJ0t';
+  var gate = document.getElementById('subGate');
+
+  // Always hide gate initially (show tool by default)
+  gate.style.display = 'none';
+
+  try {
+    var sb = supabase.createClient(SUPA_URL, SUPA_KEY);
+    var { data: { session } } = await sb.auth.getSession();
+
+    if (!session) {
+      // Not logged in → show gate
+      gate.style.display = 'flex';
+      return;
+    }
+
+    // Check org has active subscription or active trial
+    var { data: org } = await sb
+      .from('organizations')
+      .select('trial_ends_at, is_active, stripe_subscription_id')
+      .eq('email', session.user.email)
+      .single();
+
+    if (!org) {
+      gate.style.display = 'flex';
+      return;
+    }
+
+    var trialActive = org.trial_ends_at && new Date(org.trial_ends_at) > new Date();
+    var hasSubscription = !!org.stripe_subscription_id;
+    var isActive = org.is_active;
+
+    if (!trialActive && !hasSubscription && !isActive) {
+      gate.style.display = 'flex';
+    }
+
+  } catch(e) {
+    // If Supabase fails, don't block the tool
+    console.warn('Auth check failed:', e);
+  }
+})();
 </script>
 </body>
 </html>
