@@ -474,7 +474,7 @@ async function extractFromVoice(text){
 {"name":"<navn eller bedriftsnavn>","contact":"<telefon eller e-post>","location":"<sted>","industry":"<bransje>","leadType":"<b2c|b2b|taptkunde|inbound>","note":"<renskrevet notat>","signals":["<signal>"],"followUpDate":"<YYYY-MM-DD eller tom>"}
 Signaler: interessert, misfornøyd, pris, tidkritisk, beslutningsklar, tredjeperson, tidligerekunde, avvist`;
   try{
-    var res=await fetch('https://api.anthropic.com/v1/messages',{
+    var res=await fetch('/.netlify/functions/analyze',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:600,system:systemPrompt,messages:[{role:'user',content:text}]})
@@ -626,7 +626,7 @@ async function analyze(){
   var userPrompt='Analyser dette leadet:\nNavn/Bedrift: '+name+'\n'+(contact?'Kontakt: '+contact+'\n':'')+(location?'Sted: '+location+'\n':'')+(industry?'Bransje: '+industry+'\n':'')+'Type: '+leadType+'\nNotat: "'+note+'"\nKjøpssignaler: '+(signals.join(', ')||'ingen')+'\n'+(company?'Selger: '+company+'\n':'')+(product?'Produkt: '+product+'\n':'')+(prios.length?'Prioriteter: '+prios.join(', ')+'\n':'')+(priorAttempts.length?'Tidligere samtaler: '+priorAttempts.length+' — siste score: '+priorAttempts[0].score:'');
 
   try{
-    var res=await fetch('https://api.anthropic.com/v1/messages',{
+    var res=await fetch('/.netlify/functions/analyze',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:900,system:systemPrompt,messages:[{role:'user',content:userPrompt}]})
@@ -766,7 +766,7 @@ async function generateProposal(){
   document.getElementById('proposalContent').textContent='⚙ Genererer…';
   var prompt='Skriv et personlig, profesjonelt salgsforslag på norsk basert på denne leaden:\n\nKunde: '+l.name+'\nSted: '+(l.location||'ukjent')+'\nBransje: '+(l.industry||'ukjent')+'\nType: '+l.leadType+'\nNotat: '+l.note+'\nAvsender: '+(company||'vår bedrift')+'\nProdukt/tjeneste: '+(product||'vår tjeneste')+'\n\nForslaget skal være 200-300 ord, strukturert slik:\n1. Personlig innledning som refererer til samtalen\n2. Forståelse av deres situasjon\n3. Hvordan vårt produkt løser utfordringen\n4. Konkret tilbud (hold det åpent — ikke inkluder priser)\n5. Neste steg og oppfordring til handling\n\nSkriv i naturlig, varm men profesjonell tone. Ingen overskrifter. Kun løpende tekst. Ingen "Kjære" eller "Hei," — start med substans.';
   try{
-    var res=await fetch('https://api.anthropic.com/v1/messages',{
+    var res=await fetch('/.netlify/functions/analyze',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})

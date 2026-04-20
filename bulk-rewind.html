@@ -293,7 +293,7 @@ async function analyzeOne(row, company, product, improvements){
   var userPrompt = 'Kundedata: '+raw+'\n\nBedriften som vil vinne dem tilbake: '+company+'\nProdukt: '+product+'\nForbedringer siden kunden sluttet: '+(improvements||'ingen spesifisert');
 
   try{
-    var res = await fetch('https://api.anthropic.com/v1/messages',{
+    var res = await fetch('/.netlify/functions/analyze',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:350,system:systemPrompt,messages:[{role:'user',content:userPrompt}]})
