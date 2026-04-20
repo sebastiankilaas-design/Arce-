@@ -207,37 +207,11 @@ body{
         <span class="spinner"></span>
         <span class="btn-label">Logg inn</span>
       </button>
-      <div class="switch-mode">Ny bruker?<button onclick="showSignup()">Opprett konto</button></div>
-      <div class="terms">Ved å logge inn godtar du <a href="#">Vilkår</a> og <a href="#">Personvernerklæring</a></div>
+      <div class="switch-mode">Har du ikke konto ennå? <a href="mailto:hei@arcesales.no?subject=Demo-foresp%C3%B8rsel&body=Hei%2C%0A%0AJeg%20%C3%B8nsker%20en%20demo%20av%20Arce.%0A%0ANavn%3A%0ABedrift%3A%0ATelefon%3A%0A%0AMed%20vennlig%20hilsen" style="color:var(--g);text-decoration:none;font-weight:500">Book en demo</a></div>
+      <div class="terms">Ved å logge inn godtar du <a href="vilkaar.html">Vilkår</a> og <a href="personvern.html">Personvernerklæring</a></div>
     </div>
 
-    <!-- Signup form -->
-    <div id="signupForm" style="display:none">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.65rem">
-        <div class="field">
-          <label>Fornavn</label>
-          <input class="inp" type="text" id="signupFirst" placeholder="Kari" autocomplete="given-name"/>
-        </div>
-        <div class="field">
-          <label>Etternavn</label>
-          <input class="inp" type="text" id="signupLast" placeholder="Nilsen" autocomplete="family-name"/>
-        </div>
-      </div>
-      <div class="field">
-        <label>E-post</label>
-        <input class="inp" type="email" id="signupEmail" placeholder="din@bedrift.no" autocomplete="email"/>
-      </div>
-      <div class="field">
-        <label>Passord</label>
-        <input class="inp" type="password" id="signupPass" placeholder="Minst 8 tegn" autocomplete="new-password"/>
-        <div class="field-hint">Bruk minst 8 tegn, gjerne med tall og symboler</div>
-      </div>
-      <button class="btn-submit" id="signupBtn" onclick="doSignup()">
-        <span class="spinner"></span>
-        <span class="btn-label">Opprett konto</span>
-      </button>
-      <div class="switch-mode">Har konto?<button onclick="showLogin()">Logg inn</button></div>
-    </div>
+    <!-- Signup is invitation-only. New customers must book a demo first. -->
 
     <!-- Forgot password form -->
     <div id="forgotForm" style="display:none">
@@ -301,7 +275,7 @@ function setLoading(btnId, loading) {
 
 /* ─── VIEW SWITCHING ─── */
 function showForm(id) {
-  ['loginForm','signupForm','forgotForm','resetSent'].forEach(f =>
+  ['loginForm','forgotForm','resetSent'].forEach(f =>
     document.getElementById(f).style.display = f === id ? 'block' : 'none');
   clearMsg();
 }
@@ -309,11 +283,6 @@ function showLogin() {
   document.getElementById('cardTitle').textContent = 'Velkommen tilbake';
   document.getElementById('cardSub').textContent = 'Logg inn for å gå til dashboardet ditt';
   showForm('loginForm');
-}
-function showSignup() {
-  document.getElementById('cardTitle').textContent = 'Opprett konto';
-  document.getElementById('cardSub').textContent = '14 dager gratis — ingen kredittkort';
-  showForm('signupForm');
 }
 function showForgot() {
   document.getElementById('cardTitle').textContent = 'Tilbakestill passord';
@@ -325,9 +294,12 @@ function showForgot() {
 async function signInGoogle() {
   if (!sb) return;
   clearMsg();
+  const redirectTo = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? window.location.origin + '/dashboard.html'
+    : 'https://arcesales.no/dashboard.html';
   const { error } = await sb.auth.signInWithOAuth({
     provider: 'google',
-    options: { redirectTo: window.location.origin + '/dashboard.html' }
+    options: { redirectTo: redirectTo }
   });
   if (error) showMsg(error.message, 'error');
 }
@@ -344,33 +316,6 @@ async function doLogin() {
   if (error) { showMsg(error.message, 'error'); return; }
   showMsg('Logger inn…', 'success');
   setTimeout(() => window.location.href = 'dashboard.html', 600);
-}
-
-async function doSignup() {
-  if (!sb) return;
-  clearMsg();
-  const first = document.getElementById('signupFirst').value.trim();
-  const last  = document.getElementById('signupLast').value.trim();
-  const email = document.getElementById('signupEmail').value.trim();
-  const pass  = document.getElementById('signupPass').value;
-  if (!first || !email || !pass) { showMsg('Fyll inn alle påkrevde felt.', 'error'); return; }
-  if (pass.length < 8) { showMsg('Passordet må være minst 8 tegn.', 'error'); return; }
-  setLoading('signupBtn', true);
-  const { error } = await sb.auth.signUp({
-    email, password: pass,
-    options: { data: { full_name: `${first} ${last}`.trim() } }
-  });
-  setLoading('signupBtn', false);
-  if (error) { showMsg(error.message, 'error'); return; }
-  // Auto-login after signup — no email confirmation needed
-  const { error: loginErr } = await sb.auth.signInWithPassword({ email, password: pass });
-  if (loginErr) {
-    showMsg('Konto opprettet! Logg inn for å fortsette.', 'success');
-    setTimeout(function(){ showLogin(); }, 1500);
-    return;
-  }
-  showMsg('Konto opprettet! Sender deg til dashboardet…', 'success');
-  setTimeout(function(){ window.location.href = 'dashboard.html'; }, 800);
 }
 
 async function doForgot() {
@@ -393,7 +338,6 @@ async function doForgot() {
 document.addEventListener('keydown', e => {
   if (e.key !== 'Enter') return;
   if (document.getElementById('loginForm').style.display !== 'none') doLogin();
-  else if (document.getElementById('signupForm').style.display !== 'none') doSignup();
   else if (document.getElementById('forgotForm').style.display !== 'none') doForgot();
 });
 </script>

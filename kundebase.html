@@ -358,7 +358,7 @@ function openDetail(id){
     }
     if(r.signals && r.signals.length){
       html += '<div class="tl-section-title">Signaler</div>';
-      html += '<div style="display:flex;flex-wrap:wrap;gap:.25rem;margin-bottom:.4rem">'+r.signals.map(s=>'<span style="background:var(--cream2);font-family:var(--mono);font-size:.65rem;padding:.1rem .5rem;border-radius:100px;color:var(--ink3)">'+esc(s)+'</span>').join('')+'</div>';
+      html += '<div style="display:flex;flex-wrap:wrap;gap:.25rem;margin-bottom:.4rem">'+r.signals.map(s=>'<span style="background:var(--cream2);font-size:.68rem;padding:.15rem .55rem;border-radius:100px;color:var(--ink3)">'+esc(cleanTag(s))+'</span>').join('')+'</div>';
     }
     if(r.neste && r.neste.length){
       html += '<div class="tl-section-title">Neste steg</div>';
@@ -406,6 +406,15 @@ function deleteLead(id){
 }
 
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function cleanTag(s){
+  if(!s) return '';
+  var txt = String(s).replace(/_/g,' ').replace(/\s+/g,' ').trim();
+  if (txt === txt.toLowerCase()) {
+    txt = txt.charAt(0).toUpperCase() + txt.slice(1);
+  }
+  return txt;
+}
 
 function toast(msg){
   var t=document.getElementById('toast');

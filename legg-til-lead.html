@@ -189,7 +189,7 @@ select.inp{cursor:pointer}
   </a>
   <div class="nav-right">
     <a class="nav-link" href="kundebase.html">Kundebase →</a>
-    <a class="nav-link" href="bulk-rewind.html">Tapte kunder →</a>
+    <a class="nav-link" href="vinn-tilbake.html">Tapte kunder →</a>
     <a class="nav-back" href="dashboard.html">← Dashboard</a>
   </div>
 </nav>
@@ -554,6 +554,17 @@ async function lookupBrreg(){
 }
 
 function toggleChipGroup(gid,el){document.querySelectorAll('#'+gid+' .chip').forEach(c=>c.classList.remove('on'));el.classList.add('on');}
+
+// Formatter: cleans tags — removes underscores, capitalizes first letter
+function cleanTag(s){
+  if(!s) return '';
+  var txt = String(s).replace(/_/g,' ').replace(/\s+/g,' ').trim();
+  // Capitalize first letter of each word if all-lowercase
+  if (txt === txt.toLowerCase()) {
+    txt = txt.charAt(0).toUpperCase() + txt.slice(1);
+  }
+  return txt;
+}
 function toggleChip(el){el.classList.toggle('on');}
 function toggleSignal(el){el.classList.toggle('on');}
 function getChipVal(g){var e=document.querySelector('#'+g+' .chip.on');return e?e.dataset.val:'';}
@@ -622,7 +633,9 @@ async function analyze(){
 
   setLoading(true);
   var systemPrompt=`Du er en erfaren norsk salgsanalytiker. Du scorer leads etter en telefonsamtale og gir konkrete anbefalinger. Svar KUN med gyldig JSON uten markdown:
-{"score":<0-100>,"kategori":"<hot|warm|cold|skip>","tittel":"<kort vurdering, maks 6 ord>","vurdering":"<2-3 setninger>","tags_positive":["<tag>"],"tags_negative":["<tag>"],"neste_steg":["<steg1>","<steg2>","<steg3>"],"script":"<klar oppfølgingsmelding på norsk>","follow_up_days":<1-365>,"follow_up_reason":"<begrunnelse>"}`;
+{"score":<0-100>,"kategori":"<hot|warm|cold|skip>","tittel":"<kort vurdering, maks 6 ord>","vurdering":"<2-3 setninger>","tags_positive":["<tag>"],"tags_negative":["<tag>"],"neste_steg":["<steg1>","<steg2>","<steg3>"],"script":"<klar oppfølgingsmelding på norsk>","follow_up_days":<1-365>,"follow_up_reason":"<begrunnelse>"}
+
+VIKTIG for tags: Bruk naturlige norske ord eller korte fraser med mellomrom. IKKE bruk underscore (_). IKKE bruk snake_case. Start alltid med stor forbokstav. Maks 2-3 ord per tag. Eksempler: "Interessert", "B2B-potensial", "Prissensitiv", "Trenger forklaring", "Eiendom", "Usikker", "Beslutningsklar".`;
   var userPrompt='Analyser dette leadet:\nNavn/Bedrift: '+name+'\n'+(contact?'Kontakt: '+contact+'\n':'')+(location?'Sted: '+location+'\n':'')+(industry?'Bransje: '+industry+'\n':'')+'Type: '+leadType+'\nNotat: "'+note+'"\nKjøpssignaler: '+(signals.join(', ')||'ingen')+'\n'+(company?'Selger: '+company+'\n':'')+(product?'Produkt: '+product+'\n':'')+(prios.length?'Prioriteter: '+prios.join(', ')+'\n':'')+(priorAttempts.length?'Tidligere samtaler: '+priorAttempts.length+' — siste score: '+priorAttempts[0].score:'');
 
   try{
@@ -667,8 +680,8 @@ function showResult(d,name,note,leadType,signals,contact,location,industry){
   document.getElementById('resVurdering').textContent=d.vurdering||'—';
   var tagsEl=document.getElementById('resTags');
   tagsEl.innerHTML='';
-  (d.tags_positive||[]).forEach(t=>{var s=document.createElement('span');s.className='res-tag pos';s.textContent='✓ '+t;tagsEl.appendChild(s);});
-  (d.tags_negative||[]).forEach(t=>{var s=document.createElement('span');s.className='res-tag neg';s.textContent='✕ '+t;tagsEl.appendChild(s);});
+  (d.tags_positive||[]).forEach(t=>{var s=document.createElement('span');s.className='res-tag pos';s.textContent='✓ '+cleanTag(t);tagsEl.appendChild(s);});
+  (d.tags_negative||[]).forEach(t=>{var s=document.createElement('span');s.className='res-tag neg';s.textContent='✕ '+cleanTag(t);tagsEl.appendChild(s);});
   var stepsEl=document.getElementById('resSteps');
   stepsEl.innerHTML='';
   (d.neste_steg||[]).forEach((s,i)=>{

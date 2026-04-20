@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arce · Booking Agent</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;1,9..144,300;1,9..144,500&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0A0A08;--bg2:#111110;--bg3:#1A1A17;--bg4:#222220;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --accent:#E8C97A;--accent2:#D4A84B;--accent-dim:rgba(232,201,122,0.1);
+  --text:#F0EDE6;--muted:#8A8780;--muted2:#5C5A56;
+  --green:#5EC47A;--green-dim:rgba(94,196,122,0.1);--green-border:rgba(94,196,122,0.25);
+  --red:#E24B4A;--red-dim:rgba(226,75,74,0.1);
+  --serif:'Fraunces',Georgia,serif;--sans:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-weight:300;display:flex;flex-direction:column}
+
+/* TOPBAR */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0.85rem 1.5rem;
+  border-bottom:1px solid var(--border);
+  background:rgba(10,10,8,0.9);
+  backdrop-filter:blur(12px);
+  flex-shrink:0;
+}
+.logo{font-family:var(--serif);font-size:1.15rem;font-weight:500;letter-spacing:-0.02em}
+.logo span{color:var(--accent)}
+.agent-info{display:flex;align-items:center;gap:0.6rem}
+.agent-avatar{
+  width:32px;height:32px;border-radius:50%;
+  background:rgba(232,201,122,0.12);
+  border:1px solid rgba(232,201,122,0.25);
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.9rem;
+}
+.agent-name-wrap{display:flex;flex-direction:column}
+.agent-name{font-size:0.78rem;font-weight:500;color:var(--text)}
+.agent-status{font-size:0.65rem;font-family:var(--mono);color:var(--green);display:flex;align-items:center;gap:4px}
+.pulse{width:5px;height:5px;background:var(--green);border-radius:50%;animation:pulse 2s ease infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.cal-pill{
+  display:flex;align-items:center;gap:0.4rem;
+  background:var(--bg3);border:1px solid var(--border2);
+  border-radius:100px;padding:0.3rem 0.75rem;
+  font-family:var(--mono);font-size:0.65rem;color:var(--muted);
+}
+
+/* CHAT AREA */
+.chat-area{flex:1;overflow-y:auto;padding:1.5rem;display:flex;flex-direction:column;gap:1rem;scroll-behavior:smooth}
+.chat-area::-webkit-scrollbar{width:4px}
+.chat-area::-webkit-scrollbar-track{background:transparent}
+.chat-area::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* MESSAGES */
+.msg-row{display:flex;gap:0.75rem;animation:msgIn 0.3s ease both}
+@keyframes msgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.msg-row.user{flex-direction:row-reverse}
+
+.avatar{
+  width:28px;height:28px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:0.75rem;
+  margin-top:2px;
+}
+.avatar.ai{background:rgba(232,201,122,0.12);border:1px solid rgba(232,201,122,0.2)}
+.avatar.user-av{background:var(--bg3);border:1px solid var(--border2);font-size:0.7rem}
+
+.bubble{
+  max-width:78%;padding:0.75rem 1rem;border-radius:12px;
+  font-size:0.875rem;line-height:1.65;
+}
+.bubble.ai{
+  background:var(--bg2);border:1px solid var(--border);
+  border-bottom-left-radius:3px;color:var(--text);
+}
+.bubble.user{
+  background:var(--bg3);border:1px solid var(--border2);
+  border-bottom-right-radius:3px;color:var(--text);
+  text-align:right;
+}
+
+/* CONFIRM CARD */
+.confirm-card{
+  margin-top:0.75rem;
+  background:rgba(94,196,122,0.05);
+  border:1px solid var(--green-border);
+  border-radius:8px;padding:0.9rem 1rem;
+}
+.confirm-label{
+  font-family:var(--mono);font-size:0.65rem;letter-spacing:0.1em;
+  text-transform:uppercase;color:var(--green);margin-bottom:0.5rem;
+}
+.confirm-row{display:flex;align-items:center;gap:0.5rem;font-size:0.8rem;color:var(--muted);margin:0.25rem 0}
+.confirm-row strong{color:var(--text);font-weight:400}
+
+/* CANCEL CARD */
+.cancel-card{
+  margin-top:0.75rem;
+  background:var(--red-dim);border:1px solid rgba(226,75,74,0.25);
+  border-radius:8px;padding:0.75rem 1rem;
+  font-family:var(--mono);font-size:0.75rem;color:var(--red);
+}
+
+/* CONFIG PANEL */
+.config-panel{background:var(--bg2);border-bottom:1px solid var(--border);padding:0.7rem 1.5rem;display:flex;align-items:center;gap:0.85rem;flex-wrap:wrap;flex-shrink:0}
+.cfg-label{font-family:var(--mono);font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted)}
+.cfg-inp{background:var(--bg3);border:1px solid var(--border2);border-radius:5px;padding:0.28rem 0.6rem;font-family:var(--mono);font-size:0.72rem;color:var(--text);outline:none;width:140px;transition:border-color 0.15s}
+.cfg-inp:focus{border-color:var(--accent)}
+.cfg-inp.wide{width:200px}
+.cfg-type-btn{background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:0.28rem 0.75rem;font-family:var(--mono);font-size:0.65rem;color:var(--muted);cursor:pointer;transition:all 0.15s}
+.cfg-type-btn.on{background:rgba(232,201,122,0.12);border-color:var(--accent);color:var(--accent)}
+.cfg-div{width:1px;height:20px;background:var(--border)}
+
+/* TYPING INDICATOR */
+.typing{display:flex;gap:5px;align-items:center;padding:0.6rem 0.2rem}
+.typing span{width:6px;height:6px;background:var(--muted2);border-radius:50%;animation:bounce 1.2s ease infinite}
+.typing span:nth-child(2){animation-delay:0.15s}
+.typing span:nth-child(3){animation-delay:0.3s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+
+/* SUGGESTIONS */
+.suggestions{display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.75rem}
+.sug-btn{
+  background:var(--bg3);border:1px solid var(--border2);
+  border-radius:100px;padding:0.35rem 0.85rem;
+  font-size:0.75rem;color:var(--muted);font-family:var(--sans);
+  cursor:pointer;transition:all 0.15s;
+}
+.sug-btn:hover{background:var(--bg4);color:var(--text);border-color:rgba(232,201,122,0.3)}
+
+/* CALENDAR SIDEBAR */
+.sidebar{
+  width:220px;flex-shrink:0;
+  border-left:1px solid var(--border);
+  background:var(--bg2);
+  overflow-y:auto;
+  display:flex;flex-direction:column;
+}
+.sidebar-header{
+  padding:1rem 1rem 0.5rem;
+  font-family:var(--mono);font-size:0.65rem;
+  letter-spacing:0.1em;text-transform:uppercase;color:var(--muted2);
+  border-bottom:1px solid var(--border);
+}
+.appt-item{
+  padding:0.75rem 1rem;border-bottom:1px solid var(--border);
+  animation:msgIn 0.3s ease both;
+}
+.appt-name{font-size:0.8rem;font-weight:500;color:var(--text);margin-bottom:0.2rem}
+.appt-time{font-family:var(--mono);font-size:0.65rem;color:var(--accent)}
+.appt-loc{font-size:0.72rem;color:var(--muted);margin-top:0.15rem}
+.appt-cancel-btn{
+  margin-top:0.4rem;font-size:0.65rem;font-family:var(--mono);
+  color:var(--muted2);cursor:pointer;background:none;border:none;padding:0;
+  text-decoration:underline;transition:color 0.15s;
+}
+.appt-cancel-btn:hover{color:var(--red)}
+.empty-appts{padding:1.5rem 1rem;font-size:0.78rem;color:var(--muted2);text-align:center;line-height:1.6}
+
+/* MAIN LAYOUT */
+.main{display:flex;flex:1;overflow:hidden}
+
+/* INPUT */
+.input-bar{
+  flex-shrink:0;
+  border-top:1px solid var(--border);
+  background:var(--bg);
+  padding:0.85rem 1.5rem;
+  display:flex;align-items:center;gap:0.75rem;
+}
+.input-wrap{
+  flex:1;display:flex;align-items:center;
+  background:var(--bg2);border:1px solid var(--border2);
+  border-radius:8px;overflow:hidden;
+  transition:border-color 0.2s;
+}
+.input-wrap:focus-within{border-color:rgba(232,201,122,0.35)}
+#userInput{
+  flex:1;background:transparent;border:none;outline:none;
+  padding:0.75rem 1rem;color:var(--text);font-family:var(--sans);
+  font-size:0.875rem;font-weight:300;
+}
+#userInput::placeholder{color:var(--muted2)}
+#sendBtn{
+  background:var(--accent);color:var(--bg);border:none;
+  padding:0.65rem 1.1rem;font-family:var(--sans);font-size:0.85rem;
+  font-weight:500;cursor:pointer;transition:background 0.2s;
+  white-space:nowrap;
+}
+#sendBtn:hover{background:var(--accent2)}
+#sendBtn:disabled{background:var(--muted2);cursor:not-allowed}
+
+.no-appts{color:var(--muted2);font-size:0.72rem;text-align:center;padding:1rem;line-height:1.6}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="logo" href="#">Arce<span>.</span></a>
+  <div class="agent-info">
+    <div class="avatar ai">⬡</div>
+    <div class="agent-name-wrap">
+      <span class="agent-name">Arce Agent</span>
+      <span class="agent-status"><div class="pulse"></div> Online · Klar til å booke</span>
+    </div>
+  </div>
+  <div class="cal-pill">📅 <span id="todayLabel"></span></div>
+</div>
+
+<!-- CONFIG PANEL -->
+<div class="config-panel">
+  <span class="cfg-label">Bedrift</span>
+  <input class="cfg-inp wide" id="cfgCompany" placeholder="Bedriftsnavn (eks: NTE)" value=""/>
+  <div class="cfg-div"></div>
+  <span class="cfg-label">Leadtype</span>
+  <button class="cfg-type-btn on" id="cfgB2B" onclick="setCfgType('b2b')">🏢 B2B</button>
+  <button class="cfg-type-btn" id="cfgB2C" onclick="setCfgType('b2c')">👤 B2C</button>
+  <div class="cfg-div"></div>
+  <span class="cfg-label">Merkevare B2C</span>
+  <input class="cfg-inp" id="cfgBrandB2C" placeholder="Eks: Altibox" value=""/>
+  <div class="cfg-div"></div>
+  <span class="cfg-label">Merkevare B2B</span>
+  <input class="cfg-inp" id="cfgBrandB2B" placeholder="Eks: NTE" value=""/>
+  <div class="cfg-div"></div>
+  <span class="cfg-label">Produkt</span>
+  <input class="cfg-inp wide" id="cfgProduct" placeholder="Eks: Fiber internett" value=""/>
+</div>
+
+<div class="main">
+  <div style="flex:1;display:flex;flex-direction:column;overflow:hidden">
+    <div class="chat-area" id="chatArea"></div>
+    <div class="input-bar">
+      <div class="input-wrap">
+        <input type="text" id="userInput" placeholder="Skriv din forespørsel, f.eks. 'Book møte med Lars fredag kl 14'…" />
+        <button id="sendBtn" onclick="sendMessage()">Send →</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sidebar">
+    <div class="sidebar-header">Kommende avtaler</div>
+    <div id="apptList">
+      <div class="empty-appts">Ingen avtaler ennå.<br>Start en samtale for å booke.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const today = new Date();
+document.getElementById('todayLabel').textContent = today.toLocaleDateString('no-NO', {weekday:'short',day:'numeric',month:'short'});
+
+const chatArea = document.getElementById('chatArea');
+const apptList = document.getElementById('apptList');
+const userInput = document.getElementById('userInput');
+const sendBtn = document.getElementById('sendBtn');
+
+let appointments = [];
+let history = [];
+let cfgType = 'b2b';
+
+function setCfgType(t){
+  cfgType=t;
+  document.getElementById('cfgB2B').classList.toggle('on',t==='b2b');
+  document.getElementById('cfgB2C').classList.toggle('on',t==='b2c');
+}
+
+function getConfig(){
+  const company = document.getElementById('cfgCompany').value.trim() || 'Bedriften';
+  const brandB2C = document.getElementById('cfgBrandB2C').value.trim() || company;
+  const brandB2B = document.getElementById('cfgBrandB2B').value.trim() || company;
+  const product  = document.getElementById('cfgProduct').value.trim() || 'tjenesten';
+  const brand    = cfgType==='b2c' ? brandB2C : brandB2B;
+  return {company, brand, product, type: cfgType};
+}
+
+function buildSystemPrompt(){
+  const {company, brand, product, type} = getConfig();
+  const apptStr = appointments.length===0
+    ? 'Ingen bookede avtaler ennå.'
+    : appointments.map(a=>`- ${a.name}: ${a.date} kl ${a.time} (${a.location})`).join('\n');
+
+  const typeCtx = type==='b2b'
+    ? `Du snakker med bedriftskunder og beslutningstakere. Fokuser på forretningsverdi, ROI og profesjonell effektivitet. Spør etter rolle og bedriftsstørrelse for å kvalifisere.`
+    : `Du snakker med privatkunder. Vær varm, enkel og tilgjengelig. Unngå fagsjargong. Fokuser på hverdagsfordeler.`;
+
+  return `Du er en profesjonell og varm booking-agent for ${brand} (del av ${company}). Du kommuniserer på norsk og representerer ${brand} med stolthet.
+
+PRODUKT/TJENESTE: ${product}
+LEADTYPE: ${type==='b2b'?'Bedriftskunder (B2B)':'Privatkunder (B2C)'}
+${typeCtx}
+
+TONEREGLER — følg disse nøyaktig:
+1. Si ALDRI "Vi tar det på 10 minutter" — si heller "Det tar maks 10 minutter"
+2. Si ALDRI "Jeg kan svare deg med en gang" — det oppfattes som press. La kunden bestemme tempo.
+3. Hvis kunden sier nei eller er usikker, svar ALLTID: "Det har jeg forståelse for. Ønsker du at jeg skal ta kontakt igjen ved en senere anledning?"
+4. Aldri mas. Aldri purr mer enn én gang i samme samtale.
+5. Vær kortfattet — maks 2-3 setninger per melding.
+6. Bruk norsk klokkeslett-format (14:00, ikke 2 PM).
+
+STYRKER DU KAN TREKKE FREM (kun hvis relevant og naturlig):
+- Lokal tilstedeværelse og lokalt eierskap
+- Støtte til nærmiljøet
+- Personlig oppfølging — ikke bare et stort selskap
+
+NÅVÆRENDE BOOKEDE AVTALER:
+${apptStr}
+
+Når du booker en ny avtale, inkluder denne JSON-blokken på slutten:
+<book>{"action":"book","name":"[NAVN]","date":"[DATO]","time":"[TID]","location":"[LOKASJON eller 'Video']","reminder":"[PÅMINNELSE]"}</book>
+
+Når du kansellerer:
+<book>{"action":"cancel","name":"[NAVN]","date":"[DATO]","time":"[TID]"}</book>
+
+Når du endrer:
+<book>{"action":"modify","name":"[NAVN]","oldDate":"[GAMMEL DATO]","newDate":"[NY DATO]","newTime":"[NY TID]"}</book>`;
+}
+
+function addMessage(role, content, cards) {
+  const row = document.createElement('div');
+  row.className = 'msg-row ' + (role === 'user' ? 'user' : '');
+
+  const av = document.createElement('div');
+  av.className = 'avatar ' + (role === 'user' ? 'user-av' : 'ai');
+  av.textContent = role === 'user' ? 'U' : '⬡';
+
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble ' + role;
+
+  // Parse markdown-lite: bold
+  const html = content
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n/g, '<br>');
+  bubble.innerHTML = html;
+
+  if (cards) {
+    cards.forEach(c => bubble.appendChild(c));
+  }
+
+  if (role === 'user') {
+    row.appendChild(bubble);
+    row.appendChild(av);
+  } else {
+    row.appendChild(av);
+    row.appendChild(bubble);
+  }
+
+  chatArea.appendChild(row);
+  chatArea.scrollTop = chatArea.scrollHeight;
+}
+
+function addTyping() {
+  const row = document.createElement('div');
+  row.className = 'msg-row';
+  row.id = 'typingRow';
+  const av = document.createElement('div');
+  av.className = 'avatar ai';
+  av.textContent = '⬡';
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble ai';
+  bubble.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
+  row.appendChild(av);
+  row.appendChild(bubble);
+  chatArea.appendChild(row);
+  chatArea.scrollTop = chatArea.scrollHeight;
+}
+
+function removeTyping() {
+  const el = document.getElementById('typingRow');
+  if (el) el.remove();
+}
+
+function makeConfirmCard(data) {
+  const card = document.createElement('div');
+  card.className = 'confirm-card';
+  card.innerHTML = `
+    <div class="confirm-label">✓ Avtale bekreftet</div>
+    <div class="confirm-row">👤 <strong>${data.name}</strong></div>
+    <div class="confirm-row">📅 <strong>${data.date}</strong></div>
+    <div class="confirm-row">🕐 <strong>${data.time}</strong></div>
+    <div class="confirm-row">📍 <strong>${data.location || 'Ikke spesifisert'}</strong></div>
+    <div class="confirm-row">🔔 <strong>${data.reminder || '1 time før'}</strong></div>
+  `;
+  return card;
+}
+
+function makeCancelCard(data) {
+  const card = document.createElement('div');
+  card.className = 'cancel-card';
+  card.textContent = `✗ Kansellert: ${data.name} · ${data.date} kl ${data.time}`;
+  return card;
+}
+
+function updateSidebar() {
+  if (appointments.length === 0) {
+    apptList.innerHTML = '<div class="empty-appts">Ingen avtaler ennå.<br>Start en samtale for å booke.</div>';
+    return;
+  }
+  apptList.innerHTML = '';
+  appointments.forEach((a, i) => {
+    const item = document.createElement('div');
+    item.className = 'appt-item';
+    item.innerHTML = `
+      <div class="appt-name">${a.name}</div>
+      <div class="appt-time">${a.date} · ${a.time}</div>
+      <div class="appt-loc">${a.location}</div>
+      <button class="appt-cancel-btn" onclick="quickCancel(${i})">Kanseller</button>
+    `;
+    apptList.appendChild(item);
+  });
+}
+
+function quickCancel(i) {
+  const a = appointments[i];
+  appointments.splice(i, 1);
+  updateSidebar();
+  addMessage('assistant', `Din avtale med **${a.name}** den ${a.date} kl ${a.time} er kansellert.`, [makeCancelCard(a)]);
+}
+
+function parseBotResponse(text) {
+  const match = text.match(/<book>(.*?)<\/book>/s);
+  let cleanText = text.replace(/<book>.*?<\/book>/s, '').trim();
+  let card = null;
+
+  if (match) {
+    try {
+      const data = JSON.parse(match[1]);
+      if (data.action === 'book') {
+        const appt = {name:data.name, date:data.date, time:data.time, location:data.location||'Video', reminder:data.reminder};
+        appointments.push(appt);
+        updateSidebar();
+        card = makeConfirmCard(appt);
+      } else if (data.action === 'cancel') {
+        const idx = appointments.findIndex(a => a.name.toLowerCase().includes(data.name.toLowerCase()));
+        if (idx !== -1) { appointments.splice(idx, 1); updateSidebar(); }
+        card = makeCancelCard(data);
+      } else if (data.action === 'modify') {
+        const idx = appointments.findIndex(a => a.name.toLowerCase().includes(data.name.toLowerCase()));
+        if (idx !== -1) { appointments[idx].date = data.newDate; appointments[idx].time = data.newTime; updateSidebar(); }
+      }
+    } catch(e) {}
+  }
+  return { cleanText, card };
+}
+
+async function sendMessage() {
+  const text = userInput.value.trim();
+  if (!text) return;
+
+  userInput.value = '';
+  sendBtn.disabled = true;
+
+  addMessage('user', text);
+  history.push({role:'user', content: text});
+
+  addTyping();
+
+  try {
+    const res = await fetch('/.netlify/functions/analyze', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: buildSystemPrompt(),
+        messages: history
+      })
+    });
+
+    const data = await res.json();
+    removeTyping();
+
+    const raw = data.content?.[0]?.text || 'Beklager, noe gikk galt.';
+    const { cleanText, card } = parseBotResponse(raw);
+
+    history.push({role:'assistant', content: raw});
+    addMessage('assistant', cleanText, card ? [card] : null);
+
+  } catch(e) {
+    removeTyping();
+    addMessage('assistant', 'Beklager — noe gikk galt med tilkoblingen. Prøv igjen.');
+  }
+
+  sendBtn.disabled = false;
+  userInput.focus();
+}
+
+userInput.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) sendMessage(); });
+
+// Suggestion chips
+function sendSuggestion(text) {
+  userInput.value = text;
+  sendMessage();
+}
+
+function init() {
+  const row = document.createElement('div');
+  row.className = 'msg-row';
+  const av = document.createElement('div');
+  av.className = 'avatar ai';
+  av.textContent = '⬡';
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble ai';
+  bubble.innerHTML = `Hei! Jeg er din AI-booking-agent fra <strong>Arce</strong>.<br><br>
+Fyll inn bedriftsnavn, merkevare og produkt i feltet øverst — så er jeg klar til å booke møter på vegne av din bedrift.<br><br>
+Hva kan jeg hjelpe deg med?
+  <div class="suggestions">
+    <button class="sug-btn" onclick="sendSuggestion('Book et møte med en kunde neste mandag kl 10:00')">📅 Book møte</button>
+    <button class="sug-btn" onclick="sendSuggestion('Vis meg alle ledige tider i morgen')">🕐 Ledige tider</button>
+    <button class="sug-btn" onclick="sendSuggestion('Endre møtet mitt til fredag kl 15:00')">✏️ Endre avtale</button>
+    <button class="sug-btn" onclick="sendSuggestion('Kanseller mitt neste møte')">✗ Kanseller</button>
+  </div>`;
+  row.appendChild(av);
+  row.appendChild(bubble);
+  chatArea.appendChild(row);
+}
+
+init();
+</script>
+<!-- Subscription gate -->
+<div id="subGate" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(10,10,8,.95);backdrop-filter:blur(12px);align-items:center;justify-content:center;padding:2rem">
+  <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:2.5rem;max-width:420px;width:100%;text-align:center">
+    <div style="font-size:2rem;margin-bottom:1rem">🔒</div>
+    <div style="font-family:'Fraunces',Georgia,serif;font-size:1.5rem;font-style:italic;color:rgba(255,255,255,.92);margin-bottom:.5rem">Krever abonnement</div>
+    <p style="font-size:.82rem;color:rgba(255,255,255,.45);line-height:1.7;margin-bottom:1.5rem">Booking-agenten er tilgjengelig for alle Arce-abonnenter. Start gratis i 14 dager.</p>
+    <a href="mailto:hei@arcesales.no?subject=Demo-foresp%C3%B8rsel">Book demo →</a>
+    <a href="auth.html" style="display:block;font-size:.78rem;color:rgba(255,255,255,.35);text-decoration:none">Har konto? Logg inn</a>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+(async function(){
+  var SUPA_URL = 'https://iupyilakdxmtiawkishs.supabase.co';
+  var SUPA_KEY = 'sb_publishable_0BbaazLbWJCL0JUVAJPKKQ_ilY6ZJ0t';
+  var gate = document.getElementById('subGate');
+  gate.style.display = 'none';
+  try {
+    var sb = supabase.createClient(SUPA_URL, SUPA_KEY);
+    var { data: { session } } = await sb.auth.getSession();
+    if (!session) { gate.style.display='flex'; return; }
+    var { data: org } = await sb.from('organizations').select('trial_ends_at,is_active,stripe_subscription_id').eq('email',session.user.email).single();
+    if (!org) { gate.style.display='flex'; return; }
+    var trialActive = org.trial_ends_at && new Date(org.trial_ends_at) > new Date();
+    if (!trialActive && !org.stripe_subscription_id && !org.is_active) {
+      gate.style.display='flex';
+    }
+  } catch(e) { console.warn('Auth check failed',e); }
+})();
+</script>
+</body>
+</html>

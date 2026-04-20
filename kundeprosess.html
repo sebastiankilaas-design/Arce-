@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arce — Kundeprosess</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,400;0,500;1,400;1,500&family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --cream:#F3F1EB;--cream2:#EAE8E1;--white:#FAFAF7;
+  --ink:#181612;--ink2:#3C3A34;--ink3:#6E6C65;--ink4:#A09D96;
+  --g:#0C4D3A;--g2:#0F6048;--gl:#EBF3EE;--gm:#ACCFC0;
+  --gold:#B8892A;--gl2:#F5EDDA;--gm2:#DFC07A;
+  --red:#C0392B;--rl:#FEF0EE;
+  --purple:#6B4CB8;
+  --char:#1A1917;--brd:#D8D5CC;--brd2:#C5C2B8;
+  --serif:'Cormorant',Georgia,serif;
+  --body:'Outfit',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+}
+html{font-size:15px;background:var(--cream)}
+body{font-family:var(--body);font-weight:300;color:var(--ink);min-height:100vh}
+@media print{
+  .no-print{display:none!important}
+  body{background:#fff}
+  .page{max-width:100%!important;padding:1rem!important}
+}
+
+.nav{display:flex;align-items:center;justify-content:space-between;padding:0 2rem;height:56px;background:var(--char);position:sticky;top:0;z-index:50}
+.logo{display:flex;align-items:center;gap:9px;text-decoration:none}
+.logo-mark{width:24px;height:24px;background:var(--cream);border-radius:4px;display:flex;align-items:center;justify-content:center}
+.logo-word{font-family:var(--serif);font-size:1.1rem;font-weight:500;color:var(--cream);letter-spacing:.02em}
+.nav-right{display:flex;gap:.65rem}
+.btn-sm{padding:.4rem .9rem;border-radius:6px;font-size:.78rem;cursor:pointer;border:none;font-family:var(--body);text-decoration:none;display:inline-flex;align-items:center;gap:.35rem}
+.btn-outline{background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.15)}
+.btn-outline:hover{background:rgba(255,255,255,.18);color:#fff}
+.btn-primary{background:var(--cream);color:var(--char);font-weight:500}
+
+.page{max-width:860px;margin:0 auto;padding:2.5rem 1.5rem 5rem}
+
+.page-tag{font-family:var(--mono);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--g);display:flex;align-items:center;gap:7px;margin-bottom:.7rem}
+.page-tag::before{content:'';display:block;width:14px;height:1px;background:var(--g)}
+.page-h{font-family:var(--serif);font-size:2.4rem;font-style:italic;font-weight:400;color:var(--ink);margin-bottom:.4rem;letter-spacing:-.02em}
+.page-sub{font-size:.88rem;color:var(--ink3);margin-bottom:2.5rem;line-height:1.7}
+
+/* PHASE SECTIONS */
+.phase{margin-bottom:2.5rem}
+.phase-header{display:flex;align-items:center;gap:1rem;margin-bottom:1.25rem;padding-bottom:.75rem;border-bottom:2px solid var(--brd)}
+.phase-num{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:1.3rem;font-style:italic;font-weight:400;flex-shrink:0}
+.phase-num.g{background:var(--g);color:#fff}
+.phase-num.gold{background:var(--gold);color:#fff}
+.phase-num.purple{background:var(--purple);color:#fff}
+.phase-num.ink{background:var(--char);color:#fff}
+.phase-title{font-family:var(--serif);font-size:1.4rem;font-weight:500;color:var(--ink)}
+.phase-when{font-family:var(--mono);font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink4);margin-top:.1rem}
+
+/* STEPS */
+.steps{display:flex;flex-direction:column;gap:.75rem}
+.step{background:var(--white);border:1px solid var(--brd);border-radius:10px;padding:1rem 1.25rem;display:grid;grid-template-columns:auto 1fr;gap:.9rem;align-items:flex-start}
+.step-num{width:26px;height:26px;border-radius:50%;background:var(--cream2);border:1px solid var(--brd2);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.68rem;color:var(--ink3);flex-shrink:0;margin-top:.1rem;font-weight:500}
+.step-body h4{font-size:.88rem;font-weight:500;color:var(--ink);margin-bottom:.3rem}
+.step-body p{font-size:.8rem;color:var(--ink3);line-height:1.7}
+.step-body code{background:var(--cream2);border:1px solid var(--brd);border-radius:4px;padding:.1rem .4rem;font-family:var(--mono);font-size:.72rem;color:var(--ink2)}
+.step-body .action{display:inline-flex;align-items:center;gap:.4rem;background:var(--gl);border:1px solid var(--gm);border-radius:6px;padding:.3rem .7rem;font-size:.72rem;color:var(--g);font-family:var(--mono);margin-top:.5rem;font-weight:500}
+.step-body .warning{background:var(--gl2);border:1px solid var(--gm2);border-radius:6px;padding:.4rem .7rem;font-size:.74rem;color:var(--gold);margin-top:.5rem;display:block}
+.step-body .copy-block{background:var(--cream2);border:1px solid var(--brd);border-radius:8px;padding:.75rem 1rem;margin-top:.6rem;font-size:.78rem;color:var(--ink2);line-height:1.75;white-space:pre-wrap;font-family:var(--body);cursor:pointer;position:relative}
+.step-body .copy-block::after{content:'Kopier ↗';position:absolute;top:.4rem;right:.6rem;font-family:var(--mono);font-size:.6rem;color:var(--ink4)}
+.step-body .copy-block:hover{background:var(--cream);border-color:var(--brd2)}
+
+/* SUPABASE GUIDE */
+.sup-guide{background:var(--char);border-radius:12px;padding:1.5rem;margin-top:.75rem;color:rgba(255,255,255,.85)}
+.sup-guide h4{font-family:var(--serif);font-size:1rem;font-style:italic;color:#fff;margin-bottom:.85rem}
+.sup-steps{list-style:none;display:flex;flex-direction:column;gap:.55rem}
+.sup-steps li{display:flex;gap:.65rem;font-size:.8rem;line-height:1.65}
+.sup-steps li::before{content:attr(data-n);font-family:var(--mono);font-size:.62rem;color:var(--gm);min-width:16px;padding-top:.1rem;font-weight:500}
+.sup-steps code{background:rgba(255,255,255,.1);border-radius:3px;padding:.05rem .35rem;font-family:var(--mono);font-size:.7rem;color:var(--gm)}
+
+/* PRICE TABLE */
+.price-tbl{width:100%;border-collapse:collapse;margin-top:.75rem;font-size:.8rem}
+.price-tbl th{text-align:left;padding:.5rem .75rem;background:var(--cream2);border:1px solid var(--brd);font-family:var(--mono);font-size:.62rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ink4);font-weight:400}
+.price-tbl td{padding:.6rem .75rem;border:1px solid var(--brd);color:var(--ink2);vertical-align:top}
+.price-tbl tr:hover td{background:var(--cream)}
+.badge{display:inline-block;padding:.15rem .55rem;border-radius:100px;font-family:var(--mono);font-size:.62rem;font-weight:500}
+.badge-g{background:var(--gl);color:var(--g)}
+.badge-gold{background:var(--gl2);color:var(--gold)}
+.badge-purple{background:#EFE9F7;color:var(--purple)}
+
+/* QUICK REF */
+.quick-ref{background:var(--white);border:1.5px solid var(--brd);border-radius:12px;padding:1.25rem;margin-top:2rem}
+.quick-ref h3{font-family:var(--serif);font-size:1.1rem;font-style:italic;color:var(--ink);margin-bottom:.85rem}
+.ref-grid{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
+.ref-item{background:var(--cream);border:1px solid var(--brd);border-radius:7px;padding:.65rem .85rem}
+.ref-label{font-family:var(--mono);font-size:.58rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink4);margin-bottom:.2rem}
+.ref-val{font-size:.8rem;color:var(--ink2);font-family:var(--mono)}
+.ref-val a{color:var(--g);text-decoration:none}
+
+.toast{position:fixed;bottom:2rem;right:2rem;background:var(--char);color:rgba(255,255,255,.9);padding:.65rem 1.1rem;border-radius:8px;font-size:.8rem;font-family:var(--mono);opacity:0;transition:opacity .2s;pointer-events:none;z-index:999}
+.toast.show{opacity:1}
+
+@media(max-width:640px){
+  .ref-grid{grid-template-columns:1fr}
+  .step{grid-template-columns:1fr}
+  .step-num{display:none}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="logo" href="dashboard.html">
+    <div class="logo-mark">
+      <svg width="14" height="14" viewBox="0 0 18 18" fill="none">
+        <path d="M9 2L16 6v6l-7 4L2 12V6l7-4z" stroke="#1A1917" stroke-width="1.4" fill="none" stroke-linejoin="round"/>
+        <path d="M9 2v10M2 6l7 4 7-4" stroke="#1A1917" stroke-width="1.1" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="logo-word">Arce</div>
+  </a>
+  <div class="nav-right no-print">
+    <button class="btn-sm btn-outline" onclick="window.print()">🖨 Skriv ut</button>
+    <a class="btn-sm btn-primary" href="dashboard.html">← Dashboard</a>
+  </div>
+</nav>
+
+<div class="page">
+
+  <div class="page-tag">Intern prosess</div>
+  <h1 class="page-h">Fra demo-forespørsel til aktiv kunde.</h1>
+  <p class="page-sub">Steg-for-steg guide til deg, Sebastian — fra første e-post til kunden er inne i systemet og betaler.</p>
+
+  <!-- PHASE 1 -->
+  <div class="phase">
+    <div class="phase-header">
+      <div class="phase-num g">1</div>
+      <div>
+        <div class="phase-title">Kunden tar kontakt</div>
+        <div class="phase-when">Dag 0 — Du mottar e-post på hei@arcesales.no</div>
+      </div>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>Svar innen 2 timer (helst samme dag)</h4>
+          <p>Rask respons gir bedre førsteinntrykk enn nesten alt annet. Send en kort, varm svar og foreslå 2-3 konkrete tidspunkter for demo.</p>
+          <div class="copy-block" onclick="copyText(this)">Hei [Navn],
+
+Tusen takk for at du tok kontakt — satt pris på det!
+
+Jeg vil gjerne vise deg hva Arce kan gjøre for akkurat [Bedrift]. Det tar 20 minutter og du vil se konkrete resultater for din bransje.
+
+Passer noen av disse tidene?
+– [Dato og tid 1]
+– [Dato og tid 2]
+– [Dato og tid 3]
+
+Bare gi beskjed, så setter jeg opp en kort Meets-lenke.
+
+Med vennlig hilsen
+Sebastian
+Arce — hei@arcesales.no</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>Registrer leadet i Arce</h4>
+          <p>Gå til <code>legg-til-lead.html</code> → fyll inn navn, bedrift og det du vet. Velg "Inbound" og trykk Analyser. Da har du AI-scoring og neste steg klart.</p>
+          <span class="action">→ legg-til-lead.html</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 2 -->
+  <div class="phase">
+    <div class="phase-header">
+      <div class="phase-num gold">2</div>
+      <div>
+        <div class="phase-title">Hold demo</div>
+        <div class="phase-when">Dag 1-3 — Google Meet, 20 minutter</div>
+      </div>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>Forberedelse (5 min)</h4>
+          <p>Åpne <code>legg-til-lead.html</code> og se notater fra forrige steg. Åpne testportalen så du kan vise den live. Ha <code>arcesales.no</code> klar i nettleseren.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>Demo-struktur (20 min)</h4>
+          <p><strong>Minutt 1-3</strong> — Still 2 spørsmål: "Hva er din største utfordring med leads nå?" og "Hva skjer med en lead som ikke blir fulgt opp?" La dem snakke.<br><br>
+          <strong>Minutt 4-12</strong> — Vis testportalen live. Fyll inn et ekte eksempel fra deres bransje under møtet. La dem se AI-en score et lead i sanntid.<br><br>
+          <strong>Minutt 13-17</strong> — Vis kundebasen, oppfølgings-reminders og vinn-tilbake verktøyet.<br><br>
+          <strong>Minutt 18-20</strong> — Gå gjennom planer og pris. Spør: "Hvilken plan ser mest relevant ut for dere?"</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>Etter møtet — noter alt</h4>
+          <p>Gå til <code>legg-til-lead.html</code> med en gang. Bruk stemme-til-lead og fortell hva som ble sagt. AI-en lager neste steg og script for deg automatisk.</p>
+          <span class="warning">⚠ Ikke vent til neste dag — noter innen 10 minutter mens det er ferskt.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 3 -->
+  <div class="phase">
+    <div class="phase-header">
+      <div class="phase-num purple">3</div>
+      <div>
+        <div class="phase-title">Send faktura</div>
+        <div class="phase-when">Dag 1-5 — Etter demo og muntlig ja</div>
+      </div>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>Avklar detaljer</h4>
+          <p>Spør kunden: "Hvem er fakturamottaker og trenger dere en PO-nummer?" Mange bedrifter krever en innkjøpsordre (PO) før de godkjenner betaling.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>Åpne fakturaverktøyet og fyll inn</h4>
+          <p>Åpne <code>faktura.html</code> lokalt fra skrivebordet ditt.</p>
+          <table class="price-tbl" style="margin-top:.65rem">
+            <thead><tr><th>Plan</th><th>Pris/mnd ekskl. MVA</th><th>Pris/år ekskl. MVA</th></tr></thead>
+            <tbody>
+              <tr><td><span class="badge badge-g">Solo</span></td><td>kr 4 499</td><td>kr 44 999</td></tr>
+              <tr><td><span class="badge badge-gold">Vekst</span></td><td>kr 19 999</td><td>kr 199 990</td></tr>
+              <tr><td><span class="badge badge-purple">Agency</span></td><td>kr 44 999</td><td>kr 449 000</td></tr>
+            </tbody>
+          </table>
+          <p style="margin-top:.5rem">Husk: MVA (25%) legges på. B2B-kunder trekker fra mva selv. Fakturer første måned ved oppstart, deretter månedlig.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>Send fakturaen</h4>
+          <p>Trykk "Kopier e-posttekst" i fakturaverktøyet → lim inn i ny e-post → legg ved PDF (Print → Lagre som PDF) → send til kunden.</p>
+          <div class="copy-block" onclick="copyText(this)">Hei [Navn],
+
+Vedlagt faktura [Nr] for Arce [Plannavn] — [måned].
+
+Totalt: kr [beløp] inkl. MVA
+Forfall: [dato]
+Konto: [kontonummer]
+KID: [KID]
+
+Så snart betaling er bekreftet setter jeg opp din konto og sender deg innloggingsdetaljer innen 24 timer.
+
+Spørsmål? Bare ta kontakt på hei@arcesales.no
+
+Med vennlig hilsen
+Sebastian
+Arce</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 4 -->
+  <div class="phase">
+    <div class="phase-header">
+      <div class="phase-num ink">4</div>
+      <div>
+        <div class="phase-title">Opprett konto i Supabase og send tilgang</div>
+        <div class="phase-when">Etter bekreftet betaling — tar 5 minutter</div>
+      </div>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>Opprett bruker i Supabase</h4>
+          <div class="sup-guide">
+            <h4>Steg-for-steg i Supabase</h4>
+            <ul class="sup-steps">
+              <li data-n="1">Gå til <code>supabase.com</code> → logg inn → åpne Arce-prosjektet</li>
+              <li data-n="2">Klikk <code>Authentication</code> i venstre meny</li>
+              <li data-n="3">Klikk <code>Users</code> → <code>Invite user</code></li>
+              <li data-n="4">Skriv inn kundens e-postadresse → klikk <code>Invite</code></li>
+              <li data-n="5">Kunden mottar en invite-e-post og setter passord selv</li>
+              <li data-n="6">Gå til <code>Table Editor</code> → tabell <code>organizations</code></li>
+              <li data-n="7">Klikk <code>Insert row</code> og fyll inn:</li>
+            </ul>
+            <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:.75rem;margin-top:.65rem;font-family:var(--mono);font-size:.72rem;color:rgba(255,255,255,.8);line-height:2">
+              name: [Bedriftsnavn]<br>
+              plan: <code>solo</code> / <code>vekst</code> / <code>agency</code><br>
+              tokens_monthly_limit: <code>2000000</code> (Solo) / <code>5000000</code> (Vekst)<br>
+              tokens_remaining: samme som over<br>
+              subscription_status: <code>active</code>
+            </div>
+            <ul class="sup-steps" style="margin-top:.65rem">
+              <li data-n="8">Gå til <code>organization_members</code>-tabellen</li>
+              <li data-n="9">Insert row: koble <code>user_id</code> (fra Users-tabellen) til riktig <code>organization_id</code></li>
+              <li data-n="10">Ferdig — kunden har nå tilgang</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>Send innloggingsdetaljer til kunden</h4>
+          <div class="copy-block" onclick="copyText(this)">Hei [Navn],
+
+Betalingen er bekreftet — velkommen til Arce! 🎉
+
+Din konto er nå aktivert. Slik logger du inn:
+
+Adresse: arcesales.no/auth.html
+E-post: [kundens e-post]
+
+Du vil ha mottatt en e-post fra Supabase (kan ligge i søppelpost) med en lenke for å sette passord. Klikk den, sett et passord, og logg inn på adressen over.
+
+Har du spørsmål om oppsettet, ring eller e-post meg direkte.
+
+Med vennlig hilsen
+Sebastian
+Arce — hei@arcesales.no</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>Oppfølging dag 3</h4>
+          <p>Send en kort melding og sjekk at alt fungerer. Spør om de har spørsmål og om de har brukt stemme-til-lead-funksjonen. Tilbud om en 15-minutters onboarding-call om de vil ha det.</p>
+          <span class="warning">💡 Kunder som blir spurt om de er fornøyde i starten er mye mer lojale. Ta deg tid til å følge opp.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 5 -->
+  <div class="phase">
+    <div class="phase-header">
+      <div class="phase-num g">5</div>
+      <div>
+        <div class="phase-title">Fornyelse og løpende fakturering</div>
+        <div class="phase-when">Hver måned</div>
+      </div>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>Send faktura månedlig</h4>
+          <p>Sett deg en kalender-påminnelse 1.–3. i hver måned. Åpne <code>faktura.html</code>, klikk "Ny faktura" — fakturanummeret øker automatisk — fyll inn og send. Tar 2 minutter.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>Hvis kunden ikke betaler innen forfall</h4>
+          <p>Send en vennlig påminnelse etter 5 dager. Etter 14 dager — send en ny. Etter 30 dager — sett <code>subscription_status</code> i Supabase til <code>inactive</code> og kunden mister tilgang automatisk.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>Oppgrader til Stripe når du har 5+ kunder</h4>
+          <p>Når du bruker mer enn 2 timer per måned på fakturering er det verdt å koble til Stripe. Inntil da: manuell fakturering er raskere enn å sette opp automatikk.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUICK REF -->
+  <div class="quick-ref">
+    <h3>Hurtigreferanse</h3>
+    <div class="ref-grid">
+      <div class="ref-item">
+        <div class="ref-label">Din e-post</div>
+        <div class="ref-val"><a href="mailto:hei@arcesales.no">hei@arcesales.no</a></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-label">Kundeinnlogging</div>
+        <div class="ref-val"><a href="arcesales.no/auth.html" target="_blank">arcesales.no/auth.html</a></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-label">Supabase</div>
+        <div class="ref-val"><a href="https://supabase.com" target="_blank">supabase.com</a></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-label">Fakturaverktøy</div>
+        <div class="ref-val">faktura.html (lokalt)</div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-label">Lead-registrering</div>
+        <div class="ref-val"><a href="legg-til-lead.html">legg-til-lead.html</a></div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-label">Testportal (NTE)</div>
+        <div class="ref-val"><a href="testportal.html">testportal.html</a> · PIN 2847</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+function copyText(el){
+  var text = el.textContent.replace('Kopier ↗','').trim();
+  navigator.clipboard.writeText(text).then(function(){
+    var t = document.getElementById('toast');
+    t.textContent = '✓ Kopiert til utklippstavlen';
+    t.classList.add('show');
+    clearTimeout(t._t);
+    t._t = setTimeout(function(){ t.classList.remove('show'); }, 2000);
+  });
+}
+</script>
+</body>
+</html>
