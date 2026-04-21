@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
 <title>Arce — Legg til lead</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,400;0,500;1,400;1,500&family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -242,7 +243,7 @@ select.inp{cursor:pointer}
       <div class="field">
         <label>Navn / Bedrift <span style="color:var(--red)">*</span> <span style="font-weight:300;color:var(--ink4)">· B2B? Skriv bedriftsnavn og trykk 🔍</span></label>
         <div style="display:flex;gap:.4rem">
-          <input class="inp" id="leadName" placeholder="Ola Nordmann, Firma AS…" autocomplete="off" oninput="checkDuplicate()" style="flex:1"/>
+          <input class="inp" id="leadName" placeholder="Ola Nordmann, Firma AS…" autocomplete="off" oninput="debouncedCheckDuplicate()" style="flex:1"/>
           <button onclick="lookupBrreg()" style="background:var(--cream2);border:1px solid var(--brd);border-radius:7px;padding:.4rem .7rem;font-size:.82rem;cursor:pointer;color:var(--ink3)" title="Slå opp i Brønnøysundregistrene">🔍</button>
         </div>
         <div id="brregResult" style="display:none;margin-top:.5rem;padding:.5rem .75rem;background:var(--gl);border:1px solid var(--gm);border-radius:6px;font-size:.72rem;color:var(--g);line-height:1.6"></div>
@@ -812,6 +813,13 @@ function toast(msg){
   t.classList.add('show');
   clearTimeout(t._t);
   t._t=setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+// Debounce: don't fire checkDuplicate on every keystroke
+var _dupTimer = null;
+function debouncedCheckDuplicate(){
+  clearTimeout(_dupTimer);
+  _dupTimer = setTimeout(checkDuplicate, 300);
 }
 
 initVoice();

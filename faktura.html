@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Arce — Fakturaverktøy</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --cream:#F3F1EB;--cream2:#EAE8E1;--white:#FAFAF7;
+  --ink:#181612;--ink2:#3C3A34;--ink3:#6E6C65;--ink4:#A09D96;
+  --g:#0C4D3A;--g2:#0F6048;--gl:#EBF3EE;--gm:#ACCFC0;
+  --char:#1A1917;--brd:#D8D5CC;--brd2:#C5C2B8;
+  --serif:'Cormorant',Georgia,serif;
+  --body:'Outfit',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+  --sh:0 2px 8px rgba(24,22,18,.06),0 8px 32px rgba(24,22,18,.05);
+}
+html{font-size:15px;background:var(--cream)}
+body{font-family:var(--body);font-weight:300;color:var(--ink);min-height:100vh}
+
+/* ── HEADER ── */
+.app-header{background:var(--char);padding:0 2rem;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.logo{display:flex;align-items:center;gap:9px;text-decoration:none}
+.logo-mark{width:26px;height:26px;background:var(--cream);border-radius:5px;display:flex;align-items:center;justify-content:center}
+.logo-word{font-family:var(--serif);font-size:1.1rem;font-weight:500;color:var(--cream);letter-spacing:.02em}
+.logo-sub{font-size:.7rem;color:rgba(255,255,255,.4);font-family:var(--mono);margin-left:.5rem;letter-spacing:.06em}
+.header-actions{display:flex;gap:.6rem}
+.btn{border:none;border-radius:7px;padding:.5rem 1.1rem;font-family:var(--body);font-size:.8rem;font-weight:500;cursor:pointer;transition:all .15s;text-decoration:none;display:inline-flex;align-items:center;gap:.4rem}
+.btn-ghost{background:rgba(255,255,255,.08);color:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.12)}
+.btn-ghost:hover{background:rgba(255,255,255,.14);color:#fff}
+.btn-primary{background:var(--cream);color:var(--char)}
+.btn-primary:hover{background:#fff}
+.btn-green{background:var(--g);color:#fff}
+.btn-green:hover{background:var(--g2)}
+
+/* ── LAYOUT ── */
+.workspace{display:grid;grid-template-columns:300px 1fr;gap:0;min-height:calc(100vh - 56px)}
+
+/* ── SIDEBAR ── */
+.sidebar{background:var(--white);border-right:1px solid var(--brd);padding:1.5rem;overflow-y:auto;position:sticky;top:56px;height:calc(100vh - 56px)}
+.sb-section{margin-bottom:1.75rem}
+.sb-section-title{font-family:var(--mono);font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink4);margin-bottom:.75rem;display:flex;align-items:center;gap:6px}
+.sb-section-title::before{content:'';display:block;width:12px;height:1px;background:var(--brd2)}
+.field{margin-bottom:.65rem}
+.field label{display:block;font-size:.7rem;font-weight:500;color:var(--ink3);margin-bottom:.3rem}
+.inp{width:100%;background:var(--cream);border:1px solid var(--brd2);border-radius:6px;padding:.5rem .7rem;font-family:var(--body);font-size:.8rem;color:var(--ink);outline:none;transition:border-color .15s}
+.inp:focus{border-color:var(--g);background:var(--white)}
+.inp-sm{font-size:.75rem;padding:.4rem .65rem}
+select.inp{cursor:pointer}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+
+/* history list */
+.hist-item{background:var(--cream);border:1px solid var(--brd);border-radius:7px;padding:.6rem .8rem;margin-bottom:.4rem;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:space-between}
+.hist-item:hover{border-color:var(--brd2);background:var(--cream2)}
+.hist-num{font-family:var(--mono);font-size:.7rem;color:var(--g);font-weight:500}
+.hist-client{font-size:.75rem;color:var(--ink2);font-weight:500}
+.hist-amount{font-family:var(--mono);font-size:.68rem;color:var(--ink3)}
+.hist-status{font-size:.6rem;font-family:var(--mono);padding:.15rem .45rem;border-radius:100px}
+.hist-status.sent{background:var(--gl);color:var(--g)}
+.hist-status.paid{background:#EBF5EE;color:#1A7A4A}
+.hist-status.overdue{background:#FEF0EE;color:#C0392B}
+.hist-status.draft{background:var(--cream2);color:var(--ink4)}
+
+/* ── INVOICE PREVIEW ── */
+.preview-area{padding:2rem;display:flex;flex-direction:column;align-items:center;gap:1.5rem}
+.preview-toolbar{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:820px}
+.preview-label{font-family:var(--mono);font-size:.62rem;color:var(--ink4);letter-spacing:.08em;text-transform:uppercase;display:flex;align-items:center;gap:6px}
+.preview-label::before{content:'';display:block;width:12px;height:1px;background:var(--brd2)}
+.toolbar-btns{display:flex;gap:.5rem}
+
+/* ── INVOICE ── */
+.invoice{background:#fff;width:100%;max-width:820px;border-radius:12px;box-shadow:var(--sh);overflow:hidden;position:relative}
+
+.inv-top{background:var(--char);padding:2.5rem 2.5rem 2rem;position:relative;overflow:hidden}
+.inv-top-orb{position:absolute;width:300px;height:300px;top:-150px;right:-80px;background:radial-gradient(circle,rgba(12,77,58,.5) 0%,transparent 65%);pointer-events:none}
+.inv-top-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:24px 24px;pointer-events:none}
+.inv-header-row{display:flex;align-items:flex-start;justify-content:space-between;position:relative}
+.inv-logo-area{display:flex;align-items:center;gap:10px}
+.inv-logo-box{width:36px;height:36px;background:var(--cream);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.inv-logo-name{font-family:var(--serif);font-size:1.5rem;font-style:italic;color:var(--cream);letter-spacing:-.02em}
+.inv-type-area{text-align:right}
+.inv-type-word{font-family:var(--serif);font-size:2.2rem;font-style:italic;font-weight:400;color:rgba(255,255,255,.92);letter-spacing:-.03em;line-height:1}
+.inv-number{font-family:var(--mono);font-size:.72rem;color:rgba(255,255,255,.45);letter-spacing:.06em;margin-top:.25rem}
+
+.inv-meta-row{display:flex;align-items:flex-start;justify-content:space-between;margin-top:1.75rem;position:relative}
+.inv-from,.inv-to,.inv-dates{flex:1}
+.inv-to{flex:1.2}
+.inv-meta-label{font-family:var(--mono);font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:.4rem}
+.inv-meta-val{font-size:.82rem;color:rgba(255,255,255,.82);line-height:1.6;font-weight:300}
+.inv-meta-val strong{font-weight:500;color:rgba(255,255,255,.95)}
+.inv-dates{text-align:right}
+.inv-date-item{margin-bottom:.35rem}
+.inv-date-label{font-family:var(--mono);font-size:.55rem;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.3)}
+.inv-date-val{font-family:var(--mono);font-size:.78rem;color:rgba(255,255,255,.8)}
+
+/* Items table */
+.inv-body{padding:2rem 2.5rem}
+.inv-table{width:100%;border-collapse:collapse;margin-bottom:1.5rem}
+.inv-table th{padding:.5rem .75rem;border-bottom:2px solid var(--cream2);font-family:var(--mono);font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink4);text-align:left;font-weight:400}
+.inv-table th:last-child,.inv-table th:nth-last-child(2),.inv-table th:nth-last-child(3){text-align:right}
+.inv-table td{padding:.75rem .75rem;border-bottom:1px solid var(--cream2);font-size:.82rem;color:var(--ink2);vertical-align:middle}
+.inv-table td:last-child,.inv-table td:nth-last-child(2),.inv-table td:nth-last-child(3){text-align:right;font-family:var(--mono);font-size:.78rem}
+.inv-table tr:last-child td{border-bottom:none}
+.item-desc{font-weight:400;color:var(--ink)}
+.item-sub{font-size:.7rem;color:var(--ink4);margin-top:.15rem}
+.del-row-btn{background:none;border:none;color:var(--ink4);cursor:pointer;font-size:.85rem;padding:.2rem;border-radius:4px;transition:all .15s;margin-left:.5rem}
+.del-row-btn:hover{color:#C0392B;background:#FEF0EE}
+.add-row-btn{background:none;border:1.5px dashed var(--brd2);color:var(--ink3);cursor:pointer;padding:.55rem 1rem;border-radius:6px;font-family:var(--body);font-size:.78rem;width:100%;margin-bottom:1.5rem;transition:all .15s}
+.add-row-btn:hover{border-color:var(--g);color:var(--g);background:var(--gl)}
+
+/* Totals */
+.inv-totals{display:flex;justify-content:flex-end;margin-bottom:2rem}
+.inv-totals-table{min-width:280px}
+.tot-row{display:flex;justify-content:space-between;align-items:center;padding:.4rem 0;font-size:.82rem}
+.tot-row.divider{border-top:1px solid var(--brd);margin-top:.25rem;padding-top:.65rem}
+.tot-row.total{border-top:2px solid var(--char);margin-top:.25rem;padding-top:.65rem}
+.tot-label{color:var(--ink3)}
+.tot-val{font-family:var(--mono);font-size:.82rem;color:var(--ink2)}
+.tot-row.total .tot-label{font-weight:600;color:var(--ink);font-size:.9rem}
+.tot-row.total .tot-val{font-family:var(--serif);font-size:1.2rem;font-style:italic;color:var(--char)}
+
+/* Bank / notes */
+.inv-footer{border-top:1px solid var(--cream2);padding:1.5rem 2.5rem;display:grid;grid-template-columns:1fr 1fr;gap:2rem;background:var(--white)}
+.inv-footer-section{font-size:.78rem}
+.inv-footer-label{font-family:var(--mono);font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink4);margin-bottom:.4rem}
+.inv-footer-val{color:var(--ink2);line-height:1.65}
+.inv-footer-val strong{color:var(--ink);font-weight:500}
+.inv-stamp{display:inline-flex;align-items:center;gap:.35rem;background:var(--gl);border:1.5px solid var(--gm);border-radius:100px;padding:.25rem .75rem;font-family:var(--mono);font-size:.6rem;color:var(--g);font-weight:500;letter-spacing:.04em;margin-top:.5rem}
+
+/* Editable fields in preview */
+[contenteditable]{outline:none;border-radius:3px;transition:background .15s,box-shadow .15s}
+[contenteditable]:hover{background:rgba(12,77,58,.06)}
+[contenteditable]:focus{background:rgba(12,77,58,.08);box-shadow:0 0 0 2px rgba(12,77,58,.2);padding:1px 3px;margin:-1px -3px}
+
+/* Status badge */
+.status-bar{display:flex;align-items:center;justify-content:space-between;padding:.5rem .75rem;background:var(--cream);border-radius:7px;margin-bottom:.75rem;width:100%;max-width:820px}
+.status-info{font-size:.75rem;color:var(--ink3);font-family:var(--mono)}
+.status-badge{font-size:.65rem;font-family:var(--mono);padding:.2rem .6rem;border-radius:100px}
+
+/* PRINT */
+@media print{
+  .app-header,.sidebar,.preview-toolbar,.toolbar-btns,.add-row-btn,.del-row-btn,.status-bar{display:none!important}
+  .workspace{display:block}
+  .preview-area{padding:0}
+  .invoice{box-shadow:none;border-radius:0;max-width:100%}
+  body{background:#fff}
+  [contenteditable]:hover,[contenteditable]:focus{background:none!important;box-shadow:none!important}
+}
+
+@media(max-width:900px){
+  .workspace{grid-template-columns:1fr}
+  .sidebar{position:static;height:auto;border-right:none;border-bottom:1px solid var(--brd)}
+}
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="logo">
+    <div class="logo-mark">
+      <svg width="14" height="14" viewBox="0 0 18 18" fill="none">
+        <path d="M9 2L16 6v6l-7 4L2 12V6l7-4z" stroke="#1A1917" stroke-width="1.4" fill="none" stroke-linejoin="round"/>
+        <path d="M9 2v10M2 6l7 4 7-4" stroke="#1A1917" stroke-width="1.1" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <span class="logo-word">Arce</span>
+    <span class="logo-sub">Fakturaverktøy</span>
+  </div>
+  <div class="header-actions">
+    <a href="dashboard.html" class="btn btn-ghost">← Dashboard</a>
+    <button class="btn btn-ghost" onclick="newInvoice()">+ Ny faktura</button>
+    <button class="btn btn-primary" onclick="markSent()">Merk som sendt</button>
+    <button class="btn btn-green" onclick="printInvoice()">🖨 Skriv ut / PDF</button>
+  </div>
+</header>
+
+<div class="workspace">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+
+    <div class="sb-section">
+      <div class="sb-section-title">Faktura</div>
+      <div class="field">
+        <label>Fakturanummer</label>
+        <input class="inp" id="cfg-number" type="text" value="2025-001" oninput="updateField()"/>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>Fakturadato</label>
+          <input class="inp inp-sm" id="cfg-date" type="date" oninput="updateDates()"/>
+        </div>
+        <div class="field">
+          <label>Forfallsdato</label>
+          <input class="inp inp-sm" id="cfg-due" type="date" oninput="updateDates()"/>
+        </div>
+      </div>
+      <div class="field">
+        <label>Betalingsbetingelser</label>
+        <select class="inp inp-sm" id="cfg-terms" onchange="updateTerms()">
+          <option value="14">14 dagers forfall</option>
+          <option value="21">21 dagers forfall</option>
+          <option value="30" selected>30 dagers forfall</option>
+          <option value="0">Omgående betaling</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Status</label>
+        <select class="inp inp-sm" id="cfg-status" onchange="updateStatus()">
+          <option value="draft">Utkast</option>
+          <option value="sent">Sendt</option>
+          <option value="paid">Betalt</option>
+          <option value="overdue">Forfalt</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-section-title">Mottaker</div>
+      <div class="field">
+        <label>Bedriftsnavn</label>
+        <input class="inp" id="cfg-client" type="text" placeholder="NTE AS" oninput="updateField()"/>
+      </div>
+      <div class="field">
+        <label>Org.nummer</label>
+        <input class="inp inp-sm" id="cfg-client-org" type="text" placeholder="994 123 456" oninput="updateField()"/>
+      </div>
+      <div class="field">
+        <label>Adresse</label>
+        <input class="inp inp-sm" id="cfg-client-addr" type="text" placeholder="Sluppenveien 12B, 7037 Trondheim" oninput="updateField()"/>
+      </div>
+      <div class="field">
+        <label>E-post</label>
+        <input class="inp inp-sm" id="cfg-client-email" type="email" placeholder="faktura@nte.no" oninput="updateField()"/>
+      </div>
+      <div class="field">
+        <label>Kontaktperson</label>
+        <input class="inp inp-sm" id="cfg-client-contact" type="text" placeholder="Valgfritt" oninput="updateField()"/>
+      </div>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-section-title">Din bedrift</div>
+      <div class="field">
+        <label>Firmanavn</label>
+        <input class="inp inp-sm" id="cfg-from-name" type="text" value="Arce Kilaas" oninput="updateField()"/>
+      </div>
+      <div class="field">
+        <label>Org.nummer</label>
+        <input class="inp inp-sm" id="cfg-from-org" type="text" placeholder="TILDELES SNART" oninput="updateField()"/>
+      </div>
+      <div class="field">
+        <label>Adresse</label>
+        <input class="inp inp-sm" id="cfg-from-addr" type="text" placeholder="Din adresse, postnummer Sted" oninput="updateField()"/>
+      </div>
+      <div class="field">
+        <label>E-post</label>
+        <input class="inp inp-sm" id="cfg-from-email" type="text" value="hei@arcesales.no" oninput="updateField()"/>
+      </div>
+      <div class="field">
+        <label>Kontonummer</label>
+        <input class="inp inp-sm" id="cfg-account" type="text" placeholder="1234.56.78901" oninput="updateField()"/>
+      </div>
+      <div class="field">
+        <label>KID-nummer <span style="font-weight:300;color:var(--ink4)">(valgfritt)</span></label>
+        <input class="inp inp-sm" id="cfg-kid" type="text" placeholder="Autogenereres hvis tomt" oninput="updateField()"/>
+      </div>
+      <div class="field">
+        <label>Deres referanse <span style="font-weight:300;color:var(--ink4)">(valgfritt)</span></label>
+        <input class="inp inp-sm" id="cfg-ref" type="text" placeholder="Innkjøpsordre / kontaktperson" oninput="updateField()"/>
+      </div>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-section-title">MVA og valuta</div>
+      <div class="row2">
+        <div class="field">
+          <label>MVA-sats</label>
+          <select class="inp inp-sm" id="cfg-vat" onchange="recalc()">
+            <option value="25" selected>25%</option>
+            <option value="15">15%</option>
+            <option value="12">12%</option>
+            <option value="0">0% (fritak)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Valuta</label>
+          <select class="inp inp-sm" id="cfg-currency" onchange="updateField()">
+            <option value="NOK" selected>NOK</option>
+            <option value="EUR">EUR</option>
+            <option value="USD">USD</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-section-title">Tidligere fakturaer</div>
+      <div id="historyList">
+        <div style="font-size:.75rem;color:var(--ink4);text-align:center;padding:1rem 0">Ingen lagrede fakturaer ennå.<br>Klikk "Ny faktura" for å starte.</div>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- PREVIEW -->
+  <div class="preview-area">
+
+    <div class="status-bar">
+      <span class="status-info" id="statusInfo">Utkast · Ikke lagret</span>
+      <div style="display:flex;gap:.5rem">
+        <button class="btn btn-ghost" style="font-size:.72rem;padding:.3rem .7rem;color:var(--ink3);border-color:var(--brd)" onclick="saveInvoice()">💾 Lagre</button>
+        <button class="btn btn-ghost" style="font-size:.72rem;padding:.3rem .7rem;color:var(--ink3);border-color:var(--brd)" onclick="copyEmail()">📧 Kopier e-postlenke</button>
+      </div>
+    </div>
+
+    <div class="preview-toolbar">
+      <span class="preview-label">Forhåndsvisning — klikk for å redigere</span>
+      <div class="toolbar-btns">
+        <button class="btn btn-ghost" style="color:var(--ink3);border-color:var(--brd);font-size:.75rem" onclick="addItem()">+ Legg til linje</button>
+      </div>
+    </div>
+
+    <!-- INVOICE -->
+    <div class="invoice" id="invoice">
+
+      <!-- TOP BAND -->
+      <div class="inv-top">
+        <div class="inv-top-grid"></div>
+        <div class="inv-top-orb"></div>
+
+        <div class="inv-header-row">
+          <div class="inv-logo-area">
+            <div class="inv-logo-box">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                <path d="M9 2L16 6v6l-7 4L2 12V6l7-4z" stroke="#1A1917" stroke-width="1.4" fill="none" stroke-linejoin="round"/>
+                <path d="M9 2v10M2 6l7 4 7-4" stroke="#1A1917" stroke-width="1.1" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="inv-logo-name">Arce</div>
+          </div>
+          <div class="inv-type-area">
+            <div class="inv-type-word">Faktura</div>
+            <div class="inv-number" id="inv-number">Nr. 2025-001</div>
+          </div>
+        </div>
+
+        <div class="inv-meta-row">
+          <div class="inv-from">
+            <div class="inv-meta-label">Fra</div>
+            <div class="inv-meta-val">
+              <strong id="disp-from-name">Arce Kilaas</strong><br>
+              <span id="disp-from-org">Org.nr: TILDELES SNART</span><br>
+              <span id="disp-from-addr">—</span><br>
+              <span id="disp-from-email">hei@arcesales.no</span>
+            </div>
+          </div>
+          <div class="inv-to">
+            <div class="inv-meta-label">Til</div>
+            <div class="inv-meta-val">
+              <strong id="disp-client">—</strong><br>
+              <span id="disp-client-org"></span>
+              <span id="disp-client-addr"></span><br>
+              <span id="disp-client-email"></span>
+            </div>
+          </div>
+          <div class="inv-dates">
+            <div class="inv-date-item">
+              <div class="inv-date-label">Fakturadato</div>
+              <div class="inv-date-val" id="disp-date">—</div>
+            </div>
+            <div class="inv-date-item">
+              <div class="inv-date-label">Forfallsdato</div>
+              <div class="inv-date-val" id="disp-due">—</div>
+            </div>
+            <div class="inv-date-item">
+              <div class="inv-date-label">Betalingsbetingelser</div>
+              <div class="inv-date-val" id="disp-terms">30 dager netto</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BODY -->
+      <div class="inv-body">
+        <table class="inv-table">
+          <thead>
+            <tr>
+              <th style="width:45%">Beskrivelse</th>
+              <th>Antall</th>
+              <th>Enhetspris</th>
+              <th>MVA</th>
+              <th>Beløp</th>
+              <th style="width:30px"></th>
+            </tr>
+          </thead>
+          <tbody id="itemsBody">
+            <!-- rows injected by JS -->
+          </tbody>
+        </table>
+
+        <button class="add-row-btn" onclick="addItem()">+ Legg til linje</button>
+
+        <div class="inv-totals">
+          <div class="inv-totals-table">
+            <div class="tot-row">
+              <span class="tot-label">Sum ekskl. MVA</span>
+              <span class="tot-val" id="tot-sub">kr 0,00</span>
+            </div>
+            <div class="tot-row">
+              <span class="tot-label">MVA (<span id="tot-vat-pct">25</span>%)</span>
+              <span class="tot-val" id="tot-vat">kr 0,00</span>
+            </div>
+            <div class="tot-row total">
+              <span class="tot-label">Totalt å betale</span>
+              <span class="tot-val" id="tot-total">kr 0,00</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FOOTER -->
+      <div class="inv-footer">
+        <div class="inv-footer-section">
+          <div class="inv-footer-label">Betaling</div>
+          <div class="inv-footer-val">
+            Kontonummer: <strong id="disp-account">—</strong><br>
+            KID-nummer: <strong id="disp-kid">—</strong><br>
+            Deres referanse: <strong id="disp-extref">—</strong><br>
+            Forfallsdato: <strong id="disp-due2">—</strong>
+          </div>
+          <div class="inv-stamp">✓ MVA-registrert foretak</div>
+        </div>
+        <div class="inv-footer-section">
+          <div class="inv-footer-label">Merknad</div>
+          <div class="inv-footer-val" contenteditable="true" id="inv-note" style="min-height:2.5rem"
+               placeholder="Eventuelle merknader til fakturaen…">Takk for at du valgte Arce. For spørsmål om fakturaen, kontakt hei@arcesales.no</div>
+          <div style="margin-top:.75rem;font-size:.68rem;color:var(--ink4);font-family:var(--mono)">
+            Arce Kilaas · hei@arcesales.no · arcesales.no
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <!-- END INVOICE -->
+
+  </div>
+</div>
+
+<script>
+/* ── STATE ── */
+var items = [
+  { desc: 'Arce Vekst — månedlig abonnement', sub: 'AI-drevet booking og lead scoring', qty: 1, price: 19999, editable: true }
+];
+var history = JSON.parse(localStorage.getItem('arce_invoices') || '[]');
+
+/* ── INIT ── */
+(function init() {
+  var today = new Date();
+  var due   = new Date(); due.setDate(due.getDate() + 30);
+  document.getElementById('cfg-date').value = fmtDateInput(today);
+  document.getElementById('cfg-due').value  = fmtDateInput(due);
+  
+  // Auto-increment invoice number
+  var lastNum = localStorage.getItem('arce_last_invoice') || 0;
+  var nextNum = parseInt(lastNum) + 1;
+  var year = today.getFullYear();
+  document.getElementById('cfg-number').value = year + '-' + String(nextNum).padStart(3,'0');
+
+  renderItems();
+  updateAll();
+  renderHistory();
+})();
+
+/* ── HELPERS ── */
+function fmtDateInput(d) {
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function fmtDateDisplay(str) {
+  if (!str) return '—';
+  var parts = str.split('-');
+  var months = ['jan','feb','mar','apr','mai','jun','jul','aug','sep','okt','nov','des'];
+  return parseInt(parts[2]) + '. ' + months[parseInt(parts[1])-1] + ' ' + parts[0];
+}
+function fmtMoney(n) {
+  var cur = document.getElementById('cfg-currency')?.value || 'NOK';
+  return cur + ' ' + n.toLocaleString('nb-NO', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+var statusLabels = {draft:'Utkast',sent:'Sendt',paid:'Betalt',overdue:'Forfalt'};
+var statusColors = {draft:'background:var(--cream2);color:var(--ink4)',sent:'background:var(--gl);color:var(--g)',paid:'background:#EBF5EE;color:#1A7A4A',overdue:'background:#FEF0EE;color:#C0392B'};
+
+/* ── RENDER ITEMS ── */
+function renderItems() {
+  var tbody = document.getElementById('itemsBody');
+  tbody.innerHTML = '';
+  items.forEach(function(item, i) {
+    var vatPct = parseInt(document.getElementById('cfg-vat').value);
+    var lineTotal = item.qty * item.price;
+    var tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>
+        <div class="item-desc" contenteditable="true" oninput="items[${i}].desc=this.textContent;recalc()">${escHtml(item.desc)}</div>
+        <div class="item-sub" contenteditable="true" oninput="items[${i}].sub=this.textContent" style="color:var(--ink4);font-size:.7rem;margin-top:.15rem">${escHtml(item.sub||'')}</div>
+      </td>
+      <td><span contenteditable="true" oninput="items[${i}].qty=parseFloat(this.textContent)||0;recalc()" style="min-width:30px;display:inline-block">${item.qty}</span></td>
+      <td><span contenteditable="true" oninput="items[${i}].price=parseFloat(this.textContent.replace(/\s/g,'').replace(',','.'))||0;recalc()" style="min-width:60px;display:inline-block">${item.price.toLocaleString('nb-NO')}</span></td>
+      <td>${vatPct}%</td>
+      <td>${fmtMoney(lineTotal)}</td>
+      <td><button class="del-row-btn" onclick="removeItem(${i})" title="Slett linje">✕</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function addItem() {
+  items.push({desc:'Ny tjeneste', sub:'', qty:1, price:0});
+  renderItems();
+  recalc();
+}
+
+function removeItem(i) {
+  if (items.length === 1) { alert('Fakturaen må ha minst én linje.'); return; }
+  items.splice(i, 1);
+  renderItems();
+  recalc();
+}
+
+function escHtml(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* ── RECALCULATE ── */
+function recalc() {
+  var vatPct = parseInt(document.getElementById('cfg-vat').value) || 25;
+  var sub = items.reduce(function(s,it){ return s + (it.qty * it.price); }, 0);
+  var vat = sub * vatPct / 100;
+  var total = sub + vat;
+  document.getElementById('tot-sub').textContent   = fmtMoney(sub);
+  document.getElementById('tot-vat').textContent   = fmtMoney(vat);
+  document.getElementById('tot-total').textContent = fmtMoney(total);
+  document.getElementById('tot-vat-pct').textContent = vatPct;
+  renderItems();
+}
+
+/* ── UPDATE ALL DISPLAY FIELDS ── */
+function updateAll() {
+  updateField();
+  updateDates();
+  updateStatus();
+  recalc();
+}
+
+function updateField() {
+  var num = document.getElementById('cfg-number').value;
+  document.getElementById('inv-number').textContent  = 'Nr. ' + num;
+  document.getElementById('disp-ref').textContent    = num;
+
+  var setTxt = function(id, val, fallback) {
+    var el = document.getElementById(id);
+    if (el) el.textContent = val || fallback || '—';
+  };
+
+  setTxt('disp-from-name', document.getElementById('cfg-from-name').value);
+  setTxt('disp-from-org',  'Org.nr: ' + (document.getElementById('cfg-from-org').value || 'TILDELES SNART'));
+  setTxt('disp-from-addr', document.getElementById('cfg-from-addr').value);
+  setTxt('disp-from-email', document.getElementById('cfg-from-email').value);
+
+  setTxt('disp-client',       document.getElementById('cfg-client').value);
+  document.getElementById('disp-client-org').textContent  = document.getElementById('cfg-client-org').value ? 'Org.nr: ' + document.getElementById('cfg-client-org').value : '';
+  document.getElementById('disp-client-addr').textContent = document.getElementById('cfg-client-addr').value || '';
+  document.getElementById('disp-client-email').textContent= document.getElementById('cfg-client-email').value || '';
+
+  var acc = document.getElementById('cfg-account').value;
+  setTxt('disp-account', acc);
+
+  // KID — use entered value or auto-generate from invoice number
+  var kidInput = document.getElementById('cfg-kid').value.trim();
+  var autoKid  = num.replace('-','') + String(Math.floor(Math.random()*9)+1); // simple
+  setTxt('disp-kid', kidInput || autoKid);
+
+  // Deres referanse
+  var extRef = document.getElementById('cfg-ref').value.trim();
+  setTxt('disp-extref', extRef || '—');
+}
+
+function updateDates() {
+  var date = document.getElementById('cfg-date').value;
+  var due  = document.getElementById('cfg-due').value;
+  document.getElementById('disp-date').textContent = fmtDateDisplay(date);
+  document.getElementById('disp-due').textContent  = fmtDateDisplay(due);
+  document.getElementById('disp-due2').textContent = fmtDateDisplay(due);
+}
+
+function updateTerms() {
+  var days = document.getElementById('cfg-terms').value;
+  var dateVal = document.getElementById('cfg-date').value;
+  if (dateVal) {
+    var d = new Date(dateVal);
+    d.setDate(d.getDate() + parseInt(days));
+    document.getElementById('cfg-due').value = fmtDateInput(d);
+    updateDates();
+  }
+  document.getElementById('disp-terms').textContent = days === '0' ? 'Omgående' : days + ' dager netto';
+}
+
+function updateStatus() {
+  var s = document.getElementById('cfg-status').value;
+  var bar = document.getElementById('statusInfo');
+  var num = document.getElementById('cfg-number').value;
+  bar.textContent = 'Faktura ' + num + ' · ' + statusLabels[s];
+}
+
+/* ── ACTIONS ── */
+function newInvoice() {
+  if (!confirm('Opprett ny faktura? Lagre gjeldende faktura først.')) return;
+  // Increment number
+  var cur = document.getElementById('cfg-number').value;
+  var parts = cur.split('-');
+  var nextN = parseInt(parts[parts.length-1]) + 1;
+  var year = new Date().getFullYear();
+  document.getElementById('cfg-number').value = year + '-' + String(nextN).padStart(3,'0');
+  
+  // Reset
+  document.getElementById('cfg-client').value = '';
+  document.getElementById('cfg-client-org').value = '';
+  document.getElementById('cfg-client-addr').value = '';
+  document.getElementById('cfg-client-email').value = '';
+  document.getElementById('cfg-client-contact').value = '';
+  document.getElementById('cfg-status').value = 'draft';
+  
+  var today = new Date();
+  var due = new Date(); due.setDate(due.getDate() + 30);
+  document.getElementById('cfg-date').value = fmtDateInput(today);
+  document.getElementById('cfg-due').value  = fmtDateInput(due);
+  
+  items = [{desc:'Arce abonnement', sub:'', qty:1, price:19999}];
+  renderItems();
+  updateAll();
+}
+
+function saveInvoice() {
+  var inv = {
+    number:  document.getElementById('cfg-number').value,
+    client:  document.getElementById('cfg-client').value,
+    date:    document.getElementById('cfg-date').value,
+    due:     document.getElementById('cfg-due').value,
+    status:  document.getElementById('cfg-status').value,
+    items:   items.slice(),
+    vatPct:  document.getElementById('cfg-vat').value
+  };
+  
+  // Update or add
+  var idx = history.findIndex(function(h){ return h.number === inv.number; });
+  if (idx >= 0) history[idx] = inv;
+  else history.unshift(inv);
+  
+  localStorage.setItem('arce_invoices', JSON.stringify(history));
+  var lastNum = inv.number.split('-').pop();
+  localStorage.setItem('arce_last_invoice', parseInt(lastNum));
+  
+  renderHistory();
+  var bar = document.getElementById('statusInfo');
+  bar.textContent = 'Faktura ' + inv.number + ' lagret ✓';
+  setTimeout(function(){ updateStatus(); }, 2000);
+}
+
+function markSent() {
+  document.getElementById('cfg-status').value = 'sent';
+  saveInvoice();
+  updateStatus();
+}
+
+function loadInvoice(inv) {
+  document.getElementById('cfg-number').value        = inv.number;
+  document.getElementById('cfg-client').value        = inv.client;
+  document.getElementById('cfg-date').value          = inv.date;
+  document.getElementById('cfg-due').value           = inv.due;
+  document.getElementById('cfg-status').value        = inv.status;
+  document.getElementById('cfg-vat').value           = inv.vatPct;
+  items = inv.items.slice();
+  renderItems();
+  updateAll();
+}
+
+function renderHistory() {
+  var list = document.getElementById('historyList');
+  if (!history.length) {
+    list.innerHTML = '<div style="font-size:.75rem;color:var(--ink4);text-align:center;padding:1rem 0">Ingen lagrede fakturaer ennå.</div>';
+    return;
+  }
+  list.innerHTML = '';
+  history.forEach(function(inv) {
+    var vatPct = parseInt(inv.vatPct) || 25;
+    var sub   = (inv.items||[]).reduce(function(s,it){ return s+(it.qty*it.price); },0);
+    var total = sub * (1 + vatPct/100);
+    var el = document.createElement('div');
+    el.className = 'hist-item';
+    el.onclick = function(){ loadInvoice(inv); };
+    el.innerHTML = `
+      <div>
+        <div class="hist-num">${inv.number}</div>
+        <div class="hist-client">${inv.client||'Ingen klient'}</div>
+        <div class="hist-amount">kr ${total.toLocaleString('nb-NO',{minimumFractionDigits:0,maximumFractionDigits:0})}</div>
+      </div>
+      <span class="hist-status ${inv.status}">${statusLabels[inv.status]||inv.status}</span>
+    `;
+    list.appendChild(el);
+  });
+}
+
+function copyEmail() {
+  var num    = document.getElementById('cfg-number').value;
+  var client = document.getElementById('cfg-client').value || 'kunde';
+  var due    = fmtDateDisplay(document.getElementById('cfg-due').value);
+  var vatPct = parseInt(document.getElementById('cfg-vat').value)||25;
+  var sub    = items.reduce(function(s,it){return s+(it.qty*it.price);},0);
+  var total  = sub*(1+vatPct/100);
+  
+  var body = `Hei,\n\nVedlagt faktura ${num} for Arce-abonnement.\n\nTotalt å betale: kr ${total.toLocaleString('nb-NO',{minimumFractionDigits:2,maximumFractionDigits:2})} inkl. MVA\nForfallsdato: ${due}\nKontonummer: ${document.getElementById('cfg-account').value||'TILDELES SNART'}\n\nMerk betalingen med fakturanr. ${num}.\n\nTakk for at du valgte Arce!\n\nMed vennlig hilsen\nSebastian Kilaas\nArce Kilaas\nhei@arcesales.no\narcesales.no`;
+
+  navigator.clipboard.writeText(body).then(function(){
+    alert('E-posttekst kopiert til utklippstavlen!');
+  }).catch(function(){
+    prompt('Kopier denne e-postteksten:', body);
+  });
+}
+
+function printInvoice() {
+  window.print();
+}
+</script>
+</body>
+</html>

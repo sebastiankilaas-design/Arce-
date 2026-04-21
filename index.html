@@ -4,14 +4,25 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Arce — Salgsautomatisering som leverer</title>
-<meta name="description" content="Arce håndterer leadscoring og møtebooking for norske bedrifter med høye kontrakter. Resultater fra dag én.">
+<meta name="description" content="AI-drevet leadscoring og automatisk møtebooking for norske B2B-bedrifter. Mer tid på det som lukker — resultater fra dag én.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%231A1917'/><path d='M16 4L27 10v12l-11 6L5 22V10l11-6z' stroke='%23F3F1EB' stroke-width='2' fill='none' stroke-linejoin='round'/><path d='M16 4v18M5 10l11 6 11-6' stroke='%23F3F1EB' stroke-width='1.6' stroke-linejoin='round'/></svg>" type="image/svg+xml">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://arcesales.no/">
+<meta property="og:title" content="Arce — Salgsautomatisering som leverer">
+<meta property="og:description" content="AI-drevet leadscoring og automatisk møtebooking for norske B2B-bedrifter. Mer tid på det som lukker.">
+<meta property="og:locale" content="nb_NO">
+<meta property="og:site_name" content="Arce">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Arce — Salgsautomatisering som leverer">
+<meta name="twitter:description" content="AI-drevet leadscoring og møtebooking for norske B2B-bedrifter.">
+<link rel="canonical" href="https://arcesales.no/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --cream:#F3F1EB;--cream2:#EAE8E1;--cream3:#E0DDD4;
-  --white:#FAFAF7;--ink:#18161200;--ink:#181612;--ink2:#3C3A34;--ink3:#6E6C65;--ink4:#A09D96;
+  --white:#FAFAF7;--ink:#181612;--ink2:#3C3A34;--ink3:#6E6C65;--ink4:#A09D96;
   --g:#0C4D3A;--g2:#0F6048;--g3:#128058;--gl:#EBF3EE;--gm:#ACCFC0;
   --gold:#B8892A;--gd:#F5EDDA;--gm2:#DFC07A;
   --char:#1A1917;--char2:#252320;--char3:#312F2C;
@@ -589,7 +600,7 @@ body{background:var(--cream);color:var(--ink);font-family:var(--body);font-weigh
       <button class="btn btn-dark" onclick="showView('kontakt')" style="padding:.5rem 24px">Book demo</button>
     </div>
     <!-- Mobile menu trigger -->
-    <button class="mob-menu-btn" id="mobMenuBtn" onclick="toggleMobMenu()" aria-label="Meny">
+    <button class="mob-menu-btn" id="mobMenuBtn" onclick="toggleMobMenu()" aria-label="Åpne meny" aria-expanded="false" aria-controls="mobNav">
       <span></span><span></span><span></span>
     </button>
   </div>
@@ -773,7 +784,7 @@ body{background:var(--cream);color:var(--ink);font-family:var(--body);font-weigh
     <div class="footer-inner">
       <div>
         <div class="footer-logo-text">Arce</div>
-        <div style="font-size:.65rem;color:rgba(255,255,255,.2);font-family:var(--mono);margin-top:.35rem">Org.nr: [FYLL INN] · [Adresse], Norge</div>
+        <div style="font-size:.65rem;color:rgba(255,255,255,.2);font-family:var(--mono);margin-top:.35rem">Org.nr: TILDELES SNART · Trondheim, Norge</div>
       </div>
       <div class="footer-links">
         <a href="#" onclick="showView('leads');return false">Lead Intelligence</a>
@@ -784,7 +795,7 @@ body{background:var(--cream);color:var(--ink);font-family:var(--body);font-weigh
         <a href="databehandleravtale.html">Databehandleravtale</a>
         <a href="cookies.html">Cookies</a>
       </div>
-      <div class="footer-copy">© 2025 Arce AS · hei@arcesales.no</div>
+      <div class="footer-copy">© 2025–2026 Arce AS · hei@arcesales.no</div>
     </div>
   </div>
 </div>
@@ -886,7 +897,7 @@ body{background:var(--cream);color:var(--ink);font-family:var(--body);font-weigh
         <a href="#" onclick="showView('priser');return false">Priser</a>
         <a href="#" onclick="showView('kontakt');return false">Kontakt</a>
       </div>
-      <div class="footer-copy">© 2025 Arce AS · Norge</div>
+      <div class="footer-copy">© 2025–2026 Arce AS · Norge</div>
     </div>
   </div>
 </div>
@@ -1011,7 +1022,7 @@ body{background:var(--cream);color:var(--ink);font-family:var(--body);font-weigh
         <a href="#" onclick="showView('priser');return false">Priser</a>
         <a href="#" onclick="showView('kontakt');return false">Kontakt</a>
       </div>
-      <div class="footer-copy">© 2025 Arce AS · Norge</div>
+      <div class="footer-copy">© 2025–2026 Arce AS · Norge</div>
     </div>
   </div>
 </div>
@@ -1083,20 +1094,20 @@ body{background:var(--cream);color:var(--ink);font-family:var(--body);font-weigh
           <div class="pcard-for">For byråer og bedrifter som vil selge Arce-tjenester til egne kunder.</div>
           <div style="margin:1.25rem 0 1.5rem">
             <div style="font-family:var(--mono);font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink4);margin-bottom:.4rem">Inkludert</div>
-            <div style="font-size:.82rem;color:var(--ink2);line-height:1.6">Alt i Vekst · White-label · API-tilgang · Dedikert account manager</div>
+            <div style="font-size:.82rem;color:var(--ink2);line-height:1.6">Alt i Vekst · API-tilgang · Dedikert account manager · Skreddersydd onboarding</div>
           </div>
           <a class="pcta" href="mailto:hei@arcesales.no?subject=Demo-foresp%C3%B8rsel%20Agency&body=Hei%2C%0A%0AJeg%20%C3%B8nsker%20en%20demo%20av%20Agency-planen.%0A%0ABedrift%3A%20%0AAntall%20selgere%3A%20%0ATelefon%3A%20%0A%0AMed%20vennlig%20hilsen">Book demo →</a>
           <hr class="pdiv">
           <ul class="pfeats">
             <li><strong>Alt i Vekst</strong>, pluss:</li>
             <li>Ubegrenset brukere og kalendere</li>
-            <li>AI trent på din bransje</li>
-
+            <li>AI trent på din bransje og sektor</li>
             <li>Full API-tilgang</li>
             <li>Dedikert account manager</li>
             <li>SLA 99,9% oppetid</li>
             <li>Custom onboarding & opplæring</li>
             <li>Kvartalsvise strategimøter</li>
+            <li>Prioritert feilretting innen 4 timer</li>
           </ul>
         </div>
       </div>
@@ -1137,7 +1148,7 @@ body{background:var(--cream);color:var(--ink);font-family:var(--body);font-weigh
         <a href="#" onclick="showView('booking');return false">Booking</a>
         <a href="#" onclick="showView('kontakt');return false">Kontakt</a>
       </div>
-      <div class="footer-copy">© 2025 Arce AS · Norge</div>
+      <div class="footer-copy">© 2025–2026 Arce AS · Norge</div>
     </div>
   </div>
 </div>
@@ -1211,7 +1222,7 @@ body{background:var(--cream);color:var(--ink);font-family:var(--body);font-weigh
         <a href="vilkaar.html">Vilkår</a>
         <a href="cookies.html">Cookies</a>
       </div>
-      <div class="footer-copy">© 2025 Arce AS · Org.nr: [FYLL INN] · hei@arcesales.no</div>
+      <div class="footer-copy">© 2025–2026 Arce AS · Org.nr: TILDELES SNART · hei@arcesales.no</div>
     </div>
   </div>
 </div>
@@ -1264,8 +1275,10 @@ function showView(id){
 /* ─── MOBILE MENU ─── */
 function toggleMobMenu(){
   var nav=document.getElementById('mobNav');
-  var spans=document.getElementById('mobMenuBtn').querySelectorAll('span');
+  var btn=document.getElementById('mobMenuBtn');
+  var spans=btn.querySelectorAll('span');
   var open=nav.classList.toggle('open');
+  btn.setAttribute('aria-expanded',open);
   spans[0].style.transform=open?'rotate(45deg) translate(4px,4px)':'';
   spans[1].style.opacity=open?'0':'1';
   spans[2].style.transform=open?'rotate(-45deg) translate(4px,-4px)':'';
@@ -1301,8 +1314,11 @@ function submitForm(){
     '\nMed vennlig hilsen\n'+fn
   );
   window.location.href='mailto:hei@arcesales.no?subject='+subject+'&body='+body;
-  document.getElementById('contactForm').style.display='none';
-  document.getElementById('formSuccess').style.display='flex';
+  // Show success state after slight delay to allow mailto to open
+  setTimeout(function(){
+    document.getElementById('contactForm').style.display='none';
+    document.getElementById('formSuccess').style.display='flex';
+  }, 400);
 }
 
 /* ─── SCROLL REVEAL ─── */

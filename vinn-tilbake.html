@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
 <title>Arce — Vinn tilbake tapte kunder</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,400;0,500;1,400&family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -129,6 +130,10 @@ textarea.inp{resize:vertical;min-height:70px;line-height:1.6}
     <div class="field">
       <label>Hva er forbedret siden de sluttet? <span style="font-weight:300;color:var(--ink4)">(svært viktig — dette brukes i scriptet til kunden)</span></label>
       <textarea class="inp" id="cfgImprovements" placeholder="F.eks: Vi har senket prisene med 15%, lansert ny og bedre tjeneste, kundeservice er forbedret, nytt dekningsområde."></textarea>
+    </div>
+    <div class="field">
+      <label>Estimert gjennomsnittlig kundeverdi (NOK) <span style="font-weight:300;color:var(--ink4)">(brukes til pipeline-beregning)</span></label>
+      <input class="inp" id="cfgAvgValue" type="number" placeholder="50000" value="50000" min="1000" step="1000"/>
     </div>
   </div>
 
@@ -316,7 +321,8 @@ function showResults(){
   document.getElementById('statHot').textContent = hot;
   document.getElementById('statWarm').textContent = warm;
   // Rough pipeline estimate: hot 0.5 + warm 0.2 conversion rate, assume avg value 10k NOK
-  var pipelineValue = (hot*0.5 + warm*0.2) * 10000;
+  var avgVal = parseFloat(document.getElementById("cfgAvgValue").value) || 50000;
+  var pipelineValue = (hot*0.5 + warm*0.2) * avgVal;
   document.getElementById('statValue').textContent = 'kr '+Math.round(pipelineValue/1000)+'k';
 
   var body = document.getElementById('resultsBody');
